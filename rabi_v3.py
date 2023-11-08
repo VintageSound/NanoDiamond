@@ -34,6 +34,7 @@ server_port = 50001
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_socket.connect((server_ip, server_port))
 
+
 class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
     def __init__(self):
         super(PhaseLockedLoop, self).__init__()
