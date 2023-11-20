@@ -13,6 +13,7 @@ class pulseConfiguration():
         self.StartReadout = 0
         self.LaserLow = 0
         self.LaserHigh = 0
+        self.RFPower = 0
 
     # def __init__(self, countDuration, countNumber, threshold, averagesNumber, 
     #                 startPump, widthPump, startMW, widthMW, startImage, widthImage, 

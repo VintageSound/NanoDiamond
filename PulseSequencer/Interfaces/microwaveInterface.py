@@ -83,15 +83,15 @@ class microwaveInterface():
         print("Windfreak configuration sent:", config.centerFreq, trigMode)
 
     def createSweepCommandFromConfig(self, config : microwaveSweepConfiguration):
-        centerFreq = ('f' + str(config.CenterFreq)).encode()
-        power = ('W' + str(config.RFPower)).encode()
-        powerSweepStart = ('[' + str(config.RFPower)).encode()
-        powerSweepStop = (']' + str(config.RFPower)).encode()
-        startFreq = ('l' + config.txtStartFreq.text()).encode()
-        stopFreq = ('u' + config.txtStopFreq.text()).encode()
+        centerFreq = ('f' + str(config.centerFreq)).encode()
+        power = ('W' + str(config.power)).encode()
+        powerSweepStart = ('[' + str(config.powerSweepStart)).encode()
+        powerSweepStop = (']' + str(config.powerSweepStop)).encode()
+        startFreq = ('l' + str(config.startFreq)).encode()
+        stopFreq = ('u' + str(config.stopFreq)).encode()
         stepSize = ('s' + str(config.stepSize)).encode()
-        stepTime = ('t' + str(float(config.txtCountDuration.text()) / 1000)).encode()
-        trigMode = ('w' + str(config.TrigMode)).encode()
+        stepTime = ('t' + str(config.stepTime)).encode()
+        trigMode = ('w' + str(config.trigMode)).encode()
         On = ('E1').encode()
 
         command = power + powerSweepStop + powerSweepStart + startFreq + stopFreq + stepTime + stepSize + trigMode + On

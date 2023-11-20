@@ -1,4 +1,5 @@
 from PyQt5.QtNetwork import QAbstractSocket, QTcpSocket
+from PyQt5.QtCore import QObject
 import time
 import socket
 import json
@@ -8,11 +9,11 @@ import traceback
 import numpy as np
 
 class redPitayaInterface():
-    def __init__(self) -> None:
+    def __init__(self, qObjectMain) -> None:
         # Create TCP socket
         # TODO: check if QTcpSocket(self) is needed
-        self.socket = QTcpSocket()
-        self.socket.connected.connect(self.connected)
+        self.socket = QTcpSocket(qObjectMain)
+        self.socket.connected.connect(self.connectedMessageRecived)
         self.socket.readyRead.connect(self.dataRecived)
         self.socket.error.connect(self.connectionErrorRecived)
 
@@ -30,9 +31,12 @@ class redPitayaInterface():
         self.isConneced = False
         self.initalizeBuffer(1024 * 4) # Not sure why is this number...
 
+        self.isOpen = False
         self.connectedCallBack = None
         self.reciveDataCallBack = None
         self.connectionErrorCallBack = None
+
+        self.initalizeBuffer(1024)
         
     def initalizeBuffer(self, bufferSize):
         self.offset = 0  
@@ -55,11 +59,30 @@ class redPitayaInterface():
         except socket.gaierror:
             return None
 
+    def openLaserAndMicrowave(self):
+        if self.isOpen:
+            return
+
+        self.socket.write(struct.pack('<Q', 16 << 58 | np.uint32(int(1))))
+
+        self.isOpen = True
+        print('Laser and MW are opened')
+
+    def closeLaserAndMicrowave(self):
+        if not self.isOpen:
+            return
+
+        self.socket.write(struct.pack('<Q', 16 << 58 | np.uint32(int(0))))
+
+        self.isOpen = False
+        print('Laser and MW are closed')
+
     def updateIpAndPort(self, ip, port):
         self.ip = ip
         self.port = port
                 
     def connect(self):
+        print("trying to connect to red pitaya:", self.ip, self.port)
         self.socket.connectToHost(self.ip, self.port)
 
     def disconnect(self):
@@ -68,7 +91,8 @@ class redPitayaInterface():
         self.isConneced = False
     
     def congifurePulse(self, pulseConfig):
-        if self.idle: return
+        if not self.isOpen:
+            return
             
         self.socket.write(struct.pack('<Q', 1 << 58 | pulseConfig.CountDuration))
         self.socket.write(struct.pack('<Q', 2 << 58 | pulseConfig.CountNumber))
@@ -87,15 +111,33 @@ class redPitayaInterface():
         
         print("Configuration sent to red pitaya")
 
-    def convertODMRData(self, data):
-        # TODO: Fugre out WHAT THE HELL is this code...
+    def openLaserAndMicrowave(self):
+        if self.isOpen:
+            return
+
+        self.socket.write(struct.pack('<Q', 16 << 58 | np.uint32(int(1))))
+
+        self.isOpen = True
+        print('Laser and MW are opened')
+
+    def closeLaserAndMicrowave(self):
+        if not self.isOpen:
+            return
+
+        self.socket.write(struct.pack('<Q', 16 << 58 | np.uint32(int(0))))
+
+        self.isOpen = False
+        print('Laser and MW are closed')
+
+    def convertODMRData(self, data, size):
+        # TODO: Figure out WHAT THE HELL is this code...
         # set data
-        channel1 = np.array(data[0:int(self.Size / 2)], dtype=float)
-        channel2 = np.array(data[int(self.Size / 2):self.Size], dtype=float)
+        channel1 = np.array(data[0:int(size / 2)], dtype=float)
+        channel2 = np.array(data[int(size / 2):size], dtype=float)
         convertedData = np.zeros(len(channel2)) + channel1[0]
         offset = 3.5 * channel2[0] # WHYYYYYYY
 
-        for i in range(1, len(self.NormArray)):
+        for i in range(1, len(convertedData)):
             convertedData[i] = channel1[i] * ((channel2[0] + offset) / (channel2[i] + offset))
 
         return convertedData
@@ -107,8 +149,10 @@ class redPitayaInterface():
         self.socket.write(struct.pack('<Q', 6 << 58 | pulseConfig.CountDuration))
 
     # ---------------- Events -----------------
-    def connected(self):
+    def connectedMessageRecived(self):
         try:
+            print("connected message recived")
+
             self.isConnected = True
 
             if self.connectedCallBack is not None:
@@ -126,6 +170,7 @@ class redPitayaInterface():
 
     def dataRecived(self):
         try:
+            print("recived new data!")
             size = self.socket.bytesAvailable()
             print("got  " + str(size))
 
@@ -147,7 +192,7 @@ class redPitayaInterface():
             self.socket.close()
             
             if self.reciveDataCallBack is not None:
-                self.reciveDataCallBack(self.Data) 
+                self.reciveDataCallBack(self.data)
                     
         except Exception:
             traceback.print_exc()
