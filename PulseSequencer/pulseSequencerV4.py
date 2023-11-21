@@ -6,6 +6,7 @@ import traceback
 import time
 from Data.pulseConfiguration import pulseConfiguration
 from Data.microwaveSweepConfiguration import microwaveSweepConfiguration
+from enum import Enum
 
 import pandas as pd
 
@@ -25,6 +26,11 @@ from Interfaces.redPitayaInterface import redPitayaInterface
 from Interfaces.pulseBlasterInterface import pulseBlasterInterface
 from Interfaces.microwaveInterface import microwaveInterface
 
+class MeasurmentType(Enum):
+    ODMR = 1
+    Rabi = 2
+    Ramzi = 3
+
 QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True) # enable high-dpi scaling
 QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True) # use high-dpi icons
 
@@ -36,7 +42,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         self.setupUi(self)
 
         # Interfaces intialization
-        self.redPitaya = redPitayaInterface()
+        self.redPitaya = redPitayaInterface(self)
         self.pulseBaster = pulseBlasterInterface()
         self.microwaveDevice = microwaveInterface()
 
@@ -49,27 +55,27 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         self.txtPort.setText(str(self.redPitaya.port))
 
         # consts
-        self.minTimeStep = 0.008 # micro second. Beause of the shutter?
+        self.minTimeStep = 0.008 # micro second. redPitayaTimeStep
         self.maxPower = 2 ** 13 # not sure why...
+        self.constConvertMicroSecondToMilisecond = 1000
 
         # data
         self.pulseConfig = pulseConfiguration()
 
         # setting variables
+        self.measurmentType = MeasurmentType.ODMR
         self.scan_idle = True
-        self.odmr_idle = True
-        self.rabi_idle = True
         self.ScanStatus = False
         self.HaveODMRData = False
         self.HaveRabiData = False
 
         self.ODMRXAxisLabel = "Frequency [MHz]"
         self.ODMRYAxisLabel = "Photons Counted"
-        self.ODMRData = pd.DataFrame(columns=[self.ODMRXAxisLabel, self.ODMRYAxisLabel])
+        self.initializeODMRData()
 
         self.RabiXAxisLabel = "Time [micro seconds]"
         self.RabiYAxisLabel = "Photons Counted"
-        self.RabiData = pd.DataFrame(columns=[self.RabiXAxisLabel, self.RabiYAxisLabel])
+        self.initializeRabiData()
 
         self.Range = []
         self.CurrentIteration = int(1)
@@ -114,7 +120,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         self.btnMeasure.clicked.connect(self.clearAndStartRabiMeasurment)
         self.btnSave.clicked.connect(self.save) # TODO: Change
         self.btnScanRabi.clicked.connect(self.startRabiScan)
-        self.btnOpen.clicked.connect(self.pulseBlasterOpenCloseToggle) # TODO: Change
+        self.btnOpen.clicked.connect(self.laserOpenCloseToggle)
         self.btnConnect_2.clicked.connect(self.MicrowaveDeviceConnectionToggle)
         self.btnOn_Off.clicked.connect(self.microwaveOnOffToggle)
 
@@ -186,20 +192,30 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         self.txtHighLevel.textChanged.connect(self.configurePulseSequence)
 
     # V
-    def pulseBlasterOpenCloseToggle(self):
+    def laserOpenCloseToggle(self):
         try:
-            if self.pulseBaster.isOpen:
-                self.pulseBaster.closeLaserAndMicrowave()
-                
-                self.btnOpen.setText('Close')
-            else:
-                self.pulseBaster.openLaserAndMicrowave()
-                
+            if self.redPitaya.isOpen:
+                self.redPitaya.closeLaserAndMicrowave()
                 self.btnOpen.setText('Open')
+            else:
+                self.redPitaya.openLaserAndMicrowave()
+                self.btnOpen.setText('Close')
+
+            # Connect also to pulse blaster... TODO: change to differebt button
+            if not self.pulseBaster.isOpen:
+                self.pulseBaster.connect()
 
             self.pulseBaster.configurePulseBlaster(self.pulseConfig)
         except Exception:
             traceback.print_exc()
+
+    def initializeODMRData(self):
+        self.HaveODMRData = False
+        self.ODMRData = pd.DataFrame(0, index=np.arange(1024), columns=[self.ODMRXAxisLabel, self.ODMRYAxisLabel])
+
+    def initializeRabiData(self):
+        self.HaveRabiData = False
+        self.RabiData = pd.DataFrame(0, index=np.arange(1024), columns=[self.RabiXAxisLabel, self.RabiYAxisLabel])
 
     # V
     def MicrowaveDeviceConnectionToggle(self):
@@ -225,7 +241,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
     # V
     def createMicrowaveSweepConfig(self):
         stepSize = (self.StopFreq - self.StartFreq) / int(self.txtCountNumber.text())
-        stepTime = float(self.txtCountDuration.text()) / 1000 # Why 1000??
+        stepTime = float(self.txtCountDuration.text()) / self.constConvertMicroSecondToMilisecond # convert from micro seconds to ms
 
         config = microwaveSweepConfiguration(
             self.CenterFreq, self.RFPower, self.RFPower, self.RFPower, 
@@ -253,7 +269,6 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
             print('Error in sending command to windfreak')
             traceback.print_exc()
 
-        
     # V
     def connectToRedPitayaToggle(self):
         try:
@@ -271,7 +286,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
 
                 return
             
-            # Diconnect 
+            # Diconnect continueCurrentMeasurment
             self.redPitaya.disconnect()
             self.btnConnect.setText('Connect')
             self.btnConnect.setEnabled(True)
@@ -288,7 +303,6 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         try:
             print("Connected")
             self.statusBar.showMessage('Red Pitaya is connected')
-            self.idle = False
             self.btnConnect.setText('Disconnect')
             self.btnConnect.setEnabled(True)
 
@@ -297,8 +311,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
             if self.ckbRepeat.isChecked():
                 self.Channel_1 = np.zeros(int(self.Size / 2))
                 self.YData = np.zeros(int(self.Size / 2))
-                self.odmr_idle = True
-                # self.start() # TODO: Check if still work after commented out, does not suppose to be here
+                self.continueCurrentMeasurment()
 
             if self.ckbRepeatAdd.isChecked():
                 if self.lblRepeatNum.text() == '':
@@ -306,16 +319,13 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
 
                 self.lblRepeatNum.setText(str(int(self.lblRepeatNum.text()) + 1))
 
-                if int(self.lblRepeatNum.text()) > self.RepeatNum - 1:
+                if int(self.lblRepeatNum.text()) >= self.RepeatNum:
                     self.ckbRepeatAdd.setChecked(False)
 
-                self.odmr_idle = True
-                
-                # TODO: Check if still work after commented out, does not suppose to be here
                 # ----- delay loop -------
-                # time.sleep(0.5)
+                time.sleep(0.5)
                 # ------------------------
-                # self.start()
+                self.continueCurrentMeasurment()
 
             if self.ScanStatus:
                 self.scan_idle = True
@@ -325,44 +335,51 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         except Exception:
             traceback.print_exc()
 
+    def continueCurrentMeasurment(self):
+        if self.measurmentType == MeasurmentType.ODMR:
+            self.startODMR()
+        elif self.measurmentType == MeasurmentType.Rabi:
+            self.startRabiMeasurement()
+
     # V
     def reciveDataHandler(self, data):
         try:
-            if self.odmr_idle:
-                convretedData = self.redPitaya.convertODMRData(data)
-                self.convertODMRDataToDataFrame(self, convretedData)
+            if self.measurmentType == MeasurmentType.ODMR:
+                convretedData = self.redPitaya.convertODMRData(data, self.Size)
+                self.convertODMRDataToDataFrame(convretedData)
                 self.plotODMRData()
-                self.odmr_idle = False
 
-            if self.rabi_idle:
+            if self.measurmentType == MeasurmentType.Rabi:
                 self.convertRabiDataToDataFrame(data)
                 self.plotRabiData(data)
-                self.rabi_idle = False
-            
+
             self.btnStart.setEnabled(True)
             self.btnConnect.setText('Connect')
+
+            self.redPitaya.disconnect()
+            self.redPitaya.connect()
+
         except Exception:
             traceback.print_exc()
 
     # V
     def convertODMRDataToDataFrame(self, data):
-        # TODO: Check if Works...
         xData = np.linspace(self.StartFreq, self.StopFreq, int(self.Size / 2))
-        yData = self.ODMRData[self.ODMRYAxisLabel] + data
+        yData = self.ODMRData[self.ODMRYAxisLabel].tolist() + data
 
-        self.ODMRData = pd.DataFrame({self.ODMRXAxisLabel : xData, self.ODMRYAxisLabel : yData})  
+        self.ODMRData = pd.DataFrame({self.ODMRXAxisLabel: xData, self.ODMRYAxisLabel: yData})
         self.HaveODMRData = True
 
     # V
     def convertRabiDataToDataFrame(self, data):
         # TODO: Check if Works...
-        dataToPlot = np.array(self.Data[0:int(self.Size)], dtype=float)
+        dataToPlot = np.array(data[0:int(self.Size)], dtype=float)
 
         # check if Time step is the right constant...
-        xData = np.linspace(0, int(self.Size) * self.TimeStep , int(self.Size))
-        yData = self.RabiData[self.RabiYAxisLabel] + dataToPlot
+        xData = np.linspace(0, int(self.Size) * self.TimeStep, int(self.Size))
+        yData = self.RabiData[self.RabiYAxisLabel].tolist() + dataToPlot
 
-        self.RabiData = pd.DataFrame({self.RabiXAxisLabel : xData, self.RabiYAxisLabel : yData})  
+        self.RabiData = pd.DataFrame({self.RabiXAxisLabel: xData, self.RabiYAxisLabel : yData})
         self.HaveRabiData = True
 
     # V
@@ -391,7 +408,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
             self.pulseConfig.LaserLow = np.uint32(int(float(self.txtLowLevel.text()) * self.maxPower))
             self.pulseConfig.LaserHigh = np.uint32(int(float(self.txtHighLevel.text()) * self.maxPower))
 
-            self.redPitaya.congifurePulse(self.congifurePulse)
+            self.redPitaya.congifurePulse(self.pulseConfig)
             self.pulseBaster.configurePulseBlaster(self.pulseConfig)
         except Exception:
             traceback.print_exc()
@@ -399,6 +416,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
     # V
     def startODMR(self):
         try:
+            self.measurmentType = MeasurmentType.ODMR
             self.redPitaya.startODMR(self.pulseConfig)
 
             # Not sure what is this...
@@ -415,9 +433,8 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
             
             self.lblRepeatNum.setText('')
 
-            self.ODMRData = None
+            self.initializeODMRData()
             
-            self.odmr_idle = True
             self.HaveODMRData = False
 
             self.startODMR()
@@ -430,9 +447,8 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
             self.Size = 1024
             self.redPitaya.initalizeBuffer(self.Size * 4) # not sure why 4...
 
-            self.RabiData = None
+            self.initializeRabiData()
 
-            self.rabi_idle = True
             self.HaveRabiData = False
 
             self.startRabiMeasurement()
@@ -468,6 +484,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
     # V
     def startRabiMeasurement(self):
         try:
+            self.measurmentType = MeasurmentType.Rabi
             self.redPitaya.startRabiMeasurment(self.pulseConfig)
         except Exception:
             traceback.print_exc()

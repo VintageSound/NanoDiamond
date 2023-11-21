@@ -18,6 +18,7 @@ class pulseBlasterInterface():
 
     def connect(self):
         self.client_socket.connect((self.server_ip, self.server_port))
+        self.isOpen = True
 
     def configurePulseBlaster(self, pulseConfig : pulseConfiguration):
         data_to_send = json.dumps(
@@ -27,20 +28,3 @@ class pulseBlasterInterface():
         self.client_socket.send(data_to_send.encode('utf-8'))
         print("configured pulse blaster")
 
-    def openLaserAndMicrowave(self):
-        if self.isOpen:
-            return
-
-        self.socket.write(struct.pack('<Q', 16 << 58 | np.uint32(int(1))))
-
-        self.isOpen = True
-        print('Laser and MW are opened')
-
-    def closeLaserAndMicrowave(self):
-        if not self.isOpen:
-            return
-
-        self.socket.write(struct.pack('<Q', 16 << 58 | np.uint32(int(0))))
-
-        self.isOpen = False
-        print('Laser and MW are closed')
