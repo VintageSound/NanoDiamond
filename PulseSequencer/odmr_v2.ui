@@ -433,16 +433,6 @@
           <property name="sizeAdjustPolicy">
            <enum>QComboBox::AdjustToContents</enum>
           </property>
-          <item>
-           <property name="text">
-            <string>ODMR</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Rabi</string>
-           </property>
-          </item>
          </widget>
          <widget class="QLabel" name="lblMeasureType">
           <property name="geometry">

@@ -31,11 +31,11 @@ class redPitayaInterface():
         self.isConneced = False
         self.initalizeBuffer(1024 * 4) # Not sure why is this number...
 
-        self.isOpen = False
+        self.isAOMOpen = False
         self.connectedCallBack = None
         self.reciveDataCallBack = None
         self.connectionErrorCallBack = None
-
+        self.pulseConfig = None
         self.initalizeBuffer(1024)
         
     def initalizeBuffer(self, bufferSize):
@@ -59,41 +59,44 @@ class redPitayaInterface():
         except socket.gaierror:
             return None
 
-    def openLaserAndMicrowave(self):
-        if self.isOpen:
+    def openAOM(self):
+        if self.isAOMOpen:
             return
 
         self.socket.write(struct.pack('<Q', 16 << 58 | np.uint32(int(1))))
 
-        self.isOpen = True
-        print('Laser and MW are opened')
+        self.isAOMOpen = True
+        print('AOM is opened')
 
-    def closeLaserAndMicrowave(self):
-        if not self.isOpen:
+    def closeAOM(self):
+        if not self.isAOMOpen:
             return
 
         self.socket.write(struct.pack('<Q', 16 << 58 | np.uint32(int(0))))
 
-        self.isOpen = False
-        print('Laser and MW are closed')
+        self.isAOMOpen = False
+        print('AOM is closed')
 
     def updateIpAndPort(self, ip, port):
         self.ip = ip
         self.port = port
                 
     def connect(self):
+        if self.isConneced:
+            return
+
         print("trying to connect to red pitaya:", self.ip, self.port)
         self.socket.connectToHost(self.ip, self.port)
 
     def disconnect(self):
+        if not self.isConneced:
+            return
+
         self.socket.close()
         self.offset = 0
         self.isConneced = False
     
     def congifurePulse(self, pulseConfig):
-        if not self.isOpen:
-            return
-            
         self.socket.write(struct.pack('<Q', 1 << 58 | pulseConfig.CountDuration))
         self.socket.write(struct.pack('<Q', 2 << 58 | pulseConfig.CountNumber))
         self.socket.write(struct.pack('<Q', 3 << 58 | pulseConfig.Threshold))

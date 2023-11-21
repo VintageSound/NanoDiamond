@@ -17,6 +17,9 @@ class pulseBlasterInterface():
         self.isOpen = False
 
     def connect(self):
+        if self.isOpen:
+            return
+
         self.client_socket.connect((self.server_ip, self.server_port))
         self.isOpen = True
 
