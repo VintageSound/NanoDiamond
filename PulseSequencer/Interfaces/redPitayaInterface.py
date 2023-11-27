@@ -9,9 +9,20 @@ import traceback
 import numpy as np
 
 class redPitayaInterface():
-    def __init__(self, qObjectMain) -> None:
-        # Create TCP socket
-        # TODO: check if QTcpSocket(self) is needed
+    _instance = None
+    timeStep = 0.008 # micro second. 
+
+    # This is to make sure there is only one instance if the interface, so that no one will use 
+    # the same connection \ socket \ series twice
+    def __new__(cls, qObjectMain):
+        if cls._instance is None:
+            cls._instance = super(redPitayaInterface, cls).__new__(cls)
+            cls._instance.initialize(qObjectMain)
+
+        return cls._instance
+        
+    def initialize(self, qObjectMain):
+        # TODO: check if qObjectMain is needed
         self.socket = QTcpSocket(qObjectMain)
         self.socket.connected.connect(self.connectedMessageRecived)
         self.socket.readyRead.connect(self.dataRecived)
@@ -37,7 +48,7 @@ class redPitayaInterface():
         self.connectionErrorCallBack = None
         self.pulseConfig = None
         self.initalizeBuffer(1024)
-        
+    
     def initalizeBuffer(self, bufferSize):
         self.offset = 0  
         self.bufferSize = bufferSize

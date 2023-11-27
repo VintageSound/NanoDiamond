@@ -6,14 +6,24 @@ import serial
 import traceback
 import numpy as np
 
-from Data import pulseConfiguration 
+from Data.pulseConfiguration import pulseConfiguration
 
 class pulseBlasterInterface():
-    def __init__(self) -> None:
+    _instance = None
+
+    # This is to make sure there is only one instance if the interface, so that no one will use 
+    # the same connection \ socket \ series twice
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(pulseBlasterInterface, cls).__new__(cls)
+            cls._instance.initialize()
+
+        return cls._instance
+
+    def initialize(self):
         self.server_ip = "132.72.13.187"
         self.server_port = 50001
-        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        
+        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)    
         self.isOpen = False
 
     def connect(self):

@@ -3,10 +3,21 @@ import serial
 import traceback
 import numpy as np
 
-from Data import microwaveSweepConfiguration 
+from Data.microwaveConfiguration import microwaveConfiguration 
 
 class microwaveInterface():
-    def __init__(self) -> None:
+    _instance = None
+
+    # This is to make sure there is only one instance if the interface, so that no one will use 
+    # the same connection \ socket \ series twice
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(microwaveInterface, cls).__new__(cls)
+            cls._instance.initialize()
+
+        return cls._instance
+
+    def initialize(self) -> None:
         self.ser = serial.Serial()
 
     def getIsConnected(self):
@@ -62,27 +73,19 @@ class microwaveInterface():
         if self.checkIfMicrowaveIsOn():
             self.ser.write(b'E0')   
 
-    def sendSweepCommand(self, config : microwaveSweepConfiguration):
+    def sendSweepCommand(self, config : microwaveConfiguration):
         command = self.createSweepCommandFromConfig(config)
-
         self.ser.write(command)
         
         print("Windfreak sweep configuration sent")
 
-    def sendSweepCommand(self, config : microwaveSweepConfiguration):
-        command = self.createSweepCommandFromConfig(config)
-
-        self.ser.write(command)
-        
-        print("Windfreak sweep configuration sent")
-
-    def sendCenterFrequencyAndTriggerTypeCommand(self, config : microwaveSweepConfiguration):
+    def sendCenterFrequencyAndTriggerTypeCommand(self, config : microwaveConfiguration):
         trigMode = ('w' + str(config.TrigMode)).encode()
         self.ser.write(config.enterFreq + trigMode)
 
         print("Windfreak configuration sent:", config.centerFreq, trigMode)
 
-    def createSweepCommandFromConfig(self, config : microwaveSweepConfiguration):
+    def createSweepCommandFromConfig(self, config : microwaveConfiguration):
         centerFreq = ('f' + str(config.centerFreq)).encode()
         power = ('W' + str(config.power)).encode()
         powerSweepStart = ('[' + str(config.powerSweepStart)).encode()
