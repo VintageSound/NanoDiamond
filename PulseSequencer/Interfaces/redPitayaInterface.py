@@ -39,7 +39,7 @@ class redPitayaInterface():
             print(f'Could not resolve the IP address of {self.rp_host}')
 
         # state variable
-        self.isConneced = False
+        # self.isConnected = False
         self.initalizeBuffer(1024 * 4) # Not sure why is this number...
 
         self.isAOMOpen = False
@@ -54,6 +54,9 @@ class redPitayaInterface():
         self.bufferSize = bufferSize
         self.buffer = bytearray(self.bufferSize)
         self.data = np.frombuffer(self.buffer, np.int32)
+
+    def getIsConnectionOpen(self):
+        return self.socket.isOpen()
 
     def registerRedPitayaConnected(self, callback):
         self.connectedCallBack = callback
@@ -93,20 +96,26 @@ class redPitayaInterface():
         self.port = port
                 
     def connect(self):
-        if self.isConneced:
+        if self.getIsConnectionOpen():
             return
 
         print("trying to connect to red pitaya:", self.ip, self.port)
         self.socket.connectToHost(self.ip, self.port)
 
     def disconnect(self):
-        if not self.isConneced:
+        if not self.getIsConnectionOpen():
             return
+
+        print("disconnect from Red Pitaya")
 
         self.socket.close()
         self.offset = 0
-        self.isConneced = False
-    
+        # self.isConnected = False
+
+    def reconnect(self):
+        self.disconnect()
+        self.connect()
+
     def congifurePulse(self, pulseConfig):
         self.socket.write(struct.pack('<Q', 1 << 58 | pulseConfig.CountDuration))
         self.socket.write(struct.pack('<Q', 2 << 58 | pulseConfig.CountNumber))
@@ -161,13 +170,11 @@ class redPitayaInterface():
 
     def startRabiMeasurment(self, pulseConfig):
         self.socket.write(struct.pack('<Q', 6 << 58 | pulseConfig.CountDuration))
-
     # ---------------- Events -----------------
     def connectedMessageRecived(self):
         try:
-            print("connected message recived")
-
-            self.isConnected = True
+            print("connected to Red Pitaya!")
+            # self.isConnected = True
 
             if self.connectedCallBack is not None:
                 self.connectedCallBack()
@@ -178,15 +185,14 @@ class redPitayaInterface():
     def connectionErrorRecived(self, socketError):
         if socketError == QAbstractSocket.RemoteHostClosedError:
             return
-        
+
         if self.connectionErrorCallBack is not None:
             self.connectionErrorCallBack(self.socket.errorString())
 
     def dataRecived(self):
         try:
-            print("recived new data!")
             size = self.socket.bytesAvailable()
-            print("got  " + str(size))
+            print("recived new data, bytes:", size)
 
             # Recive partial data
             if self.offset + size < self.bufferSize:
@@ -200,10 +206,8 @@ class redPitayaInterface():
             self.buffer[self.offset:self.bufferSize] = self.socket.read(self.bufferSize - self.offset)
             
             self.offset = 0
-            self.haveData = True # ?
             
-            self.isConneced = False
-            self.socket.close()
+            self.reconnect()
             
             if self.reciveDataCallBack is not None:
                 self.reciveDataCallBack(self.data)

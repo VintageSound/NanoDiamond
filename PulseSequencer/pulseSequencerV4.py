@@ -14,19 +14,21 @@ from PyQt5 import QtTest
 
 import matplotlib
 
-from Data.MeasurmentType import MeasurmentType
+from Data.MeasurementType import MeasurementType
 
 matplotlib.use('Qt5Agg')
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 import matplotlib.pyplot as plt
 
-from LogicManagers.measurmentManager import measurmentManager
+from LogicManagers.measurementManager import measurementManager
 
 QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True) # enable high-dpi scaling
 QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True) # use high-dpi icons
 
-Ui_PhaseLockedLoop, QMainWindow = uic.loadUiType('PulseSequencer\PulseSequencerV4.ui')
+# Ui_PhaseLockedLoop, QMainWindow = uic.loadUiType('PulseSequencer\\PulseSequencerV4.ui')
+Ui_PhaseLockedLoop, QMainWindow = uic.loadUiType('PulseSequencerV4.ui')
+
 
 constConvertMicroSecondToMilisecond = 1000
 
@@ -34,18 +36,18 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
     def __init__(self):
         super(PhaseLockedLoop, self).__init__()
         self.setupUi(self)
-        self.measurmentManager = measurmentManager(self)
+        self.measurementManager = measurementManager(self)
 
-        self.txtIP.setText(str(self.measurmentManager.redPitaya.ip))
-        self.txtPort.setText(str(self.measurmentManager.redPitaya.port))
+        self.txtIP.setText(str(self.measurementManager.redPitaya.ip))
+        self.txtPort.setText(str(self.measurementManager.redPitaya.port))
 
         # Register Events
-        self.measurmentManager.registerToAOMStatusChangedEvent(self.laserStatusChangedEventHandler)
-        self.measurmentManager.registerToRedPitayaConnectedEvent(self.redPitayaConnectedHandler)
+        self.measurementManager.registerToAOMStatusChangedEvent(self.laserStatusChangedEventHandler)
+        self.measurementManager.registerToRedPitayaConnectedEvent(self.redPitayaConnectedHandler)
         
-        self.measurmentManager.registerToRabiPulseDataRecivedEvent(self.reciveRabiDataHandler)
-        self.measurmentManager.registerToODMRDataRecivedEvent(self.reciveODMRDataHandler)
-        self.measurmentManager.registerConnectionErrorEvent(self.connectionErrorEventHandler)
+        self.measurementManager.registerToRabiPulseDataRecivedEvent(self.reciveRabiDataHandler)
+        self.measurementManager.registerToODMRDataRecivedEvent(self.reciveODMRDataHandler)
+        self.measurementManager.registerConnectionErrorEvent(self.connectionErrorEventHandler)
 
         # Create figure
         figure, self.axes = plt.subplots()
@@ -69,11 +71,12 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         self.btnConnect.clicked.connect(self.connectToRedPitayaToggle)
         self.btnStart.clicked.connect(self.clearAndStartODMR)
         self.btnApply.clicked.connect(self.applyChangesOfMicrowaveSettings)
-        self.btnMeasure.clicked.connect(self.clearAndStartRabiMeasurment)
+        self.btnMeasure.clicked.connect(self.clearAndStartRabiMeasurement)
         self.btnSave.clicked.connect(self.save)
         self.btnOpen.clicked.connect(self.laserOpenCloseToggle)
         self.btnConnect_2.clicked.connect(self.microwaveDeviceConnectionToggle)
         self.btnOn_Off.clicked.connect(self.microwaveOnOffToggle)
+        self.ckbRepeatAdd.clicked.connect(self.repeatAddCheackboxChanged)
         
         # TODO: Add full rabi sequence
         # self.btnScanRabi.clicked.connect(self.startRabiScan)
@@ -98,7 +101,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         self.comboBoxMode.setCurrentIndex(0)
         self.btnOn_Off.setText("RF is Off")
         # Declare operation mode
-        self.comboBoxMeasureType.addItems([m.name for m in MeasurmentType])
+        self.comboBoxMeasureType.addItems([m.name for m in MeasurementType])
         self.comboBoxMeasureType.setCurrentIndex(0)
         # set SynthHD as default MW device
         self.comboBoxMWdevice.setCurrentIndex(0)
@@ -114,7 +117,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         self.txtStartReadout.setText('0')
         
         # declare File Path
-        self.txtPath.setText(self.measurmentManager.dataSaver.getFolderToSave())
+        self.txtPath.setText(self.measurementManager.dataSaver.getFolderToSave())
         self.txtPath.textChanged.connect(self.path_changed)
         self.txtNum.setText('0')
 
@@ -131,50 +134,45 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
 
         # declare Laser level
         self.txtLowLevel.setText('0.014')
-        # self.txtLowLevel.textChanged.connect(self.configurePulseSequence)
         self.txtHighLevel.setText('0.9')
-        # self.txtHighLevel.textChanged.connect(self.configurePulseSequence)
-    
+
     # Action Methods
     def applyChangesOfMicrowaveSettings(self):
         try:
             self.updateMicrowaveSweepConfig()
-
-            if self.measurmentManager.measurmentType == MeasurmentType.ODMR:
-                self.plotODMRData()            
-            elif self.measurmentManager.measurmentType == MeasurmentType.SingleRabiPulse:
-                self.plotRabiData()                           
+            self.refreshPlot()
         except Exception:
             traceback.print_exc()
 
     def laserOpenCloseToggle(self):
         try:
-            self.measurmentManager.laserOpenCloseToggle()
+            self.measurementManager.laserOpenCloseToggle()
         except Exception as ex:
             print(ex)
             traceback.print_exc()
 
     def microwaveDeviceConnectionToggle(self):
         try:
-            self.measurmentManager.microwaveDeviceConnectionToggle()
+            self.measurementManager.microwaveDeviceConnectionToggle()
 
-            if self.measurmentManager.isMicrowaveOpen():
-                self.btnOn_Off.setText("RF is off")
-                self.btnOn_Off.setStyleSheet("background-color:none")
-                self.btnConnect_2.setText('Connect')
-            else:
+            if self.measurementManager.getIsMicrowaveConnected():
                 self.btnOn_Off.setText("RF is On")
                 self.btnOn_Off.setStyleSheet("background-color:red")
                 self.btnConnect_2.setText('Disconnect')
+            else:
+                self.btnOn_Off.setText("RF is off")
+                self.btnOn_Off.setStyleSheet("background-color:none")
+                self.btnConnect_2.setText('Connect')
+
         except Exception as ex:
             print('Cannot connect to windfreak', ex)
             traceback.print_exc()
 
     def microwaveOnOffToggle(self):
         try:
-            self.measurmentManager.microwaveOnOffToggle()
+            self.measurementManager.microwaveOnOffToggle()
 
-            if self.measurmentManager.isMicrowaveOn():
+            if self.measurementManager.getIsMicrowaveOn():
                 self.btnOn_Off.setText("RF is On")
                 self.btnOn_Off.setStyleSheet("background-color:red")
             else:
@@ -187,42 +185,46 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
 
     def connectToRedPitayaToggle(self):
         try:
-            self.measurmentManager.connectToRedPitayaToggle(self.txtIP.text(), int(self.txtPort.text()))
+            self.measurementManager.connectToRedPitayaToggle(self.txtIP.text(), int(self.txtPort.text()))
 
-            if self.measurmentManager.isRedPitayaConnected():
+            if self.measurementManager.getIsRedPitayaConnected():
                 # Wait for connection event to enable the button  
                 self.btnConnect.setEnabled(False)
             else:
                 self.btnConnect.setText('Connect')
                 self.btnConnect.setEnabled(True)
 
-            # Connect also to pulse blaster... TODO: change to differebt button
-            self.measurmentManager.connectToPulseBlaster()
+            # Connect also to pulse blaster... TODO: change to different button
+            self.measurementManager.connectToPulseBlaster()
         except Exception:
             traceback.print_exc()
+
+    def repeatAddCheackboxChanged(self):
+        if not self.ckbRepeatAdd.isChecked():
+            self.measurementManager.stopCurrentMeasurement()
 
     def clearAndStartODMR(self):
         try:
             self.lblRepeatNum.setText('')
             self.updateMicrowaveSweepConfig()
             config = self.createPulseConfiguration()
-            self.measurmentManager.startNewODMRMeasuremnt(config)
+            self.measurementManager.startNewODMRMeasuremnt(config)
         except Exception as ex:
             print(ex)
             traceback.print_exc()
 
-    def clearAndStartRabiMeasurment(self):
+    def clearAndStartRabiMeasurement(self):
         try:
             config = self.createPulseConfiguration()
-            self.measurmentManager.startNewRabiPulseMeasuremnt(config)
+            self.measurementManager.startNewRabiPulseMeasuremnt(config)
         except Exception:
             traceback.print_exc()
 
     def save(self):
         try:
-            if self.measurmentManager.measurmentType == MeasurmentType.ODMR:
+            if self.measurementManager.measurementType == MeasurementType.ODMR:
                 self.saveODMR()
-            elif self.measurmentManager.measurmentType == MeasurmentType.SingleRabiPulse:
+            elif self.measurementManager.measurementType == MeasurementType.SingleRabiPulse:
                 self.saveRabi()
         except Exception as ex:
             print(ex)
@@ -231,17 +233,17 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
     # Config Methods
     def createPulseConfiguration(self):
         try:
-            timeStep = measurmentManager.redPitayaTimeStep
+            timeStep = measurementManager.redPitayaTimeStep
             pulseConfig = pulseConfiguration()
 
             # TODO: regard ramsi and multipule rabi when needed
-            if self.measurmentManager.measurmentType == MeasurmentType.ODMR:
+            if self.measurementManager.measurementType == MeasurementType.ODMR:
                 pulseConfig.CountDuration = np.uint32(int(float(self.txtCountDuration.text()) / timeStep))
             else:
                 pulseConfig.CountDuration = np.uint32(1)
 
             pulseConfig.CountNumber = np.uint32(int(np.log2(float(self.txtCountNumber.text()))))
-            pulseConfig.Threshold = np.uint32(int(float(self.txtThreshold.text()) * measurmentManager.maxPower / 20)) # why 20 ????
+            pulseConfig.Threshold = np.uint32(int(float(self.txtThreshold.text()) * measurementManager.maxPower / 20)) # why 20 ????
             pulseConfig.AveragesNumber = np.uint32(int(self.txtAveragesNumber.text()))
             pulseConfig.StartPump = np.uint32(int(float(self.txtStartPump.text()) / timeStep))
             pulseConfig.WidthPump = np.uint32(int(float(self.txtWidthPump.text()) / timeStep))
@@ -250,8 +252,8 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
             pulseConfig.StartImage = np.uint32(int(float(self.txtStartImage.text()) / timeStep))
             pulseConfig.WidthImage = np.uint32(int(float(self.txtWidthImage.text()) / timeStep))
             pulseConfig.StartReadout = np.uint32(int(float(self.txtStartReadout.text()) / timeStep))
-            pulseConfig.LaserLow = np.uint32(int(float(self.txtLowLevel.text()) * measurmentManager.maxPower))
-            pulseConfig.LaserHigh = np.uint32(int(float(self.txtHighLevel.text()) * measurmentManager.maxPower))
+            pulseConfig.LaserLow = np.uint32(int(float(self.txtLowLevel.text()) * measurementManager.maxPower))
+            pulseConfig.LaserHigh = np.uint32(int(float(self.txtHighLevel.text()) * measurementManager.maxPower))
 
             return pulseConfig
         except Exception:
@@ -262,18 +264,25 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
             centerFreq=float(self.txtCenterFreq.text()), 
             power=float(self.txtRFPower.text()), 
             powerSweepStart=float(self.txtRFPower.text()),
-            powerSweepEnd=float(self.txtRFPower.text()),
+            powerSweepStop=float(self.txtRFPower.text()),
             startFreq=float(self.txtStartFreq.text()),
             stopFreq=float(self.txtStopFreq.text()),
-            trigMode=self.comboBoxMode.currentIndex()
-            )
+            trigMode=self.comboBoxMode.currentIndex())
 
-        config.stepSize = (config.StopFreq - config.StartFreq) / int(self.txtCountNumber.text())
+        config.stepSize = (config.stopFreq - config.startFreq) / int(self.txtCountNumber.text())
         config.stepTime = float(self.txtCountDuration.text()) / constConvertMicroSecondToMilisecond # convert from micro seconds to ms
 
-        self.measurmentManager.updateMicrowaveSweepConfig(config)
+        self.measurementManager.updateMicrowaveSweepConfig(config)
     
     # Plot Methods
+    def refreshPlot(self):
+        type = self.measurementManager.getMeasurementType()
+
+        if type == MeasurementType.ODMR and self.measurementManager.getHaveODMRData():
+            self.plotODMRData(self.measurementManager.getODMRData())
+        elif type == MeasurementType.SingleRabiPulse and self.measurementManager.getHaveRabiData():
+            self.plotRabiData(self.measurementManager.getRabiData())
+
     def plotODMRData(self, data):
         try:
             # reset toolbar
@@ -285,11 +294,11 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
             self.axes2.clear()
             self.axes.grid()
 
-            xLabel = self.measurmentManager.ODMRXAxisLabel
-            yLabel = self.measurmentManager.ODMRYAxisLabel
+            xLabel = self.measurementManager.ODMRXAxisLabel
+            yLabel = self.measurementManager.ODMRYAxisLabel
 
             # plot
-            self.curve_3_2, = self.axes.plot(data[xLabel], self.ODMRData[yLabel], linewidth=0.5, c='black', label="Normalized signal")
+            self.curve_3_2, = self.axes.plot(data[xLabel], data[yLabel], linewidth=0.5, c='black', label="Normalized signal")
             self.axes.set_xlabel(xLabel)
             self.axes.set_ylabel(yLabel)
             self.axes.set_position([0.15, 0.15, 0.8, 0.8])
@@ -311,11 +320,11 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
             self.axes.grid()
 
             # plot
-            xLabel = self.measurmentManager.RabiXAxisLabel
-            yLabel = self.measurmentManager.RabiYAxisLabel
+            xLabel = self.measurementManager.RabiXAxisLabel
+            yLabel = self.measurementManager.RabiYAxisLabel
 
-            self.curve_3_1 = self.axes.scatter(data[xLabel], self.RabiData[yLabel], s=1, c='black')
-            self.curve_3_2 = self.axes.plot(data[xLabel], self.RabiData[yLabel], linewidth=0.5, c='black')
+            self.curve_3_1 = self.axes.scatter(data[xLabel], data[yLabel], s=1, c='black')
+            self.curve_3_2 = self.axes.plot(data[xLabel], data[yLabel], linewidth=0.5, c='black')
             
             self.axes.set_xlabel(xLabel)
             self.axes.set_ylabel(yLabel)
@@ -335,7 +344,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
             traceback.print_exc()
     
     def laserStatusChangedEventHandler(self):
-        if self.measurmentManager.isLaserOpen():
+        if self.measurementManager.getIsLaserOpen():
             self.btnOpen.setText('Close')
         else:
             self.btnOpen.setText('Open')
@@ -348,13 +357,15 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
             print(ex)
             traceback.print_exc()
 
-    def reciveODMRDataHandler(self, data):
+    def reciveODMRDataHandler(self, data, count):
+        self.lblRepeatNum.setText(str(count))
         self.plotODMRData(data)
 
         self.btnStart.setEnabled(True)
         self.btnConnect.setText('Connect')
 
-    def reciveRabiDataHandler(self, data):
+    def reciveRabiDataHandler(self, data, count):
+        self.lblRepeatNum.setText(str(count))
         self.plotRabiData(data)
 
         self.btnStart.setEnabled(True)
