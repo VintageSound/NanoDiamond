@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1242</width>
-    <height>1000</height>
+    <width>1312</width>
+    <height>1130</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -50,6 +50,11 @@
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
+      <property name="font">
+       <font>
+        <family>Tahoma</family>
+       </font>
+      </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
         <widget class="QWidget" name="horizontalWidget" native="true">
@@ -66,189 +71,303 @@
           </size>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout">
-          <item alignment="Qt::AlignLeft">
-           <widget class="QGroupBox" name="RedPitaya">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>380</width>
-              <height>100</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <family>Century Gothic</family>
-              <pointsize>12</pointsize>
-             </font>
-            </property>
-            <property name="title">
-             <string>Red Pitaya settings</string>
-            </property>
-            <property name="flat">
-             <bool>false</bool>
-            </property>
-            <property name="checkable">
-             <bool>false</bool>
-            </property>
-            <widget class="QLabel" name="lblPort">
-             <property name="geometry">
-              <rect>
-               <x>20</x>
-               <y>60</y>
-               <width>111</width>
-               <height>16</height>
-              </rect>
-             </property>
-             <property name="font">
-              <font>
-               <family>Century Gothic</family>
-              </font>
-             </property>
-             <property name="text">
-              <string>Port Number:</string>
-             </property>
-            </widget>
-            <widget class="QPushButton" name="btnConnect">
-             <property name="geometry">
-              <rect>
-               <x>260</x>
-               <y>30</y>
-               <width>101</width>
-               <height>51</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>Connect</string>
-             </property>
-            </widget>
-            <widget class="QLineEdit" name="txtPort">
-             <property name="geometry">
-              <rect>
-               <x>130</x>
-               <y>60</y>
-               <width>113</width>
-               <height>20</height>
-              </rect>
-             </property>
-            </widget>
-            <widget class="QLineEdit" name="txtIP">
-             <property name="geometry">
-              <rect>
-               <x>130</x>
-               <y>30</y>
-               <width>113</width>
-               <height>20</height>
-              </rect>
-             </property>
-            </widget>
-            <widget class="QLabel" name="lblIP">
-             <property name="geometry">
-              <rect>
-               <x>20</x>
-               <y>30</y>
-               <width>91</width>
-               <height>16</height>
-              </rect>
-             </property>
-             <property name="font">
-              <font>
-               <family>Century Gothic</family>
-              </font>
-             </property>
-             <property name="text">
-              <string>IP Address:</string>
-             </property>
-            </widget>
-           </widget>
-          </item>
-          <item alignment="Qt::AlignLeft">
-           <widget class="QGroupBox" name="LaserControl">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>320</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <family>Century Gothic</family>
-              <pointsize>12</pointsize>
-             </font>
-            </property>
-            <property name="title">
-             <string>Laser control</string>
-            </property>
-            <widget class="QLabel" name="lblLowLevel">
-             <property name="geometry">
-              <rect>
-               <x>30</x>
-               <y>30</y>
-               <width>101</width>
-               <height>16</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>Low level, V:</string>
-             </property>
-            </widget>
-            <widget class="QLabel" name="lblHighLevel">
-             <property name="geometry">
-              <rect>
-               <x>30</x>
-               <y>60</y>
-               <width>101</width>
-               <height>20</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>High level, V:</string>
-             </property>
-            </widget>
-            <widget class="QLineEdit" name="txtLowLevel">
-             <property name="geometry">
-              <rect>
-               <x>140</x>
-               <y>30</y>
-               <width>61</width>
-               <height>20</height>
-              </rect>
-             </property>
-            </widget>
-            <widget class="QLineEdit" name="txtHighLevel">
-             <property name="geometry">
-              <rect>
-               <x>140</x>
-               <y>60</y>
-               <width>61</width>
-               <height>20</height>
-              </rect>
-             </property>
-            </widget>
-            <widget class="QPushButton" name="btnOpen">
-             <property name="geometry">
-              <rect>
-               <x>214</x>
-               <y>30</y>
-               <width>91</width>
-               <height>51</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>Open</string>
-             </property>
-            </widget>
-           </widget>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <item>
+             <widget class="QGroupBox" name="PulseBlaster">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>380</width>
+                <height>100</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <family>Calibri Light</family>
+                <pointsize>12</pointsize>
+                <weight>50</weight>
+                <bold>false</bold>
+               </font>
+              </property>
+              <property name="title">
+               <string>Pulse Blaster settings</string>
+              </property>
+              <property name="flat">
+               <bool>false</bool>
+              </property>
+              <property name="checkable">
+               <bool>false</bool>
+              </property>
+              <widget class="QLabel" name="lblPortPulseBlaster">
+               <property name="geometry">
+                <rect>
+                 <x>20</x>
+                 <y>60</y>
+                 <width>111</width>
+                 <height>16</height>
+                </rect>
+               </property>
+               <property name="font">
+                <font>
+                 <family>Calibri Light</family>
+                 <pointsize>12</pointsize>
+                 <weight>50</weight>
+                 <bold>false</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Port</string>
+               </property>
+              </widget>
+              <widget class="QPushButton" name="btnConnectPulseBlaster">
+               <property name="geometry">
+                <rect>
+                 <x>260</x>
+                 <y>30</y>
+                 <width>101</width>
+                 <height>51</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Connect</string>
+               </property>
+              </widget>
+              <widget class="QLineEdit" name="txtPortPulseBlaster">
+               <property name="geometry">
+                <rect>
+                 <x>72</x>
+                 <y>60</y>
+                 <width>171</width>
+                 <height>20</height>
+                </rect>
+               </property>
+              </widget>
+              <widget class="QLineEdit" name="txtIPPulseBlaster">
+               <property name="geometry">
+                <rect>
+                 <x>72</x>
+                 <y>30</y>
+                 <width>171</width>
+                 <height>20</height>
+                </rect>
+               </property>
+              </widget>
+              <widget class="QLabel" name="lblIPPulseBlaster">
+               <property name="geometry">
+                <rect>
+                 <x>20</x>
+                 <y>30</y>
+                 <width>91</width>
+                 <height>16</height>
+                </rect>
+               </property>
+               <property name="font">
+                <font>
+                 <family>Calibri Light</family>
+                 <pointsize>12</pointsize>
+                 <weight>50</weight>
+                 <bold>false</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>IP</string>
+               </property>
+              </widget>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="RedPitaya">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>380</width>
+                <height>100</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <family>Calibri Light</family>
+                <pointsize>12</pointsize>
+               </font>
+              </property>
+              <property name="title">
+               <string>Red Pitaya settings</string>
+              </property>
+              <property name="flat">
+               <bool>false</bool>
+              </property>
+              <property name="checkable">
+               <bool>false</bool>
+              </property>
+              <widget class="QLabel" name="lblPortRedPitaya">
+               <property name="geometry">
+                <rect>
+                 <x>20</x>
+                 <y>60</y>
+                 <width>111</width>
+                 <height>16</height>
+                </rect>
+               </property>
+               <property name="font">
+                <font>
+                 <family>Calibri Light</family>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string>Port</string>
+               </property>
+              </widget>
+              <widget class="QPushButton" name="btnConnectRedPitaya">
+               <property name="geometry">
+                <rect>
+                 <x>260</x>
+                 <y>30</y>
+                 <width>101</width>
+                 <height>51</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Connect</string>
+               </property>
+              </widget>
+              <widget class="QLineEdit" name="txtPortRedPitaya">
+               <property name="geometry">
+                <rect>
+                 <x>62</x>
+                 <y>60</y>
+                 <width>181</width>
+                 <height>20</height>
+                </rect>
+               </property>
+              </widget>
+              <widget class="QLineEdit" name="txtIPRedPitaya">
+               <property name="geometry">
+                <rect>
+                 <x>62</x>
+                 <y>30</y>
+                 <width>181</width>
+                 <height>20</height>
+                </rect>
+               </property>
+              </widget>
+              <widget class="QLabel" name="lblIPRedPitaya">
+               <property name="geometry">
+                <rect>
+                 <x>20</x>
+                 <y>30</y>
+                 <width>91</width>
+                 <height>16</height>
+                </rect>
+               </property>
+               <property name="font">
+                <font>
+                 <family>Calibri Light</family>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string>IP</string>
+               </property>
+              </widget>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="LaserControl">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>380</width>
+                <height>100</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <family>Calibri Light</family>
+                <pointsize>12</pointsize>
+               </font>
+              </property>
+              <property name="title">
+               <string>AOM control</string>
+              </property>
+              <widget class="QLabel" name="lblLowLevel">
+               <property name="geometry">
+                <rect>
+                 <x>30</x>
+                 <y>30</y>
+                 <width>101</width>
+                 <height>16</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Low [V]</string>
+               </property>
+              </widget>
+              <widget class="QLabel" name="lblHighLevel">
+               <property name="geometry">
+                <rect>
+                 <x>30</x>
+                 <y>60</y>
+                 <width>101</width>
+                 <height>20</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>High [V]</string>
+               </property>
+              </widget>
+              <widget class="QLineEdit" name="txtLowLevel">
+               <property name="geometry">
+                <rect>
+                 <x>110</x>
+                 <y>30</y>
+                 <width>141</width>
+                 <height>20</height>
+                </rect>
+               </property>
+              </widget>
+              <widget class="QLineEdit" name="txtHighLevel">
+               <property name="geometry">
+                <rect>
+                 <x>110</x>
+                 <y>60</y>
+                 <width>141</width>
+                 <height>20</height>
+                </rect>
+               </property>
+              </widget>
+              <widget class="QPushButton" name="btnOpenCloseAOM">
+               <property name="geometry">
+                <rect>
+                 <x>270</x>
+                 <y>30</y>
+                 <width>91</width>
+                 <height>51</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Open</string>
+               </property>
+              </widget>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </widget>
@@ -267,857 +386,850 @@
            <height>0</height>
           </size>
          </property>
-         <layout class="QVBoxLayout" name="plotLayout"/>
-        </widget>
-       </item>
-       <item>
-        <widget class="QProgressBar" name="pbarProgress">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="value">
-          <number>0</number>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item>
-     <widget class="QWidget" name="verticalWidget" native="true">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <item>
-        <widget class="QGroupBox" name="MW">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>450</width>
-           <height>250</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <family>Century Gothic</family>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
-         <property name="title">
-          <string>MW generator properties</string>
-         </property>
-         <widget class="QPushButton" name="btnApply">
-          <property name="geometry">
-           <rect>
-            <x>360</x>
-            <y>190</y>
-            <width>75</width>
-            <height>51</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Apply</string>
-          </property>
-         </widget>
-         <widget class="QWidget" name="layoutWidget">
-          <property name="geometry">
-           <rect>
-            <x>30</x>
-            <y>70</y>
-            <width>312</width>
-            <height>171</height>
-           </rect>
-          </property>
-          <layout class="QFormLayout" name="formLayout">
-           <item row="0" column="0">
-            <widget class="QLabel" name="lblStartFreq">
-             <property name="text">
-              <string>Start Frequency, MHz:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLineEdit" name="txtStartFreq"/>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="lblStopFreq">
-             <property name="text">
-              <string>Stop Frequency, MHz:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLineEdit" name="txtStopFreq"/>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="lblCenterFreq">
-             <property name="text">
-              <string>Center Freq, MHz:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLineEdit" name="txtCenterFreq"/>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="lblRFPower">
-             <property name="text">
-              <string>RF Power, dBm:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <widget class="QLineEdit" name="txtRFPower"/>
-           </item>
-           <item row="4" column="0">
-            <widget class="QLabel" name="lblTrigMode">
-             <property name="text">
-              <string>Trigger Mode:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="1">
-            <widget class="QComboBox" name="comboBoxMode">
-             <property name="autoFillBackground">
-              <bool>false</bool>
-             </property>
-             <property name="sizeAdjustPolicy">
-              <enum>QComboBox::AdjustToContents</enum>
-             </property>
-             <item>
-              <property name="text">
-               <string>0-No trigger</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>1-Full sweep</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>2- Step sweep</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QComboBox" name="comboBoxMeasureType">
-          <property name="geometry">
-           <rect>
-            <x>360</x>
-            <y>40</y>
-            <width>76</width>
-            <height>26</height>
-           </rect>
-          </property>
-          <property name="autoFillBackground">
-           <bool>false</bool>
-          </property>
-          <property name="sizeAdjustPolicy">
-           <enum>QComboBox::AdjustToContents</enum>
-          </property>
-         </widget>
-         <widget class="QLabel" name="lblMeasureType">
-          <property name="geometry">
-           <rect>
-            <x>180</x>
-            <y>40</y>
-            <width>169</width>
-            <height>27</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Measurment Type:</string>
-          </property>
-         </widget>
-         <widget class="QPushButton" name="btnConnect_2">
-          <property name="geometry">
-           <rect>
-            <x>360</x>
-            <y>70</y>
-            <width>81</width>
-            <height>51</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Connect</string>
-          </property>
-         </widget>
-         <widget class="QPushButton" name="btnOn_Off">
-          <property name="geometry">
-           <rect>
-            <x>360</x>
-            <y>130</y>
-            <width>75</width>
-            <height>51</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>RF is Off</string>
-          </property>
-         </widget>
-         <widget class="QComboBox" name="comboBoxMWdevice">
-          <property name="geometry">
-           <rect>
-            <x>20</x>
-            <y>30</y>
-            <width>90</width>
-            <height>26</height>
-           </rect>
-          </property>
-          <property name="autoFillBackground">
-           <bool>false</bool>
-          </property>
-          <property name="sizeAdjustPolicy">
-           <enum>QComboBox::AdjustToContents</enum>
-          </property>
+         <layout class="QVBoxLayout" name="plotLayout">
           <item>
-           <property name="text">
-            <string>SynthHD</string>
-           </property>
+           <widget class="QTabWidget" name="measurmentTabs">
+            <property name="currentIndex">
+             <number>0</number>
+            </property>
+            <widget class="QWidget" name="ODMRTab">
+             <attribute name="title">
+              <string>ODMR</string>
+             </attribute>
+             <layout class="QGridLayout" name="gridLayout_4">
+              <item row="0" column="0">
+               <layout class="QGridLayout" name="gridLayout_2">
+                <property name="sizeConstraint">
+                 <enum>QLayout::SetNoConstraint</enum>
+                </property>
+                <item row="0" column="0">
+                 <widget class="QWidget" name="ODMRPlotWidget" native="true">
+                  <property name="minimumSize">
+                   <size>
+                    <width>690</width>
+                    <height>839</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QWidget" name="verticalWidget_2" native="true">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <layout class="QGridLayout" name="gridLayout">
+                   <item row="1" column="0">
+                    <widget class="QGroupBox" name="ODMR">
+                     <property name="minimumSize">
+                      <size>
+                       <width>450</width>
+                       <height>300</height>
+                      </size>
+                     </property>
+                     <property name="font">
+                      <font>
+                       <family>Calibri Light</family>
+                       <pointsize>12</pointsize>
+                      </font>
+                     </property>
+                     <property name="title">
+                      <string>ODMR Measurement Settings</string>
+                     </property>
+                     <widget class="QLabel" name="lblRepeatNum">
+                      <property name="geometry">
+                       <rect>
+                        <x>30</x>
+                        <y>120</y>
+                        <width>71</width>
+                        <height>16</height>
+                       </rect>
+                      </property>
+                      <property name="text">
+                       <string/>
+                      </property>
+                     </widget>
+                     <widget class="QWidget" name="formLayoutWidget">
+                      <property name="geometry">
+                       <rect>
+                        <x>10</x>
+                        <y>30</y>
+                        <width>431</width>
+                        <height>242</height>
+                       </rect>
+                      </property>
+                      <layout class="QFormLayout" name="formLayout_3">
+                       <item row="0" column="0">
+                        <widget class="QLabel" name="lblCountDuration">
+                         <property name="text">
+                          <string>Single Pulse Duration [us]</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="0" column="1">
+                        <widget class="QLineEdit" name="txtCountDuration"/>
+                       </item>
+                       <item row="1" column="0">
+                        <widget class="QLabel" name="lblCountNumber">
+                         <property name="text">
+                          <string>Number of Pulses</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="1" column="1">
+                        <widget class="QLineEdit" name="txtCountNumber"/>
+                       </item>
+                       <item row="2" column="0">
+                        <widget class="QLabel" name="lblThreshold">
+                         <property name="text">
+                          <string>Threshold [V]</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="2" column="1">
+                        <widget class="QLineEdit" name="txtThreshold"/>
+                       </item>
+                       <item row="3" column="0">
+                        <widget class="QLabel" name="label">
+                         <property name="text">
+                          <string>Repetition?</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="4" column="0">
+                        <widget class="QLabel" name="label_3">
+                         <property name="text">
+                          <string>Repetition Max Number</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="4" column="1">
+                        <widget class="QLineEdit" name="txtRepetitionMax"/>
+                       </item>
+                       <item row="5" column="0">
+                        <widget class="QLabel" name="label_4">
+                         <property name="text">
+                          <string>Current Repetetion</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="5" column="1">
+                        <widget class="QLabel" name="lblCurrentRepetetion">
+                         <property name="text">
+                          <string>0</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="3" column="1">
+                        <widget class="QComboBox" name="repetitionComboBox"/>
+                       </item>
+                      </layout>
+                     </widget>
+                     <widget class="QWidget" name="horizontalLayoutWidget_2">
+                      <property name="geometry">
+                       <rect>
+                        <x>10</x>
+                        <y>240</y>
+                        <width>431</width>
+                        <height>51</height>
+                       </rect>
+                      </property>
+                      <layout class="QHBoxLayout" name="horizontalLayout_5">
+                       <item>
+                        <widget class="QPushButton" name="btnStartODMR">
+                         <property name="text">
+                          <string>Start</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QPushButton" name="btnStopODMR">
+                         <property name="text">
+                          <string>Stop</string>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </widget>
+                    </widget>
+                   </item>
+                   <item row="0" column="0">
+                    <widget class="QGroupBox" name="MW">
+                     <property name="enabled">
+                      <bool>true</bool>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>450</width>
+                       <height>250</height>
+                      </size>
+                     </property>
+                     <property name="font">
+                      <font>
+                       <family>Calibri Light</family>
+                       <pointsize>12</pointsize>
+                      </font>
+                     </property>
+                     <property name="title">
+                      <string>MW Generator Settings</string>
+                     </property>
+                     <widget class="QWidget" name="layoutWidget">
+                      <property name="geometry">
+                       <rect>
+                        <x>18</x>
+                        <y>70</y>
+                        <width>421</width>
+                        <height>121</height>
+                       </rect>
+                      </property>
+                      <layout class="QFormLayout" name="formLayout">
+                       <item row="0" column="0">
+                        <widget class="QLabel" name="lblStartFreq">
+                         <property name="text">
+                          <string>Start Frequency [MHz]:</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="0" column="1">
+                        <widget class="QLineEdit" name="txtStartFreq"/>
+                       </item>
+                       <item row="1" column="0">
+                        <widget class="QLabel" name="lblStopFreq">
+                         <property name="text">
+                          <string>Stop Frequency [MHz]:</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="1" column="1">
+                        <widget class="QLineEdit" name="txtStopFreq"/>
+                       </item>
+                       <item row="2" column="0">
+                        <widget class="QLabel" name="lblRFPower">
+                         <property name="text">
+                          <string>RF Power [dBm]</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="2" column="1">
+                        <widget class="QLineEdit" name="txtRFPower"/>
+                       </item>
+                      </layout>
+                     </widget>
+                     <widget class="QComboBox" name="comboBoxMWdevice">
+                      <property name="geometry">
+                       <rect>
+                        <x>20</x>
+                        <y>30</y>
+                        <width>99</width>
+                        <height>30</height>
+                       </rect>
+                      </property>
+                      <property name="autoFillBackground">
+                       <bool>false</bool>
+                      </property>
+                      <property name="sizeAdjustPolicy">
+                       <enum>QComboBox::AdjustToContents</enum>
+                      </property>
+                      <item>
+                       <property name="text">
+                        <string>SynthHD</string>
+                       </property>
+                      </item>
+                     </widget>
+                     <widget class="QPushButton" name="connectMicrowaveODMRButton">
+                      <property name="geometry">
+                       <rect>
+                        <x>20</x>
+                        <y>210</y>
+                        <width>121</width>
+                        <height>28</height>
+                       </rect>
+                      </property>
+                      <property name="text">
+                       <string>Connect</string>
+                      </property>
+                     </widget>
+                     <widget class="QPushButton" name="onOffODMRConnectButton">
+                      <property name="geometry">
+                       <rect>
+                        <x>160</x>
+                        <y>210</y>
+                        <width>111</width>
+                        <height>28</height>
+                       </rect>
+                      </property>
+                      <property name="text">
+                       <string>RF is Off</string>
+                      </property>
+                     </widget>
+                     <widget class="QPushButton" name="applyMicrowaveODMRButton">
+                      <property name="geometry">
+                       <rect>
+                        <x>300</x>
+                        <y>210</y>
+                        <width>121</width>
+                        <height>28</height>
+                       </rect>
+                      </property>
+                      <property name="text">
+                       <string>Apply</string>
+                      </property>
+                     </widget>
+                    </widget>
+                   </item>
+                   <item row="2" column="0">
+                    <widget class="QGroupBox" name="DataSave">
+                     <property name="font">
+                      <font>
+                       <family>Calibri Light</family>
+                       <pointsize>12</pointsize>
+                      </font>
+                     </property>
+                     <property name="title">
+                      <string>Save Data</string>
+                     </property>
+                     <widget class="QWidget" name="formLayoutWidget_2">
+                      <property name="geometry">
+                       <rect>
+                        <x>9</x>
+                        <y>22</y>
+                        <width>431</width>
+                        <height>171</height>
+                       </rect>
+                      </property>
+                      <layout class="QFormLayout" name="formLayout_4">
+                       <item row="0" column="0">
+                        <widget class="QLabel" name="lblPath">
+                         <property name="text">
+                          <string>Path</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="2" column="0">
+                        <widget class="QLabel" name="lblParamValue">
+                         <property name="text">
+                          <string>Measurment Number</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="2" column="1">
+                        <widget class="QLineEdit" name="txtNum"/>
+                       </item>
+                       <item row="3" column="0">
+                        <widget class="QLabel" name="lblComment">
+                         <property name="text">
+                          <string>Comment:</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="1" column="0" colspan="2">
+                        <widget class="QLineEdit" name="txtPath"/>
+                       </item>
+                       <item row="4" column="0" colspan="2">
+                        <widget class="QLineEdit" name="txtComment"/>
+                       </item>
+                      </layout>
+                     </widget>
+                     <widget class="QPushButton" name="btnSaveODMR">
+                      <property name="geometry">
+                       <rect>
+                        <x>10</x>
+                        <y>210</y>
+                        <width>421</width>
+                        <height>33</height>
+                       </rect>
+                      </property>
+                      <property name="text">
+                       <string>Save</string>
+                      </property>
+                     </widget>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="RabiPulseTab">
+             <attribute name="title">
+              <string>Rabi Pulse Sequence</string>
+             </attribute>
+             <layout class="QGridLayout" name="gridLayout_11">
+              <item row="0" column="0">
+               <layout class="QGridLayout" name="gridLayout_9">
+                <property name="sizeConstraint">
+                 <enum>QLayout::SetNoConstraint</enum>
+                </property>
+                <item row="0" column="0">
+                 <widget class="QWidget" name="ODMRPlotwidget_2" native="true">
+                  <property name="minimumSize">
+                   <size>
+                    <width>690</width>
+                    <height>839</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QWidget" name="verticalWidget_3" native="true">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <layout class="QGridLayout" name="gridLayout_10">
+                   <item row="0" column="0">
+                    <widget class="QGroupBox" name="MW_3">
+                     <property name="enabled">
+                      <bool>true</bool>
+                     </property>
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>450</width>
+                       <height>250</height>
+                      </size>
+                     </property>
+                     <property name="font">
+                      <font>
+                       <family>Calibri Light</family>
+                       <pointsize>12</pointsize>
+                      </font>
+                     </property>
+                     <property name="title">
+                      <string>MW Generator Settings</string>
+                     </property>
+                     <layout class="QGridLayout" name="gridLayout_6">
+                      <item row="0" column="0">
+                       <widget class="QComboBox" name="comboBoxMWdevice_3">
+                        <property name="autoFillBackground">
+                         <bool>false</bool>
+                        </property>
+                        <property name="sizeAdjustPolicy">
+                         <enum>QComboBox::AdjustToContents</enum>
+                        </property>
+                        <item>
+                         <property name="text">
+                          <string>SynthHD</string>
+                         </property>
+                        </item>
+                       </widget>
+                      </item>
+                      <item row="2" column="0">
+                       <layout class="QHBoxLayout" name="horizontalLayout_3">
+                        <property name="spacing">
+                         <number>7</number>
+                        </property>
+                        <property name="sizeConstraint">
+                         <enum>QLayout::SetMinimumSize</enum>
+                        </property>
+                        <item>
+                         <widget class="QPushButton" name="connectMicrowaveRabiButton">
+                          <property name="text">
+                           <string>Connect</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QPushButton" name="onOffRabiConnectButton">
+                          <property name="enabled">
+                           <bool>true</bool>
+                          </property>
+                          <property name="text">
+                           <string>RF is Off</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QPushButton" name="applyMicrowaveRabiButton">
+                          <property name="text">
+                           <string>Apply</string>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </item>
+                      <item row="1" column="0">
+                       <layout class="QFormLayout" name="formLayout_5">
+                        <item row="1" column="0">
+                         <widget class="QLabel" name="lblRFPower_3">
+                          <property name="text">
+                           <string>RF Power [dBm]</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item row="1" column="1">
+                         <widget class="QLineEdit" name="txtRFPowerRabi"/>
+                        </item>
+                        <item row="0" column="0">
+                         <widget class="QLabel" name="lblCenterFreq_2">
+                          <property name="text">
+                           <string>Center Freq, MHz:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item row="0" column="1">
+                         <widget class="QLineEdit" name="txtCenterFreq"/>
+                        </item>
+                       </layout>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item row="2" column="0">
+                    <widget class="QGroupBox" name="DataSave_2">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="font">
+                      <font>
+                       <family>Calibri Light</family>
+                       <pointsize>12</pointsize>
+                      </font>
+                     </property>
+                     <property name="title">
+                      <string>Save Data</string>
+                     </property>
+                     <layout class="QGridLayout" name="gridLayout_8">
+                      <item row="0" column="0">
+                       <layout class="QFormLayout" name="formLayout_6">
+                        <property name="sizeConstraint">
+                         <enum>QLayout::SetNoConstraint</enum>
+                        </property>
+                        <property name="formAlignment">
+                         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                        </property>
+                        <item row="0" column="0">
+                         <widget class="QLabel" name="lblPathRabi">
+                          <property name="text">
+                           <string>Path</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item row="2" column="0">
+                         <widget class="QLabel" name="lblParamValue_2">
+                          <property name="text">
+                           <string>Measurment Index</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item row="2" column="1">
+                         <widget class="QLineEdit" name="txtIndexRai"/>
+                        </item>
+                        <item row="3" column="0">
+                         <widget class="QLabel" name="lblCommentRabi">
+                          <property name="text">
+                           <string>Comment:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item row="1" column="0" colspan="2">
+                         <widget class="QLineEdit" name="txtPathRabi"/>
+                        </item>
+                        <item row="0" column="1">
+                         <widget class="QPushButton" name="btnSaveRabi">
+                          <property name="text">
+                           <string>Save</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item row="4" column="0" colspan="2">
+                         <widget class="QLineEdit" name="txtCommentRabi"/>
+                        </item>
+                       </layout>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QGroupBox" name="Rabi">
+                     <property name="enabled">
+                      <bool>true</bool>
+                     </property>
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>450</width>
+                       <height>220</height>
+                      </size>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>400</width>
+                       <height>16777215</height>
+                      </size>
+                     </property>
+                     <property name="font">
+                      <font>
+                       <family>Calibri Light</family>
+                       <pointsize>12</pointsize>
+                      </font>
+                     </property>
+                     <property name="title">
+                      <string>Rabi Pulse Settings</string>
+                     </property>
+                     <layout class="QGridLayout" name="gridLayout_7">
+                      <item row="4" column="1">
+                       <widget class="QLineEdit" name="txtStartReadout"/>
+                      </item>
+                      <item row="0" column="3">
+                       <widget class="QLabel" name="lblDuration">
+                        <property name="text">
+                         <string>Duration, us:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="1" column="3">
+                       <widget class="QLineEdit" name="txtWidthPump"/>
+                      </item>
+                      <item row="2" column="3">
+                       <widget class="QLineEdit" name="txtWidthMW"/>
+                      </item>
+                      <item row="3" column="3">
+                       <widget class="QLineEdit" name="txtWidthImage"/>
+                      </item>
+                      <item row="5" column="1">
+                       <widget class="QLineEdit" name="txtAveragesNumber"/>
+                      </item>
+                      <item row="2" column="0">
+                       <widget class="QLabel" name="lblMW">
+                        <property name="text">
+                         <string>MW pulse:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="2" column="1">
+                       <widget class="QLineEdit" name="txtStartMW"/>
+                      </item>
+                      <item row="1" column="0">
+                       <widget class="QLabel" name="lblPump">
+                        <property name="text">
+                         <string>Pump pulse:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="3" column="0">
+                       <widget class="QLabel" name="lblImaging">
+                        <property name="text">
+                         <string>Imaging pulse:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="3" column="1">
+                       <widget class="QLineEdit" name="txtStartImage"/>
+                      </item>
+                      <item row="1" column="1">
+                       <widget class="QLineEdit" name="txtStartPump"/>
+                      </item>
+                      <item row="5" column="0">
+                       <widget class="QLabel" name="lblAveragesNumber">
+                        <property name="text">
+                         <string>Averages number:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="0" column="1" colspan="2">
+                       <widget class="QLabel" name="lblStartTime">
+                        <property name="text">
+                         <string>Start time, us:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="4" column="0">
+                       <widget class="QLabel" name="lblReadout">
+                        <property name="text">
+                         <string>Readout pulse:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="4" column="3" rowspan="3">
+                       <widget class="QPushButton" name="btnMeasureRabiPulse">
+                        <property name="text">
+                         <string>Measure</string>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item row="3" column="0">
+                    <widget class="QWidget" name="widget" native="true"/>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="FullRabiTab">
+             <attribute name="title">
+              <string>Full Rabi</string>
+             </attribute>
+             <widget class="QGroupBox" name="Scan_2">
+              <property name="geometry">
+               <rect>
+                <x>220</x>
+                <y>100</y>
+                <width>450</width>
+                <height>130</height>
+               </rect>
+              </property>
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>130</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <family>Calibri Light</family>
+                <pointsize>12</pointsize>
+               </font>
+              </property>
+              <property name="title">
+               <string>Scan Control</string>
+              </property>
+              <widget class="QLabel" name="label_2">
+               <property name="geometry">
+                <rect>
+                 <x>30</x>
+                 <y>30</y>
+                 <width>141</width>
+                 <height>21</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Scan parameter:</string>
+               </property>
+              </widget>
+              <widget class="QComboBox" name="cmbScanParam_2">
+               <property name="geometry">
+                <rect>
+                 <x>170</x>
+                 <y>30</y>
+                 <width>111</width>
+                 <height>22</height>
+                </rect>
+               </property>
+              </widget>
+              <widget class="QLabel" name="lblRange_2">
+               <property name="geometry">
+                <rect>
+                 <x>100</x>
+                 <y>60</y>
+                 <width>61</width>
+                 <height>21</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Range:</string>
+               </property>
+              </widget>
+              <widget class="QLineEdit" name="txtRange_2">
+               <property name="geometry">
+                <rect>
+                 <x>170</x>
+                 <y>60</y>
+                 <width>111</width>
+                 <height>20</height>
+                </rect>
+               </property>
+               <property name="placeholderText">
+                <string>start,stop,step_size</string>
+               </property>
+              </widget>
+              <widget class="QPushButton" name="btnScanRabi_2">
+               <property name="geometry">
+                <rect>
+                 <x>320</x>
+                 <y>30</y>
+                 <width>101</width>
+                 <height>51</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Scan Rabi</string>
+               </property>
+              </widget>
+              <widget class="QLabel" name="lblCurrentValue_2">
+               <property name="geometry">
+                <rect>
+                 <x>30</x>
+                 <y>60</y>
+                 <width>61</width>
+                 <height>21</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+              <widget class="QLabel" name="lblIterations_2">
+               <property name="geometry">
+                <rect>
+                 <x>80</x>
+                 <y>90</y>
+                 <width>81</width>
+                 <height>16</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Iterations:</string>
+               </property>
+              </widget>
+              <widget class="QLineEdit" name="txtIterations_2">
+               <property name="geometry">
+                <rect>
+                 <x>170</x>
+                 <y>90</y>
+                 <width>113</width>
+                 <height>20</height>
+                </rect>
+               </property>
+              </widget>
+              <widget class="QLabel" name="lblCurrentIterations_2">
+               <property name="geometry">
+                <rect>
+                 <x>30</x>
+                 <y>90</y>
+                 <width>47</width>
+                 <height>16</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </widget>
+            </widget>
+           </widget>
           </item>
-         </widget>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="Scan">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>130</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <family>Century Gothic</family>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
-         <property name="title">
-          <string>Scan Control</string>
-         </property>
-         <widget class="QLabel" name="label">
-          <property name="geometry">
-           <rect>
-            <x>30</x>
-            <y>30</y>
-            <width>141</width>
-            <height>21</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Scan parameter:</string>
-          </property>
-         </widget>
-         <widget class="QComboBox" name="cmbScanParam">
-          <property name="geometry">
-           <rect>
-            <x>170</x>
-            <y>30</y>
-            <width>111</width>
-            <height>22</height>
-           </rect>
-          </property>
-         </widget>
-         <widget class="QLabel" name="lblRange">
-          <property name="geometry">
-           <rect>
-            <x>100</x>
-            <y>60</y>
-            <width>61</width>
-            <height>21</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Range:</string>
-          </property>
-         </widget>
-         <widget class="QLineEdit" name="txtRange">
-          <property name="geometry">
-           <rect>
-            <x>170</x>
-            <y>60</y>
-            <width>111</width>
-            <height>20</height>
-           </rect>
-          </property>
-          <property name="placeholderText">
-           <string>start,stop,step_size</string>
-          </property>
-         </widget>
-         <widget class="QPushButton" name="btnScanRabi">
-          <property name="geometry">
-           <rect>
-            <x>320</x>
-            <y>30</y>
-            <width>101</width>
-            <height>51</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Scan Rabi</string>
-          </property>
-         </widget>
-         <widget class="QLabel" name="lblCurrentValue">
-          <property name="geometry">
-           <rect>
-            <x>30</x>
-            <y>60</y>
-            <width>61</width>
-            <height>21</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-         <widget class="QLabel" name="lblIterations">
-          <property name="geometry">
-           <rect>
-            <x>80</x>
-            <y>90</y>
-            <width>81</width>
-            <height>16</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Iterations:</string>
-          </property>
-         </widget>
-         <widget class="QLineEdit" name="txtIterations">
-          <property name="geometry">
-           <rect>
-            <x>170</x>
-            <y>90</y>
-            <width>113</width>
-            <height>20</height>
-           </rect>
-          </property>
-         </widget>
-         <widget class="QLabel" name="lblCurrentIterations">
-          <property name="geometry">
-           <rect>
-            <x>30</x>
-            <y>90</y>
-            <width>47</width>
-            <height>16</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="Rabi">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>450</width>
-           <height>220</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <family>Century Gothic</family>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
-         <property name="title">
-          <string>Rabi oscillations measurements</string>
-         </property>
-         <widget class="QLabel" name="lblAveragesNumber">
-          <property name="geometry">
-           <rect>
-            <x>30</x>
-            <y>180</y>
-            <width>151</width>
-            <height>21</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Averages number:</string>
-          </property>
-         </widget>
-         <widget class="QLineEdit" name="txtAveragesNumber">
-          <property name="geometry">
-           <rect>
-            <x>202</x>
-            <y>180</y>
-            <width>81</width>
-            <height>20</height>
-           </rect>
-          </property>
-         </widget>
-         <widget class="QPushButton" name="btnMeasure">
-          <property name="geometry">
-           <rect>
-            <x>320</x>
-            <y>150</y>
-            <width>91</width>
-            <height>51</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Measure</string>
-          </property>
-         </widget>
-         <widget class="QLabel" name="lblStartTime">
-          <property name="geometry">
-           <rect>
-            <x>170</x>
-            <y>30</y>
-            <width>111</width>
-            <height>16</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Start time, us:</string>
-          </property>
-         </widget>
-         <widget class="QLabel" name="lblDuration">
-          <property name="geometry">
-           <rect>
-            <x>320</x>
-            <y>30</y>
-            <width>101</width>
-            <height>16</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Duration, us:</string>
-          </property>
-         </widget>
-         <widget class="QLabel" name="lblPump">
-          <property name="geometry">
-           <rect>
-            <x>30</x>
-            <y>60</y>
-            <width>111</width>
-            <height>21</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Pump pulse:</string>
-          </property>
-         </widget>
-         <widget class="QLineEdit" name="txtStartPump">
-          <property name="geometry">
-           <rect>
-            <x>170</x>
-            <y>60</y>
-            <width>113</width>
-            <height>20</height>
-           </rect>
-          </property>
-         </widget>
-         <widget class="QLineEdit" name="txtWidthPump">
-          <property name="geometry">
-           <rect>
-            <x>310</x>
-            <y>60</y>
-            <width>113</width>
-            <height>20</height>
-           </rect>
-          </property>
-         </widget>
-         <widget class="QLineEdit" name="txtWidthMW">
-          <property name="geometry">
-           <rect>
-            <x>310</x>
-            <y>90</y>
-            <width>113</width>
-            <height>20</height>
-           </rect>
-          </property>
-         </widget>
-         <widget class="QLabel" name="lblMW">
-          <property name="geometry">
-           <rect>
-            <x>30</x>
-            <y>90</y>
-            <width>111</width>
-            <height>21</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>MW pulse:</string>
-          </property>
-         </widget>
-         <widget class="QLineEdit" name="txtStartMW">
-          <property name="geometry">
-           <rect>
-            <x>170</x>
-            <y>90</y>
-            <width>113</width>
-            <height>20</height>
-           </rect>
-          </property>
-         </widget>
-         <widget class="QLineEdit" name="txtWidthImage">
-          <property name="geometry">
-           <rect>
-            <x>310</x>
-            <y>120</y>
-            <width>113</width>
-            <height>20</height>
-           </rect>
-          </property>
-         </widget>
-         <widget class="QLabel" name="lblImaging">
-          <property name="geometry">
-           <rect>
-            <x>30</x>
-            <y>120</y>
-            <width>121</width>
-            <height>21</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Imaging pulse:</string>
-          </property>
-         </widget>
-         <widget class="QLineEdit" name="txtStartImage">
-          <property name="geometry">
-           <rect>
-            <x>170</x>
-            <y>120</y>
-            <width>113</width>
-            <height>20</height>
-           </rect>
-          </property>
-         </widget>
-         <widget class="QLabel" name="lblReadout">
-          <property name="geometry">
-           <rect>
-            <x>30</x>
-            <y>150</y>
-            <width>121</width>
-            <height>21</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Readout pulse:</string>
-          </property>
-         </widget>
-         <widget class="QLineEdit" name="txtStartReadout">
-          <property name="geometry">
-           <rect>
-            <x>170</x>
-            <y>150</y>
-            <width>113</width>
-            <height>20</height>
-           </rect>
-          </property>
-         </widget>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="ODMR">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>450</width>
-           <height>150</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <family>Century Gothic</family>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
-         <property name="title">
-          <string>ODMR measurements</string>
-         </property>
-         <widget class="QPushButton" name="btnStart">
-          <property name="geometry">
-           <rect>
-            <x>350</x>
-            <y>30</y>
-            <width>81</width>
-            <height>81</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Start</string>
-          </property>
-         </widget>
-         <widget class="QLabel" name="lblRepeatNum">
-          <property name="geometry">
-           <rect>
-            <x>30</x>
-            <y>120</y>
-            <width>71</width>
-            <height>16</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-         <widget class="QLineEdit" name="txtCountNumber">
-          <property name="geometry">
-           <rect>
-            <x>220</x>
-            <y>60</y>
-            <width>113</width>
-            <height>20</height>
-           </rect>
-          </property>
-         </widget>
-         <widget class="QLabel" name="lblThreshold">
-          <property name="geometry">
-           <rect>
-            <x>30</x>
-            <y>90</y>
-            <width>151</width>
-            <height>21</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Threshold, V:</string>
-          </property>
-         </widget>
-         <widget class="QLineEdit" name="txtCountDuration">
-          <property name="geometry">
-           <rect>
-            <x>220</x>
-            <y>30</y>
-            <width>113</width>
-            <height>20</height>
-           </rect>
-          </property>
-         </widget>
-         <widget class="QCheckBox" name="ckbRepeatAdd">
-          <property name="geometry">
-           <rect>
-            <x>170</x>
-            <y>120</y>
-            <width>161</width>
-            <height>17</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Repeat and Add</string>
-          </property>
-         </widget>
-         <widget class="QLabel" name="lblCountDuration">
-          <property name="geometry">
-           <rect>
-            <x>30</x>
-            <y>30</y>
-            <width>181</width>
-            <height>21</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Counting duration, us:</string>
-          </property>
-         </widget>
-         <widget class="QLineEdit" name="txtThreshold">
-          <property name="geometry">
-           <rect>
-            <x>220</x>
-            <y>90</y>
-            <width>113</width>
-            <height>20</height>
-           </rect>
-          </property>
-         </widget>
-         <widget class="QCheckBox" name="ckbRepeat">
-          <property name="geometry">
-           <rect>
-            <x>350</x>
-            <y>120</y>
-            <width>91</width>
-            <height>17</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Repeat</string>
-          </property>
-         </widget>
-         <widget class="QLabel" name="lblCountNumber">
-          <property name="geometry">
-           <rect>
-            <x>30</x>
-            <y>60</y>
-            <width>181</width>
-            <height>21</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Counting number:</string>
-          </property>
-         </widget>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="DataSave">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>130</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <family>Century Gothic</family>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
-         <property name="title">
-          <string>Data saving</string>
-         </property>
-         <widget class="QLabel" name="lblPath">
-          <property name="geometry">
-           <rect>
-            <x>30</x>
-            <y>30</y>
-            <width>51</width>
-            <height>16</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Path:</string>
-          </property>
-         </widget>
-         <widget class="QLineEdit" name="txtPath">
-          <property name="geometry">
-           <rect>
-            <x>90</x>
-            <y>30</y>
-            <width>341</width>
-            <height>20</height>
-           </rect>
-          </property>
-         </widget>
-         <widget class="QLabel" name="lblNum">
-          <property name="geometry">
-           <rect>
-            <x>30</x>
-            <y>60</y>
-            <width>51</width>
-            <height>16</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Num:</string>
-          </property>
-         </widget>
-         <widget class="QLineEdit" name="txtNum">
-          <property name="geometry">
-           <rect>
-            <x>90</x>
-            <y>60</y>
-            <width>41</width>
-            <height>20</height>
-           </rect>
-          </property>
-         </widget>
-         <widget class="QLabel" name="lblParamValue">
-          <property name="geometry">
-           <rect>
-            <x>150</x>
-            <y>60</y>
-            <width>101</width>
-            <height>16</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Param. val.:</string>
-          </property>
-         </widget>
-         <widget class="QLineEdit" name="txtParamValue">
-          <property name="geometry">
-           <rect>
-            <x>250</x>
-            <y>60</y>
-            <width>81</width>
-            <height>20</height>
-           </rect>
-          </property>
-         </widget>
-         <widget class="QLabel" name="lblComment">
-          <property name="geometry">
-           <rect>
-            <x>30</x>
-            <y>90</y>
-            <width>91</width>
-            <height>16</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Comment:</string>
-          </property>
-         </widget>
-         <widget class="QLineEdit" name="txtComment">
-          <property name="geometry">
-           <rect>
-            <x>130</x>
-            <y>90</y>
-            <width>201</width>
-            <height>20</height>
-           </rect>
-          </property>
-         </widget>
-         <widget class="QPushButton" name="btnSave">
-          <property name="geometry">
-           <rect>
-            <x>350</x>
-            <y>60</y>
-            <width>81</width>
-            <height>51</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Save</string>
-          </property>
-         </widget>
+         </layout>
         </widget>
        </item>
       </layout>

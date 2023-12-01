@@ -5,6 +5,8 @@ import time
 
 from Data.pulseConfiguration import pulseConfiguration
 from Data.microwaveConfiguration import microwaveConfiguration
+from Data.measurementType import measurementType
+from Data.repetition import repetition
 
 from PyQt5 import uic
 from PyQt5.QtWidgets import QApplication, QMessageBox
@@ -13,8 +15,6 @@ from PyQt5 import QtWidgets, QtCore
 from PyQt5 import QtTest
 
 import matplotlib
-
-from Data.MeasurementType import MeasurementType
 
 matplotlib.use('Qt5Agg')
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -26,9 +26,8 @@ from LogicManagers.measurementManager import measurementManager
 QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True) # enable high-dpi scaling
 QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True) # use high-dpi icons
 
-# Ui_PhaseLockedLoop, QMainWindow = uic.loadUiType('PulseSequencer\\PulseSequencerV4.ui')
-Ui_PhaseLockedLoop, QMainWindow = uic.loadUiType('PulseSequencerV4.ui')
-
+Ui_PhaseLockedLoop, QMainWindow = uic.loadUiType('PulseSequencer\\PulseSequencerV4.ui')
+# Ui_PhaseLockedLoop, QMainWindow = uic.loadUiType('PulseSequencerV4.ui')
 
 constConvertMicroSecondToMilisecond = 1000
 
@@ -38,8 +37,12 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         self.setupUi(self)
         self.measurementManager = measurementManager(self)
 
-        self.txtIP.setText(str(self.measurementManager.redPitaya.ip))
-        self.txtPort.setText(str(self.measurementManager.redPitaya.port))
+        self.txtIPRedPitaya.setText(str(self.measurementManager.redPitaya.ip))
+        self.txtPortRedPitaya.setText(str(self.measurementManager.redPitaya.port))
+
+        self.txtIPPulseBlaster.setText(str(self.measurementManager.pulseBaster.server_ip))
+        self.txtPortPulseBlaster.setText(str(self.measurementManager.pulseBaster.server_port))
+        self.repetitionComboBox.addItems([m.name for m in repetition])
 
         # Register Events
         self.measurementManager.registerToAOMStatusChangedEvent(self.laserStatusChangedEventHandler)
@@ -49,35 +52,28 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         self.measurementManager.registerToODMRDataRecivedEvent(self.reciveODMRDataHandler)
         self.measurementManager.registerConnectionErrorEvent(self.connectionErrorEventHandler)
 
-        # Create figure
-        figure, self.axes = plt.subplots()
-        figure.set_facecolor('none')
-        self.axes2 = self.axes.twinx()
-        self.canvas = FigureCanvas(figure)
-        self.plotLayout.addWidget(self.canvas)
-
-        # Create navigation toolbar
-        self.toolbar = NavigationToolbar(self.canvas, self.plotWidget, False)
-
-        # Remove subplots action
-        actions = self.toolbar.actions()
-        self.toolbar.removeAction(actions[7])
-        self.plotLayout.addWidget(self.toolbar)
-   
-        # set status bar
-        self.statusBar.showMessage('Red Pitaya is disconnected')
-
         # settings for buttons
-        self.btnConnect.clicked.connect(self.connectToRedPitayaToggle)
-        self.btnStart.clicked.connect(self.clearAndStartODMR)
-        self.btnApply.clicked.connect(self.applyChangesOfMicrowaveSettings)
-        self.btnMeasure.clicked.connect(self.clearAndStartRabiMeasurement)
-        self.btnSave.clicked.connect(self.save)
-        self.btnOpen.clicked.connect(self.laserOpenCloseToggle)
-        self.btnConnect_2.clicked.connect(self.microwaveDeviceConnectionToggle)
-        self.btnOn_Off.clicked.connect(self.microwaveOnOffToggle)
-        self.ckbRepeatAdd.clicked.connect(self.repeatAddCheackboxChanged)
-        
+        # general
+        self.btnConnectPulseBlaster.clicked.connect(self.connectToPulseBlasterToggle)
+        self.btnConnectRedPitaya.clicked.connect(self.connectToRedPitayaToggle)
+
+        # ODMR
+        self.btnStartODMR.clicked.connect(self.clearAndStartODMR)
+        self.btnStopODMR.clicked.connect(self.stopCurrentMeasurement)
+        self.applyMicrowaveODMRButton.clicked.connect(self.applyChangesOfMicrowaveSettings)
+        self.btnOpenCloseAOM.clicked.connect(self.laserOpenCloseToggle)
+        self.connectMicrowaveODMRButton.clicked.connect(self.microwaveDeviceConnectionToggle)
+        self.onOffODMRConnectButton.clicked.connect(self.microwaveOnOffToggleODMR)
+
+        # rabi
+        self.applyMicrowaveRabiButton.clicked.connect(self.applyChangesOfMicrowaveSettings)
+        self.btnMeasureRabiPulse.clicked.connect(self.clearAndStartRabiMeasurement)
+        self.connectMicrowaveRabiButton.clicked.connect(self.microwaveDeviceConnectionToggle)
+        self.onOffRabiConnectButton.clicked.connect(self.microwaveOnOffToggleRabi)
+
+        # TODO: ADD save method
+        # self.btnSave.clicked.connect(self.save)
+
         # TODO: Add full rabi sequence
         # self.btnScanRabi.clicked.connect(self.startRabiScan)
 
@@ -98,13 +94,9 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         self.txtStopFreq.setText("3200")
         self.txtCenterFreq.setText("2870")
         self.txtRFPower.setText("0")
-        self.comboBoxMode.setCurrentIndex(0)
-        self.btnOn_Off.setText("RF is Off")
-        # Declare operation mode
-        self.comboBoxMeasureType.addItems([m.name for m in MeasurementType])
-        self.comboBoxMeasureType.setCurrentIndex(0)
-        # set SynthHD as default MW device
-        self.comboBoxMWdevice.setCurrentIndex(0)
+        self.txtRFPowerRabi.setText("0")
+        self.onOffRabiConnectButton.setText("RF is Off")
+        self.onOffODMRConnectButton.setText("RF is Off")
         # --------------------------------------------------------------------------------------------------------------
 
         # declare start time and width for Rabi sequence pulses
@@ -117,24 +109,42 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         self.txtStartReadout.setText('0')
         
         # declare File Path
-        self.txtPath.setText(self.measurementManager.dataSaver.getFolderToSave())
-        self.txtPath.textChanged.connect(self.path_changed)
-        self.txtNum.setText('0')
+        # self.txtPath.setText(self.measurementManager.dataSaver.getFolderToSave())
+        # self.txtPath.textChanged.connect(self.path_changed)
+        # self.txtNum.setText('0')
 
-        # populate Scan param combobox
-        self.cmbScanParam.addItems(['MW width'])
+        # # declare Range
+        # self.txtRange.setText('')
+        # self.txtRange.editingFinished.connect(self.range_changed)
 
-        # declare Range
-        self.txtRange.setText('')
-        self.txtRange.editingFinished.connect(self.range_changed)
-
-        # declare Iterations
-        self.txtIterations.setText('')
-        self.txtIterations.editingFinished.connect(self.iterations_changed)
+        # # declare Iterations
+        # self.txtIterations.setText('')
+        # self.txtIterations.editingFinished.connect(self.iterations_changed)
 
         # declare Laser level
         self.txtLowLevel.setText('0.014')
         self.txtHighLevel.setText('0.9')
+
+    # Initialization Methods
+    def initializeODMRAxes(self):
+        # Create figure
+        figure, self.axesODMR = plt.subplots()
+        figure.set_facecolor('none')
+        
+        # TODO: check if necessery?
+        # self.axesODMR2 = self.axesODMR.twinx()
+
+        self.canvas = FigureCanvas(figure)
+        self.ODMRPlotWidget.addWidget(self.canvas)
+
+        # Create navigation toolbar
+        self.toolbar = NavigationToolbar(self.canvas, self.ODMRPlotWidget, False)
+
+        # TODO: check if necessery?
+        # Remove subplots action
+        actions = self.toolbar.actions()
+        self.toolbar.removeAction(actions[7])
+        self.ODMRPlotWidget.addWidget(self.toolbar)
 
     # Action Methods
     def applyChangesOfMicrowaveSettings(self):
@@ -159,6 +169,8 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
                 self.btnOn_Off.setText("RF is On")
                 self.btnOn_Off.setStyleSheet("background-color:red")
                 self.btnConnect_2.setText('Disconnect')
+
+                self.applyChangesOfMicrowaveSettings()
             else:
                 self.btnOn_Off.setText("RF is off")
                 self.btnOn_Off.setStyleSheet("background-color:none")
@@ -173,11 +185,19 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
             self.measurementManager.microwaveOnOffToggle()
 
             if self.measurementManager.getIsMicrowaveOn():
-                self.btnOn_Off.setText("RF is On")
-                self.btnOn_Off.setStyleSheet("background-color:red")
+                self.onOffODMRConnectButton.setText("RF is On")
+                self.onOffRabiConnectButton.setText("RF is On")
+                
+                self.onOffODMRConnectButton.setStyleSheet("background-color:red")
+                self.onOffRabiConnectButton.setStyleSheet("background-color:red")
+
+                self.applyChangesOfMicrowaveSettings()
             else:
-                self.btnOn_Off.setText("RF is off")
-                self.btnOn_Off.setStyleSheet("background-color:none")
+                self.onOffODMRConnectButton.setText("RF is off")
+                self.onOffRabiConnectButton.setText("RF is off")
+                
+                self.onOffODMRConnectButton.setStyleSheet("background-color:none")
+                self.onOffRabiConnectButton.setStyleSheet("background-color:none")
 
         except Exception:
             print('Error in sending command to windfreak')
@@ -185,7 +205,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
 
     def connectToRedPitayaToggle(self):
         try:
-            self.measurementManager.connectToRedPitayaToggle(self.txtIP.text(), int(self.txtPort.text()))
+            self.measurementManager.connectToRedPitayaToggle(self.txtIPRedPitaya.text(), int(self.txtPortRedPitaya.text()))
 
             if self.measurementManager.getIsRedPitayaConnected():
                 # Wait for connection event to enable the button  
@@ -193,42 +213,52 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
             else:
                 self.btnConnect.setText('Connect')
                 self.btnConnect.setEnabled(True)
-
-            # Connect also to pulse blaster... TODO: change to different button
-            self.measurementManager.connectToPulseBlaster()
         except Exception:
             traceback.print_exc()
 
-    def repeatAddCheackboxChanged(self):
-        if not self.ckbRepeatAdd.isChecked():
-            self.measurementManager.stopCurrentMeasurement()
+    def connectToPulseBlasterToggle(self):
+        try:
+            # TODO: Change to Toggle, add IP and Port
+            self.measurementManager.connectToPulseBlaster()
+        except Exception:
+            traceback.print_exc()
 
     def clearAndStartODMR(self):
         try:
             self.lblRepeatNum.setText('')
             self.updateMicrowaveSweepConfig()
             config = self.createPulseConfiguration()
-            self.measurementManager.startNewODMRMeasuremnt(config)
+            repet = repetition[self.repetitionComboBox.currentText()]
+            self.measurementManager.startNewODMRMeasuremnt(repet, config)
+        except Exception as ex:
+            print(ex)
+            traceback.print_exc()
+
+    def stopCurrentMeasurement(self):
+        try:
+            self.measurementManager.stopCurrentMeasurement()
         except Exception as ex:
             print(ex)
             traceback.print_exc()
 
     def clearAndStartRabiMeasurement(self):
         try:
+            self.updateMicrowaveSweepConfig()
             config = self.createPulseConfiguration()
             self.measurementManager.startNewRabiPulseMeasuremnt(config)
         except Exception:
             traceback.print_exc()
 
-    def save(self):
-        try:
-            if self.measurementManager.measurementType == MeasurementType.ODMR:
-                self.saveODMR()
-            elif self.measurementManager.measurementType == MeasurementType.SingleRabiPulse:
-                self.saveRabi()
-        except Exception as ex:
-            print(ex)
-            traceback.print_exc()
+    # TODO: Add Save
+    # def save(self):
+    #     try:
+    #         if self.measurementManager.measurementType == MeasurementType.ODMR:
+    #             self.saveODMR()
+    #         elif self.measurementManager.measurementType == MeasurementType.SingleRabiPulse:
+    #             self.saveRabi()
+    #     except Exception as ex:
+    #         print(ex)
+    #         traceback.print_exc()
 
     # Config Methods
     def createPulseConfiguration(self):
@@ -236,8 +266,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
             timeStep = measurementManager.redPitayaTimeStep
             pulseConfig = pulseConfiguration()
 
-            # TODO: regard ramsi and multipule rabi when needed
-            if self.measurementManager.measurementType == MeasurementType.ODMR:
+            if self.measurmentTabs.currentIndex() == measurementType.ODMR.value:
                 pulseConfig.CountDuration = np.uint32(int(float(self.txtCountDuration.text()) / timeStep))
             else:
                 pulseConfig.CountDuration = np.uint32(1)
@@ -260,14 +289,22 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
             traceback.print_exc()
 
     def updateMicrowaveSweepConfig(self):
+        currentTriggerMode = 0
+        RFPower = float(self.txtRFPowerRabi.text())
+
+        if self.measurmentTabs.currentIndex() == measurementType.ODMR.value:
+            # Sweep Mode
+            currentTriggerMode = 1
+            RFPower = float(self.txtRFPower.text())
+        
         config = microwaveConfiguration(
             centerFreq=float(self.txtCenterFreq.text()), 
-            power=float(self.txtRFPower.text()), 
-            powerSweepStart=float(self.txtRFPower.text()),
-            powerSweepStop=float(self.txtRFPower.text()),
+            power=RFPower, 
+            powerSweepStart=RFPower,
+            powerSweepStop=RFPower,
             startFreq=float(self.txtStartFreq.text()),
             stopFreq=float(self.txtStopFreq.text()),
-            trigMode=self.comboBoxMode.currentIndex())
+            trigMode=currentTriggerMode)
 
         config.stepSize = (config.stopFreq - config.startFreq) / int(self.txtCountNumber.text())
         config.stepTime = float(self.txtCountDuration.text()) / constConvertMicroSecondToMilisecond # convert from micro seconds to ms
@@ -278,9 +315,9 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
     def refreshPlot(self):
         type = self.measurementManager.getMeasurementType()
 
-        if type == MeasurementType.ODMR and self.measurementManager.getHaveODMRData():
+        if type == measurementType.ODMR and self.measurementManager.getHaveODMRData():
             self.plotODMRData(self.measurementManager.getODMRData())
-        elif type == MeasurementType.SingleRabiPulse and self.measurementManager.getHaveRabiData():
+        elif type == measurementType.RabiPulse and self.measurementManager.getHaveRabiData():
             self.plotRabiData(self.measurementManager.getRabiData())
 
     def plotODMRData(self, data):
@@ -290,19 +327,19 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
             self.toolbar.update()
 
             # reset plot
-            self.axes.clear()
-            self.axes2.clear()
-            self.axes.grid()
+            self.axesODMR.clear()
+            # self.axes2.clear()
+            self.axesODMR.grid()
 
             xLabel = self.measurementManager.ODMRXAxisLabel
             yLabel = self.measurementManager.ODMRYAxisLabel
 
             # plot
-            self.curve_3_2, = self.axes.plot(data[xLabel], data[yLabel], linewidth=0.5, c='black', label="Normalized signal")
-            self.axes.set_xlabel(xLabel)
-            self.axes.set_ylabel(yLabel)
-            self.axes.set_position([0.15, 0.15, 0.8, 0.8])
-            self.axes.legend(loc="upper right")
+            self.curveODMR, = self.axesODMR.plot(data[xLabel], data[yLabel], linewidth=0.5, c='black', label="Normalized signal")
+            self.axesODMR.set_xlabel(xLabel)
+            self.axesODMR.set_ylabel(yLabel)
+            self.axesODMR.set_position([0.15, 0.15, 0.8, 0.8])
+            self.axesODMR.legend(loc="upper right")
             
             self.canvas.draw()
         except Exception:
@@ -315,21 +352,21 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
             self.toolbar.update()
 
             # reset plot
-            self.axes.clear()
-            self.axes2.clear()
-            self.axes.grid()
+            self.axesRabi.clear()
+            # self.axes2.clear()
+            self.axesRabi.grid()
 
             # plot
             xLabel = self.measurementManager.RabiXAxisLabel
             yLabel = self.measurementManager.RabiYAxisLabel
 
-            self.curve_3_1 = self.axes.scatter(data[xLabel], data[yLabel], s=1, c='black')
-            self.curve_3_2 = self.axes.plot(data[xLabel], data[yLabel], linewidth=0.5, c='black')
+            self.axesRabi1 = self.axesRabi.scatter(data[xLabel], data[yLabel], s=1, c='black')
+            self.axesRabi2 = self.axesRabi.plot(data[xLabel], data[yLabel], linewidth=0.5, c='black')
             
-            self.axes.set_xlabel(xLabel)
-            self.axes.set_ylabel(yLabel)
+            self.axesRabi.set_xlabel(xLabel)
+            self.axesRabi.set_ylabel(yLabel)
             
-            self.axes.set_position([0.15, 0.15, 0.8, 0.8])
+            self.axesRabi.set_position([0.15, 0.15, 0.8, 0.8])
             self.canvas.draw()
         except Exception:
             traceback.print_exc()
@@ -372,26 +409,13 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         self.btnConnect.setText('Connect')
 
     # V
-    def range_changed(self):
-        try:
-            self.Range = []
-            self.Range = self.txtRange.text().split(",")
-            self.Step = float(self.Range[2])
-            self.Range = np.arange(float(self.Range[0]), float(self.Range[1]) + self.Step, self.Step)
-        except Exception:
-            traceback.print_exc()
+    # def iterations_changed(self):
+    #     try:
+    #         self.Iterations = 0
+    #         self.Iterations = int(self.txtIterations.text())
+    #     except Exception:
+    #         traceback.print_exc()
 
-    # V
-    def iterations_changed(self):
-        try:
-            self.Iterations = 0
-            self.Iterations = int(self.txtIterations.text())
-        except Exception:
-            traceback.print_exc()
-
-    # V
-    def path_changed(self):
-        self.txtNum.setText(r'0')
 
     #TODO: Rewrite to make sense...
     # def startRabiScan(self):

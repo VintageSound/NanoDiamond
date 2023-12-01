@@ -1,7 +1,6 @@
 from enum import Enum
 
-class MeasurementType(Enum):
-    ODMR = 1
-    SingleRabiPulse = 2
-    RabiScan = 3
-    Ramzi = 4
+class measurementType(Enum):
+    ODMR = 0
+    RabiPulse = 1
+    RamziPulse = 2

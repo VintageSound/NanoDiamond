@@ -10,6 +10,8 @@ from Data.pulseConfiguration import pulseConfiguration
 
 class pulseBlasterInterface():
     _instance = None
+    defaultIp = "132.72.13.187"
+    defaultPort = 50001
 
     # This is to make sure there is only one instance if the interface, so that no one will use 
     # the same connection \ socket \ series twice
@@ -21,8 +23,8 @@ class pulseBlasterInterface():
         return cls._instance
 
     def initialize(self):
-        self.server_ip = "132.72.13.187"
-        self.server_port = 50001
+        self.server_ip = pulseBlasterInterface.defaultIp
+        self.server_port = pulseBlasterInterface.defaultPort
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)    
         self.isOpen = False
 

@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import os
 
-from Data.MeasurementType import MeasurementType
+from Data.measurementType import measurementType
 from Interfaces.redPitayaInterface import redPitayaInterface
 
 class dataSaver():
@@ -16,7 +16,7 @@ class dataSaver():
         return r'D:/Experiments/' + str(self.currentDate) + r'/'
 
     def saveODMR(self):
-        metadata = {'Measurement type:': MeasurementType.ODMR.name,
+        metadata = {'Measurement type:': measurementType.ODMR.name,
                 'RF Power [dBm]:': self.pulseConfig.RFPower,
                 'Measurment Duration [us]:': self.pulseConfig.CountDuration * redPitayaInterface.timeStep,
                 'Comment:': self.txtComment.text(),
@@ -28,7 +28,7 @@ class dataSaver():
         self.save(filePath, metadata, self.ODMRData)
 
     def saveRabi(self, pulseConfig, comment, paramValue):
-        metadata = {'Measurement type': MeasurementType.Rabi.name,
+        metadata = {'Measurement type': measurementType.RabiPulse.name,
                 'RF Power [dBm]': pulseConfig.RFPower,
                 'Measurement Duration [us]': pulseConfig.CountDuration * redPitayaInterface.timeStep,
                 'Comment': comment,
@@ -48,12 +48,12 @@ class dataSaver():
 
     # TODO: comeplete
     def createFilePathODMR(self, textPath):
-        filePath = self.txtPath.text() + r'/' + MeasurementType.ODMR.name + '_' + self.txtNum.text() + '.csv'
+        filePath = self.txtPath.text() + r'/' + measurementType.ODMR.name + '_' + self.txtNum.text() + '.csv'
         return filePath
 
     # TODO: comeplete
     def createFilePathODMR(self, textPath):
-        filePath = self.txtPath.text() + r'/' + MeasurementType.Rabi.name + '_' + self.txtNum.text() + '.csv'
+        filePath = self.txtPath.text() + r'/' + measurementType.Rabi.name + '_' + self.txtNum.text() + '.csv'
         return filePath
 
     # TODO: change to pickle

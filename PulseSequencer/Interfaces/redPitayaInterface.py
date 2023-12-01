@@ -11,6 +11,8 @@ import numpy as np
 class redPitayaInterface():
     _instance = None
     timeStep = 0.008 # micro second. 
+    defaultRpHost = 'rp-f09ded.local'
+    defaultPort = 1001
 
     # This is to make sure there is only one instance if the interface, so that no one will use 
     # the same connection \ socket \ series twice
@@ -29,14 +31,13 @@ class redPitayaInterface():
         self.socket.error.connect(self.connectionErrorRecived)
 
         # set IP address and Port number
-        self.rp_host = 'rp-f09ded.local'
-        self.ip = self.get_ip_address(self.rp_host)
-        self.port = 1001
+        self.ip = self.get_ip_address(redPitayaInterface.defaultRpHost)
+        self.port = redPitayaInterface.defaultPort
 
         if self.ip:
             print(f'The IP address of {self.rp_host} is {self.ip}')
         else:
-            print(f'Could not resolve the IP address of {self.rp_host}')
+            print(f'Could not resolve the IP address of {redPitayaInterface.defaultRpHost}')
 
         # state variable
         # self.isConnected = False

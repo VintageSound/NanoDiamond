@@ -10,7 +10,8 @@ from Interfaces.redPitayaInterface import redPitayaInterface
 from Interfaces.pulseBlasterInterface import pulseBlasterInterface
 from Interfaces.microwaveInterface import microwaveInterface
 from Interfaces.dataSaver import dataSaver
-from Data.MeasurementType import MeasurementType
+from Data.measurementType import measurementType
+from Data.repetition import repetition
 
 class measurementManager():
     maxPower = 2 ** 13 # not sure why...
@@ -47,15 +48,15 @@ class measurementManager():
         self.initializeRabiData()
 
         # setting variables
-        self.measurementType = MeasurementType.ODMR
+        self.measurementType = measurementType.ODMR
+        self.repetition = repetition.RepeatAndSum
         self.isMeasurementActive = False
         
         self.range = []
         self.repeatMeasurement = True
-        self.currentIteration = int(1)
         
-        # self.repeatNum = int(2000)
-        self.timeStep = int(0)
+        self.maxRepetetions = None
+        self.timeStep = 0
         self.size = 2048  # number of samples to show on the plot # max size
         self.initalizeBufferODMR()
         
@@ -181,7 +182,7 @@ class measurementManager():
         self.redPitaya.startRabiMeasurement(self.pulseConfig)
 
     def startNewRabiPulseMeasuremnt(self, config = None):
-        self.measurementType = MeasurementType.SingleRabiPulse
+        self.measurementType = measurementType.RabiPulse
         self.isMeasurementActive = True
         self.initalizeBufferRabi()
         self.configurePulseSequence(config)
@@ -191,8 +192,12 @@ class measurementManager():
 
         self._RabiPulseMeasurement()
     
-    def startNewODMRMeasuremnt(self, config = None):
-        self.measurementType = MeasurementType.ODMR
+    def startNewODMRMeasuremnt(self, repet = repetition.RepeatAndSum, maxRepetations = None, config = None):
+        self.repetition = repet
+        self.maxRepetetions = maxRepetations
+        self.measurementCountODMR = 0
+
+        self.measurementType = measurementType.ODMR
         self.isMeasurementActive = True
         self.initalizeBufferODMR()
         self.configurePulseSequence(config)
@@ -205,7 +210,11 @@ class measurementManager():
     # Data Convertion
     def saveODMRDataToDataFrame(self, data):
         xData = np.linspace(self.microwaveConfig.startFreq, self.microwaveConfig.stopFreq, int(self.size / 2))
-        yData = self.ODMRData[self.ODMRYAxisLabel].tolist() + data
+        yData = data
+
+        # Add the recived data to the stored data if needed
+        if self.repetition == repetition.RepeatAndSum:
+            yData = self.ODMRData[self.ODMRYAxisLabel].tolist() + data
 
         self.ODMRData = pd.DataFrame({self.ODMRXAxisLabel: xData, self.ODMRYAxisLabel: yData})
         self.HaveODMRData = True
@@ -298,27 +307,28 @@ class measurementManager():
         if not self.isMeasurementActive:
             return
 
-        if not self.repeatMeasurement:
-            return
-
         # ----- delay loop -------
         time.sleep(0.5)
         # ------------------------
 
-        if self.measurementType == MeasurementType.ODMR:
+        if (self.measurementType == measurementType.ODMR and 
+            self.repetition != repetition.Single and 
+            self.measurementCountODMR <= self.maxRepetetions):
             self._ODMRMeasuremnt()
-        elif self.measurementType == MeasurementType.SingleRabiPulse:
-            self._RabiMeasurement()
+
+        # TODO: check if needed?
+        # elif self.measurementType == measurementType.RabiPulse:
+        #     self._RabiMeasurement()
 
     def reciveDataHandler(self, data):
         try:
-            if self.measurementType == MeasurementType.ODMR:
+            if self.measurementType == measurementType.ODMR:
                 convertedData = self.redPitaya.convertODMRData(data, self.size)
                 self.saveODMRDataToDataFrame(convertedData)
                 self.measurementCountODMR += 1
                 self.raiseODMRDataRecivedEvent()
 
-            if self.measurementType == MeasurementType.SingleRabiPulse:
+            if self.measurementType == measurementType.RabiPulse:
                 self.saveRabiDataToDataFrame(data)
                 self.measurementCountRabi += 1
                 self.raiseRabiDataRecivedEvent()
