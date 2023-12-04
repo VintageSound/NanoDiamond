@@ -28,8 +28,8 @@ from LogicManagers.measurementManager import measurementManager
 QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True) # enable high-dpi scaling
 QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True) # use high-dpi icons
 
-Ui_PhaseLockedLoop, QMainWindow = uic.loadUiType('PulseSequencer\\PulseSequencerV4.ui')
-# Ui_PhaseLockedLoop, QMainWindow = uic.loadUiType('PulseSequencerV4.ui')
+# Ui_PhaseLockedLoop, QMainWindow = uic.loadUiType('PulseSequencer\\PulseSequencerV4.ui')
+Ui_PhaseLockedLoop, QMainWindow = uic.loadUiType('PulseSequencerV4.ui')
 
 constConvertMicroSecondToMilisecond = 1000
 
@@ -141,13 +141,13 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         self.ODMRPlotLayout.addWidget(self.odmrCanvas)
 
         # Create navigation toolbar
-        self.toolbar = NavigationToolbar(self.odmrCanvas, self.ODMRPlotWidget, False)
+        self.ODMRToolbar = NavigationToolbar(self.odmrCanvas, self.ODMRPlotWidget, False)
 
         # TODO: check if necessery?
         # Remove subplots action
-        actions = self.toolbar.actions()
-        self.toolbar.removeAction(actions[7])
-        self.ODMRPlotLayout.addWidget(self.toolbar)
+        actions = self.ODMRToolbar.actions()
+        self.ODMRToolbar.removeAction(actions[7])
+        self.ODMRPlotLayout.addWidget(self.ODMRToolbar)
 
     def initializeRabiAxes(self):
         # Create figure
@@ -160,20 +160,21 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         self.rabiPulsePlotLayout.addWidget(self.rabiCanvas)
 
         # Create navigation toolbar
-        self.rabiToolbar = NavigationToolbar(self.canvas, self.RabiPlotWidget, False)
+        self.rabiToolbar = NavigationToolbar(self.rabiCanvas, self.rabiPulsePlotWidget, False)
 
         # TODO: check if necessery?
         # Remove subplots action
         actions = self.rabiToolbar.actions()
         self.rabiToolbar.removeAction(actions[7])
-        self.rabiPulsePlotLayout.addWidget(self.toolbar)
+        self.rabiPulsePlotLayout.addWidget(self.rabiToolbar)
 
     # Action Methods
     def applyChangesOfMicrowaveSettings(self):
         try:
             self.updateMicrowaveSweepConfig()
             self.refreshPlot()
-        except Exception:
+        except Exception as ex:
+            print(ex)
             traceback.print_exc()
 
     def laserOpenCloseToggle(self):
@@ -230,8 +231,8 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
                 self.onOffODMRConnectButton.setStyleSheet("background-color:none")
                 self.onOffRabiConnectButton.setStyleSheet("background-color:none")
 
-        except Exception:
-            print('Error in sending command to windfreak')
+        except Exception as ex:
+            print('Error in sending command to windfreak', ex)
             traceback.print_exc()
 
     def connectToRedPitayaToggle(self):
@@ -256,11 +257,19 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
 
     def clearAndStartODMR(self):
         try:
-            self.lblRepeatNum.setText('')
+            self.lblCurrentRepetetion.setText('0')
             self.updateMicrowaveSweepConfig()
             config = self.createPulseConfiguration()
-            repet = repetition[self.repetitionComboBox.currentText()]
-            self.measurementManager.startNewODMRMeasuremnt(repet, config)
+            repeat = repetition[self.repetitionComboBox.currentText()]
+
+            max_repetitions = self.txtRepetitionMax.text()
+
+            if max_repetitions == "":
+                max_repetitions = None
+            else:
+                max_repetitions = int(max_repetitions)
+
+            self.measurementManager.startNewODMRMeasuremnt(repeat, config, max_repetitions)
         except Exception as ex:
             print(ex)
             traceback.print_exc()
@@ -276,7 +285,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         try:
             self.updateMicrowaveSweepConfig()
             config = self.createPulseConfiguration()
-            self.measurementManager.startNewRabiPulseMeasuremnt(config)
+            self.measurementManager.startNewRabiPulseMeasurement(config)
         except Exception:
             traceback.print_exc()
 
@@ -372,51 +381,51 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
     def plotODMRData(self, data):
         try:
             # reset toolbar
-            self.toolbar.home()
-            self.toolbar.update()
+            self.ODMRToolbar.home()
+            self.ODMRToolbar.update()
 
             # reset plot
             self.axesODMR.clear()
             # self.axes2.clear()
             self.axesODMR.grid()
 
-            xLabel = self.measurementManager.ODMRXAxisLabel
-            yLabel = self.measurementManager.ODMRYAxisLabel
+            x_label = self.measurementManager.ODMRXAxisLabel
+            y_label = self.measurementManager.ODMRYAxisLabel
 
             # plot
-            self.curveODMR, = self.axesODMR.plot(data[xLabel], data[yLabel], linewidth=0.5, c='black', label="Normalized signal")
-            self.axesODMR.set_xlabel(xLabel)
-            self.axesODMR.set_ylabel(yLabel)
+            self.curveODMR, = self.axesODMR.plot(data[x_label], data[y_label], linewidth=0.5, c='black', label="Normalized signal")
+            self.axesODMR.set_xlabel(x_label)
+            self.axesODMR.set_ylabel(y_label)
             self.axesODMR.set_position([0.15, 0.15, 0.8, 0.8])
             self.axesODMR.legend(loc="upper right")
             
-            self.canvas.draw()
+            self.odmrCanvas.draw()
         except Exception:
             traceback.print_exc()
 
     def plotRabiData(self, data):
         try:
             # reset toolbar
-            self.toolbar.home()
-            self.toolbar.update()
+            self.rabiToolbar.home()
+            self.rabiToolbar.update()
 
             # reset plot
-            self.axesRabi.clear()
-            # self.axes2.clear()
-            self.axesRabi.grid()
+            self.axesRabi1.clear()
+            self.axesRabi2.clear()
+            self.axesRabi1.grid()
 
             # plot
             xLabel = self.measurementManager.RabiXAxisLabel
             yLabel = self.measurementManager.RabiYAxisLabel
 
-            self.axesRabi1 = self.axesRabi.scatter(data[xLabel], data[yLabel], s=1, c='black')
-            self.axesRabi2 = self.axesRabi.plot(data[xLabel], data[yLabel], linewidth=0.5, c='black')
+            self.curveRabi1 = self.axesRabi1.scatter(data[xLabel], data[yLabel], s=1, c='black')
+            self.curveRabi2 = self.axesRabi1.plot(data[xLabel], data[yLabel], linewidth=0.5, c='black')
             
-            self.axesRabi.set_xlabel(xLabel)
-            self.axesRabi.set_ylabel(yLabel)
+            self.axesRabi1.set_xlabel(xLabel)
+            self.axesRabi1.set_ylabel(yLabel)
             
-            self.axesRabi.set_position([0.15, 0.15, 0.8, 0.8])
-            self.canvas.draw()
+            self.axesRabi1.set_position([0.15, 0.15, 0.8, 0.8])
+            self.rabiCanvas.draw()
         except Exception:
             traceback.print_exc()
 
@@ -431,9 +440,9 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
     
     def laserStatusChangedEventHandler(self):
         if self.measurementManager.getIsLaserOpen():
-            self.btnOpen.setText('Close')
+            self.btnOpenCloseAOM.setText('Close')
         else:
-            self.btnOpen.setText('Open')
+            self.btnOpenCloseAOM.setText('Open')
 
     def redPitayaConnectedHandler(self):
         try:

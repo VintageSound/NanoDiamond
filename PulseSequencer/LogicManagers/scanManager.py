@@ -24,7 +24,7 @@ class scanManager():
         self.config.WidthMW = self.timeRange[self.currentIteration] 
 
         self.measurementManager.registerToRabiPulseDataRecivedEvent(self.rabiPulseEndedEventHandler)
-        self.measurementManager.startNewRabiPulseMeasuremnt(config=self.config)
+        self.measurementManager.startNewRabiPulseMeasurement(config=self.config)
         
     def rabiPulseEndedEventHandler(self, data):
         self.measurementData[self.config.WidthMW] = data
@@ -34,5 +34,5 @@ class scanManager():
     def continueCurrentScan(self):
         self.currentIteration += 1
         self.config.WidthMW = self.timeRange[self.currentIteration] 
-        self.measurementManager.startNewRabiPulseMeasuremnt(config=self.config)
+        self.measurementManager.startNewRabiPulseMeasurement(config=self.config)
     

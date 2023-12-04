@@ -47,6 +47,7 @@ class microwaveInterface():
 
         print("WindFreak is connected")
 
+    # TODO:  self.ser.is_open is false when called twice...
     def checkIfMicrowaveIsOn(self):
         if not self.ser.is_open:
             raise Exception('Windfreak is disconnected')

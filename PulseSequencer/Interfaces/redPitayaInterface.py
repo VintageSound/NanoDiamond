@@ -35,7 +35,7 @@ class redPitayaInterface():
         self.port = redPitayaInterface.defaultPort
 
         if self.ip:
-            print(f'The IP address of {self.rp_host} is {self.ip}')
+            print(f'The IP address of {redPitayaInterface.defaultRpHost} is {self.ip}')
         else:
             print(f'Could not resolve the IP address of {redPitayaInterface.defaultRpHost}')
 
@@ -169,7 +169,7 @@ class redPitayaInterface():
     def startODMR(self, pulseConfig):
         self.socket.write(struct.pack('<Q', 4 << 58 | pulseConfig.CountDuration))
 
-    def startRabiMeasurment(self, pulseConfig):
+    def startRabiMeasurement(self, pulseConfig):
         self.socket.write(struct.pack('<Q', 6 << 58 | pulseConfig.CountDuration))
     # ---------------- Events -----------------
     def connectedMessageRecived(self):
@@ -195,14 +195,14 @@ class redPitayaInterface():
             size = self.socket.bytesAvailable()
             print("recived new data, bytes:", size)
 
-            # Recive partial data
+            # Receive partial data
             if self.offset + size < self.bufferSize:
                 self.buffer[self.offset:self.offset + size] = self.socket.read(size)
                 self.offset += size
 
                 return
             
-            # Recive all data
+            # Receive all data
             print("All the data was recived")
             self.buffer[self.offset:self.bufferSize] = self.socket.read(self.bufferSize - self.offset)
             

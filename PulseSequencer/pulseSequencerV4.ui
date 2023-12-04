@@ -390,7 +390,7 @@
           <item>
            <widget class="QTabWidget" name="measurmentTabs">
             <property name="currentIndex">
-             <number>2</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="ODMRTab">
              <attribute name="title">
@@ -612,8 +612,8 @@
                        <rect>
                         <x>20</x>
                         <y>30</y>
-                        <width>99</width>
-                        <height>30</height>
+                        <width>82</width>
+                        <height>26</height>
                        </rect>
                       </property>
                       <property name="autoFillBackground">
@@ -686,7 +686,7 @@
                         <x>9</x>
                         <y>22</y>
                         <width>431</width>
-                        <height>171</height>
+                        <height>151</height>
                        </rect>
                       </property>
                       <layout class="QFormLayout" name="formLayout_4">
@@ -725,10 +725,10 @@
                      <widget class="QPushButton" name="btnSaveODMR">
                       <property name="geometry">
                        <rect>
-                        <x>190</x>
-                        <y>210</y>
-                        <width>241</width>
-                        <height>33</height>
+                        <x>230</x>
+                        <y>180</y>
+                        <width>211</width>
+                        <height>51</height>
                        </rect>
                       </property>
                       <property name="text">
@@ -741,7 +741,9 @@
                  </widget>
                 </item>
                 <item row="0" column="0">
-                 <layout class="QGridLayout" name="ODMRPlotLayout"/>
+                 <widget class="QWidget" name="ODMRPlotWidget" native="true">
+                  <layout class="QGridLayout" name="ODMRPlotLayout"/>
+                 </widget>
                 </item>
                </layout>
               </item>
@@ -780,7 +782,7 @@
                      <property name="minimumSize">
                       <size>
                        <width>450</width>
-                       <height>250</height>
+                       <height>220</height>
                       </size>
                      </property>
                      <property name="font">
@@ -808,40 +810,6 @@
                         </item>
                        </widget>
                       </item>
-                      <item row="2" column="0">
-                       <layout class="QHBoxLayout" name="horizontalLayout_3">
-                        <property name="spacing">
-                         <number>7</number>
-                        </property>
-                        <property name="sizeConstraint">
-                         <enum>QLayout::SetMinimumSize</enum>
-                        </property>
-                        <item>
-                         <widget class="QPushButton" name="connectMicrowaveRabiButton">
-                          <property name="text">
-                           <string>Connect</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QPushButton" name="onOffRabiConnectButton">
-                          <property name="enabled">
-                           <bool>true</bool>
-                          </property>
-                          <property name="text">
-                           <string>RF is Off</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QPushButton" name="applyMicrowaveRabiButton">
-                          <property name="text">
-                           <string>Apply</string>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
-                      </item>
                       <item row="1" column="0">
                        <layout class="QFormLayout" name="formLayout_5">
                         <item row="1" column="0">
@@ -865,6 +833,42 @@
                          <widget class="QLineEdit" name="txtCenterFreq"/>
                         </item>
                        </layout>
+                      </item>
+                      <item row="2" column="0">
+                       <widget class="QWidget" name="" native="true">
+                        <layout class="QHBoxLayout" name="horizontalLayout_3">
+                         <property name="spacing">
+                          <number>7</number>
+                         </property>
+                         <property name="sizeConstraint">
+                          <enum>QLayout::SetMinimumSize</enum>
+                         </property>
+                         <item>
+                          <widget class="QPushButton" name="connectMicrowaveRabiButton">
+                           <property name="text">
+                            <string>Connect</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QPushButton" name="onOffRabiConnectButton">
+                           <property name="enabled">
+                            <bool>true</bool>
+                           </property>
+                           <property name="text">
+                            <string>RF is Off</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QPushButton" name="applyMicrowaveRabiButton">
+                           <property name="text">
+                            <string>Apply</string>
+                           </property>
+                          </widget>
+                         </item>
+                        </layout>
+                       </widget>
                       </item>
                      </layout>
                     </widget>
@@ -1076,7 +1080,9 @@
                  </widget>
                 </item>
                 <item row="0" column="0">
-                 <layout class="QGridLayout" name="rabiPulsePlotLayout"/>
+                 <widget class="QWidget" name="rabiPulsePlotWidget" native="true">
+                  <layout class="QGridLayout" name="rabiPulsePlotLayout"/>
+                 </widget>
                 </item>
                </layout>
               </item>
@@ -1315,7 +1321,9 @@
                  </widget>
                 </item>
                 <item row="0" column="0">
-                 <layout class="QGridLayout" name="rabiScanPlotLayout"/>
+                 <widget class="QWidget" name="rabiScanPlotWidget" native="true">
+                  <layout class="QGridLayout" name="rabiScanPlotLayout"/>
+                 </widget>
                 </item>
                </layout>
               </item>
