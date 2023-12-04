@@ -22,7 +22,6 @@ class measurementManager():
         self.redPitaya = redPitayaInterface(QMainObject)
         self.pulseBaster = pulseBlasterInterface()
         self.microwaveDevice = microwaveInterface()
-        self.dataSaver = dataSaver()
 
         # register Events:
         self.redPitaya.registerReciveData(self.reciveDataHandler)
@@ -61,11 +60,11 @@ class measurementManager():
         self.initalizeBufferODMR()
         
         # Events 
-        self.AOMStatusChangedEvent = None
-        self.redPitayaConnectedEvent = None
-        self.ODMRDataRecivedEvent = None
-        self.rabiPulseDataRecivedEvent = None
-        self.connectionErrorEvent = None
+        self.AOMStatusChangedEvent = []
+        self.redPitayaConnectedEvent = []
+        self.ODMRDataRecivedEvent = []
+        self.rabiPulseDataRecivedEvent = []
+        self.connectionErrorEvent = []
 
     # Data Methods
     def initalizeBufferODMR(self):
@@ -234,62 +233,47 @@ class measurementManager():
 
     
     # Register Events
-    def registerToAOMStatusChangedEvent(self, eventHandler):
-        if self.AOMStatusChangedEvent is not None:
-            raise(Exception("AOMStatusChangedEvent allready registered!"))  
-        
-        self.AOMStatusChangedEvent = eventHandler
+    def registerToAOMStatusChangedEvent(self, callback):
+        self.AOMStatusChangedEvent.append(callback)
 
-    def registerToRedPitayaConnectedEvent(self, eventHandler):
-        if self.redPitayaConnectedEvent is not None:
-            raise(Exception("redPitayaConnectedEvent allready registered!"))  
-        
-        self.redPitayaConnectedEvent = eventHandler
+    def registerToRedPitayaConnectedEvent(self, callback):
+        self.redPitayaConnectedEvent.append(callback)
 
-    def registerToODMRDataRecivedEvent(self, eventHandler):
-        if self.ODMRDataRecivedEvent is not None:
-            raise(Exception("ODMRDataRecivedEvent allready registered!"))  
-        
-        self.ODMRDataRecivedEvent = eventHandler
+    def registerToODMRDataRecivedEvent(self, callback):
+        self.ODMRDataRecivedEvent.append(callback)
 
-    def registerToRabiPulseDataRecivedEvent(self, eventHandler):
-        if self.rabiPulseDataRecivedEvent is not None:
-            raise(Exception("rabiPulseDataRecivedEvent allready registered!"))  
-        
-        self.rabiPulseDataRecivedEvent = eventHandler
+    def registerToRabiPulseDataRecivedEvent(self, callback):
+        self.rabiPulseDataRecivedEvent.append(callback)
 
-    def registerConnectionErrorEvent(self, eventHandler):
-        if self.connectionErrorEvent is not None:
-            raise(Exception("connectionErrorEvent allready registered!"))  
-        
-        self.connectionErrorEvent = eventHandler
+    def registerConnectionErrorEvent(self, callback):
+        self.connectionErrorEvent.append(callback)
     
     # Raise Events
     def raiseAOMStatusChangedEvent(self):
-        if self.AOMStatusChangedEvent is not None:
-            self.AOMStatusChangedEvent()
+        for callback in self.AOMStatusChangedEvent:
+            callback()
 
     def raiseRedPitayaConnectedEvent(self):
-        if self.redPitayaConnectedEvent is not None:
-            self.redPitayaConnectedEvent()
+        for callback in self.redPitayaConnectedEvent:
+            callback()
         
     def raiseConnectionErrorEvent(self, error):
-        if self.connectionErrorEvent is not None:
-            self.connectionErrorEvent(error)
-
+        for callback in self.connectionErrorEvent:
+            callback()
+        
     def raiseODMRDataRecivedEvent(self):
         if not self.HaveODMRData:
             return
 
-        if self.ODMRDataRecivedEvent is not None:
-            self.ODMRDataRecivedEvent(self.ODMRData, self.measurementCountODMR)
-        
+        for callback in self.ODMRDataRecivedEvent:
+            callback(self.ODMRData, self.measurementCountODMR)
+
     def raiseRabiDataRecivedEvent(self):
         if not self.HaveRabiData:
             return
 
-        if self.rabiDataRecivedEvent is not None:
-            self.rabiDataRecivedEvent(self.RabiData, self.measurementCountRabi)
+        for callback in self.rabiDataRecivedEvent:
+            callback(self.RabiData)
 
     # Event Handlers    
     def redPitayaConnectedHandler(self):

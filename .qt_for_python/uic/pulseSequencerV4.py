@@ -359,29 +359,29 @@ class Ui_odmr(object):
 
         self.formLayout_4.setWidget(2, QFormLayout.LabelRole, self.lblParamValue)
 
-        self.txtNum = QLineEdit(self.formLayoutWidget_2)
-        self.txtNum.setObjectName(u"txtNum")
+        self.ODMRFileNumber = QLineEdit(self.formLayoutWidget_2)
+        self.ODMRFileNumber.setObjectName(u"ODMRFileNumber")
 
-        self.formLayout_4.setWidget(2, QFormLayout.FieldRole, self.txtNum)
+        self.formLayout_4.setWidget(2, QFormLayout.FieldRole, self.ODMRFileNumber)
 
         self.lblComment = QLabel(self.formLayoutWidget_2)
         self.lblComment.setObjectName(u"lblComment")
 
         self.formLayout_4.setWidget(3, QFormLayout.LabelRole, self.lblComment)
 
-        self.txtPath = QLineEdit(self.formLayoutWidget_2)
-        self.txtPath.setObjectName(u"txtPath")
+        self.ODMRPathTextBox = QLineEdit(self.formLayoutWidget_2)
+        self.ODMRPathTextBox.setObjectName(u"ODMRPathTextBox")
 
-        self.formLayout_4.setWidget(1, QFormLayout.SpanningRole, self.txtPath)
+        self.formLayout_4.setWidget(1, QFormLayout.SpanningRole, self.ODMRPathTextBox)
 
-        self.txtComment = QLineEdit(self.formLayoutWidget_2)
-        self.txtComment.setObjectName(u"txtComment")
+        self.ODMRComment = QLineEdit(self.formLayoutWidget_2)
+        self.ODMRComment.setObjectName(u"ODMRComment")
 
-        self.formLayout_4.setWidget(4, QFormLayout.SpanningRole, self.txtComment)
+        self.formLayout_4.setWidget(4, QFormLayout.SpanningRole, self.ODMRComment)
 
         self.btnSaveODMR = QPushButton(self.DataSave)
         self.btnSaveODMR.setObjectName(u"btnSaveODMR")
-        self.btnSaveODMR.setGeometry(QRect(10, 210, 421, 33))
+        self.btnSaveODMR.setGeometry(QRect(190, 210, 241, 33))
 
         self.gridLayout.addWidget(self.DataSave, 2, 0, 1, 1)
 
@@ -399,11 +399,11 @@ class Ui_odmr(object):
         self.gridLayout_9 = QGridLayout()
         self.gridLayout_9.setObjectName(u"gridLayout_9")
         self.gridLayout_9.setSizeConstraint(QLayout.SetNoConstraint)
-        self.ODMRPlotwidget_2 = QWidget(self.RabiPulseTab)
-        self.ODMRPlotwidget_2.setObjectName(u"ODMRPlotwidget_2")
-        self.ODMRPlotwidget_2.setMinimumSize(QSize(690, 839))
+        self.RabiPlotWidget = QWidget(self.RabiPulseTab)
+        self.RabiPlotWidget.setObjectName(u"RabiPlotWidget")
+        self.RabiPlotWidget.setMinimumSize(QSize(690, 839))
 
-        self.gridLayout_9.addWidget(self.ODMRPlotwidget_2, 0, 0, 1, 1)
+        self.gridLayout_9.addWidget(self.RabiPlotWidget, 0, 0, 1, 1)
 
         self.verticalWidget_3 = QWidget(self.RabiPulseTab)
         self.verticalWidget_3.setObjectName(u"verticalWidget_3")
@@ -514,28 +514,39 @@ class Ui_odmr(object):
         self.lblCommentRabi = QLabel(self.DataSave_2)
         self.lblCommentRabi.setObjectName(u"lblCommentRabi")
 
-        self.formLayout_6.setWidget(3, QFormLayout.LabelRole, self.lblCommentRabi)
+        self.formLayout_6.setWidget(4, QFormLayout.LabelRole, self.lblCommentRabi)
 
         self.txtPathRabi = QLineEdit(self.DataSave_2)
         self.txtPathRabi.setObjectName(u"txtPathRabi")
 
         self.formLayout_6.setWidget(1, QFormLayout.SpanningRole, self.txtPathRabi)
 
-        self.btnSaveRabi = QPushButton(self.DataSave_2)
-        self.btnSaveRabi.setObjectName(u"btnSaveRabi")
-
-        self.formLayout_6.setWidget(0, QFormLayout.FieldRole, self.btnSaveRabi)
-
         self.txtCommentRabi = QLineEdit(self.DataSave_2)
         self.txtCommentRabi.setObjectName(u"txtCommentRabi")
 
-        self.formLayout_6.setWidget(4, QFormLayout.SpanningRole, self.txtCommentRabi)
+        self.formLayout_6.setWidget(5, QFormLayout.SpanningRole, self.txtCommentRabi)
+
+        self.widget_4 = QWidget(self.DataSave_2)
+        self.widget_4.setObjectName(u"widget_4")
+        self.widget_4.setMinimumSize(QSize(0, 50))
+
+        self.formLayout_6.setWidget(7, QFormLayout.LabelRole, self.widget_4)
+
+        self.btnSaveRabi = QPushButton(self.DataSave_2)
+        self.btnSaveRabi.setObjectName(u"btnSaveRabi")
+
+        self.formLayout_6.setWidget(7, QFormLayout.FieldRole, self.btnSaveRabi)
 
 
         self.gridLayout_8.addLayout(self.formLayout_6, 0, 0, 1, 1)
 
 
-        self.gridLayout_10.addWidget(self.DataSave_2, 2, 0, 1, 1)
+        self.gridLayout_10.addWidget(self.DataSave_2, 3, 0, 1, 1)
+
+        self.widget = QWidget(self.verticalWidget_3)
+        self.widget.setObjectName(u"widget")
+
+        self.gridLayout_10.addWidget(self.widget, 4, 0, 1, 1)
 
         self.Rabi = QGroupBox(self.verticalWidget_3)
         self.Rabi.setObjectName(u"Rabi")
@@ -624,16 +635,16 @@ class Ui_odmr(object):
 
         self.btnMeasureRabiPulse = QPushButton(self.Rabi)
         self.btnMeasureRabiPulse.setObjectName(u"btnMeasureRabiPulse")
+        sizePolicy7 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
+        sizePolicy7.setHorizontalStretch(0)
+        sizePolicy7.setVerticalStretch(0)
+        sizePolicy7.setHeightForWidth(self.btnMeasureRabiPulse.sizePolicy().hasHeightForWidth())
+        self.btnMeasureRabiPulse.setSizePolicy(sizePolicy7)
 
-        self.gridLayout_7.addWidget(self.btnMeasureRabiPulse, 4, 3, 3, 1)
+        self.gridLayout_7.addWidget(self.btnMeasureRabiPulse, 4, 3, 2, 1)
 
 
         self.gridLayout_10.addWidget(self.Rabi, 1, 0, 1, 1)
-
-        self.widget = QWidget(self.verticalWidget_3)
-        self.widget.setObjectName(u"widget")
-
-        self.gridLayout_10.addWidget(self.widget, 3, 0, 1, 1)
 
 
         self.gridLayout_9.addWidget(self.verticalWidget_3, 0, 1, 1, 1)
@@ -642,43 +653,116 @@ class Ui_odmr(object):
         self.gridLayout_11.addLayout(self.gridLayout_9, 0, 0, 1, 1)
 
         self.measurmentTabs.addTab(self.RabiPulseTab, "")
-        self.FullRabiTab = QWidget()
-        self.FullRabiTab.setObjectName(u"FullRabiTab")
-        self.Scan_2 = QGroupBox(self.FullRabiTab)
+        self.tab = QWidget()
+        self.tab.setObjectName(u"tab")
+        self.gridLayout_3 = QGridLayout(self.tab)
+        self.gridLayout_3.setObjectName(u"gridLayout_3")
+        self.gridLayout_17 = QGridLayout()
+        self.gridLayout_17.setObjectName(u"gridLayout_17")
+        self.gridLayout_17.setSizeConstraint(QLayout.SetNoConstraint)
+        self.RabiScanPlotwidget = QWidget(self.tab)
+        self.RabiScanPlotwidget.setObjectName(u"RabiScanPlotwidget")
+        self.RabiScanPlotwidget.setMinimumSize(QSize(690, 839))
+
+        self.gridLayout_17.addWidget(self.RabiScanPlotwidget, 0, 0, 1, 1)
+
+        self.verticalWidget_5 = QWidget(self.tab)
+        self.verticalWidget_5.setObjectName(u"verticalWidget_5")
+        sizePolicy3.setHeightForWidth(self.verticalWidget_5.sizePolicy().hasHeightForWidth())
+        self.verticalWidget_5.setSizePolicy(sizePolicy3)
+        self.gridLayout_18 = QGridLayout(self.verticalWidget_5)
+        self.gridLayout_18.setObjectName(u"gridLayout_18")
+        self.DataSave_4 = QGroupBox(self.verticalWidget_5)
+        self.DataSave_4.setObjectName(u"DataSave_4")
+        sizePolicy6.setHeightForWidth(self.DataSave_4.sizePolicy().hasHeightForWidth())
+        self.DataSave_4.setSizePolicy(sizePolicy6)
+        self.DataSave_4.setFont(font2)
+        self.gridLayout_20 = QGridLayout(self.DataSave_4)
+        self.gridLayout_20.setObjectName(u"gridLayout_20")
+        self.formLayout_10 = QFormLayout()
+        self.formLayout_10.setObjectName(u"formLayout_10")
+        self.formLayout_10.setSizeConstraint(QLayout.SetNoConstraint)
+        self.formLayout_10.setFormAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
+        self.lblPathRabi_3 = QLabel(self.DataSave_4)
+        self.lblPathRabi_3.setObjectName(u"lblPathRabi_3")
+
+        self.formLayout_10.setWidget(0, QFormLayout.LabelRole, self.lblPathRabi_3)
+
+        self.txtPathRabi_3 = QLineEdit(self.DataSave_4)
+        self.txtPathRabi_3.setObjectName(u"txtPathRabi_3")
+
+        self.formLayout_10.setWidget(1, QFormLayout.SpanningRole, self.txtPathRabi_3)
+
+        self.lblCommentRabi_3 = QLabel(self.DataSave_4)
+        self.lblCommentRabi_3.setObjectName(u"lblCommentRabi_3")
+
+        self.formLayout_10.setWidget(2, QFormLayout.LabelRole, self.lblCommentRabi_3)
+
+        self.txtCommentRabi_3 = QLineEdit(self.DataSave_4)
+        self.txtCommentRabi_3.setObjectName(u"txtCommentRabi_3")
+
+        self.formLayout_10.setWidget(3, QFormLayout.SpanningRole, self.txtCommentRabi_3)
+
+
+        self.gridLayout_20.addLayout(self.formLayout_10, 1, 0, 1, 1)
+
+
+        self.gridLayout_18.addWidget(self.DataSave_4, 2, 0, 1, 1)
+
+        self.widget_3 = QWidget(self.verticalWidget_5)
+        self.widget_3.setObjectName(u"widget_3")
+
+        self.gridLayout_18.addWidget(self.widget_3, 3, 0, 1, 1)
+
+        self.Scan_2 = QGroupBox(self.verticalWidget_5)
         self.Scan_2.setObjectName(u"Scan_2")
-        self.Scan_2.setGeometry(QRect(220, 100, 450, 130))
-        sizePolicy1.setHeightForWidth(self.Scan_2.sizePolicy().hasHeightForWidth())
-        self.Scan_2.setSizePolicy(sizePolicy1)
-        self.Scan_2.setMinimumSize(QSize(0, 130))
+        sizePolicy2.setHeightForWidth(self.Scan_2.sizePolicy().hasHeightForWidth())
+        self.Scan_2.setSizePolicy(sizePolicy2)
+        self.Scan_2.setMinimumSize(QSize(450, 160))
         self.Scan_2.setFont(font2)
-        self.label_2 = QLabel(self.Scan_2)
-        self.label_2.setObjectName(u"label_2")
-        self.label_2.setGeometry(QRect(30, 30, 141, 21))
-        self.cmbScanParam_2 = QComboBox(self.Scan_2)
-        self.cmbScanParam_2.setObjectName(u"cmbScanParam_2")
-        self.cmbScanParam_2.setGeometry(QRect(170, 30, 111, 22))
-        self.lblRange_2 = QLabel(self.Scan_2)
-        self.lblRange_2.setObjectName(u"lblRange_2")
-        self.lblRange_2.setGeometry(QRect(100, 60, 61, 21))
-        self.txtRange_2 = QLineEdit(self.Scan_2)
-        self.txtRange_2.setObjectName(u"txtRange_2")
-        self.txtRange_2.setGeometry(QRect(170, 60, 111, 20))
-        self.btnScanRabi_2 = QPushButton(self.Scan_2)
-        self.btnScanRabi_2.setObjectName(u"btnScanRabi_2")
-        self.btnScanRabi_2.setGeometry(QRect(320, 30, 101, 51))
-        self.lblCurrentValue_2 = QLabel(self.Scan_2)
-        self.lblCurrentValue_2.setObjectName(u"lblCurrentValue_2")
-        self.lblCurrentValue_2.setGeometry(QRect(30, 60, 61, 21))
-        self.lblIterations_2 = QLabel(self.Scan_2)
-        self.lblIterations_2.setObjectName(u"lblIterations_2")
-        self.lblIterations_2.setGeometry(QRect(80, 90, 81, 16))
-        self.txtIterations_2 = QLineEdit(self.Scan_2)
-        self.txtIterations_2.setObjectName(u"txtIterations_2")
-        self.txtIterations_2.setGeometry(QRect(170, 90, 113, 20))
-        self.lblCurrentIterations_2 = QLabel(self.Scan_2)
-        self.lblCurrentIterations_2.setObjectName(u"lblCurrentIterations_2")
-        self.lblCurrentIterations_2.setGeometry(QRect(30, 90, 47, 16))
-        self.measurmentTabs.addTab(self.FullRabiTab, "")
+        self.btnScanRabi_3 = QPushButton(self.Scan_2)
+        self.btnScanRabi_3.setObjectName(u"btnScanRabi_3")
+        self.btnScanRabi_3.setGeometry(QRect(230, 100, 201, 51))
+        self.lblIterations_3 = QLabel(self.Scan_2)
+        self.lblIterations_3.setObjectName(u"lblIterations_3")
+        self.lblIterations_3.setGeometry(QRect(240, 60, 81, 16))
+        self.txtIterations_3 = QLineEdit(self.Scan_2)
+        self.txtIterations_3.setObjectName(u"txtIterations_3")
+        self.txtIterations_3.setGeometry(QRect(330, 60, 101, 20))
+        self.lblCurrentIterations = QLabel(self.Scan_2)
+        self.lblCurrentIterations.setObjectName(u"lblCurrentIterations")
+        self.lblCurrentIterations.setGeometry(QRect(166, 100, 61, 20))
+        self.lblRange_4 = QLabel(self.Scan_2)
+        self.lblRange_4.setObjectName(u"lblRange_4")
+        self.lblRange_4.setGeometry(QRect(20, 30, 81, 21))
+        self.txtIterations_4 = QLineEdit(self.Scan_2)
+        self.txtIterations_4.setObjectName(u"txtIterations_4")
+        self.txtIterations_4.setGeometry(QRect(150, 30, 81, 20))
+        self.txtIterations_5 = QLineEdit(self.Scan_2)
+        self.txtIterations_5.setObjectName(u"txtIterations_5")
+        self.txtIterations_5.setGeometry(QRect(330, 30, 101, 20))
+        self.lblRange_5 = QLabel(self.Scan_2)
+        self.lblRange_5.setObjectName(u"lblRange_5")
+        self.lblRange_5.setGeometry(QRect(240, 30, 81, 21))
+        self.lblRange_6 = QLabel(self.Scan_2)
+        self.lblRange_6.setObjectName(u"lblRange_6")
+        self.lblRange_6.setGeometry(QRect(20, 60, 121, 21))
+        self.txtIterations_6 = QLineEdit(self.Scan_2)
+        self.txtIterations_6.setObjectName(u"txtIterations_6")
+        self.txtIterations_6.setGeometry(QRect(150, 60, 81, 20))
+        self.lblIterations_4 = QLabel(self.Scan_2)
+        self.lblIterations_4.setObjectName(u"lblIterations_4")
+        self.lblIterations_4.setGeometry(QRect(20, 100, 141, 16))
+
+        self.gridLayout_18.addWidget(self.Scan_2, 1, 0, 1, 1)
+
+
+        self.gridLayout_17.addWidget(self.verticalWidget_5, 0, 1, 1, 1)
+
+
+        self.gridLayout_3.addLayout(self.gridLayout_17, 0, 0, 1, 1)
+
+        self.measurmentTabs.addTab(self.tab, "")
 
         self.plotLayout.addWidget(self.measurmentTabs)
 
@@ -695,7 +779,7 @@ class Ui_odmr(object):
 
         self.retranslateUi(odmr)
 
-        self.measurmentTabs.setCurrentIndex(0)
+        self.measurmentTabs.setCurrentIndex(2)
 
 
         QMetaObject.connectSlotsByName(odmr)
@@ -759,19 +843,22 @@ class Ui_odmr(object):
         self.lblMW.setText(QCoreApplication.translate("odmr", u"MW pulse:", None))
         self.lblPump.setText(QCoreApplication.translate("odmr", u"Pump pulse:", None))
         self.lblImaging.setText(QCoreApplication.translate("odmr", u"Imaging pulse:", None))
-        self.lblAveragesNumber.setText(QCoreApplication.translate("odmr", u"Averages number:", None))
+        self.lblAveragesNumber.setText(QCoreApplication.translate("odmr", u"Average Number:", None))
         self.lblStartTime.setText(QCoreApplication.translate("odmr", u"Start time, us:", None))
         self.lblReadout.setText(QCoreApplication.translate("odmr", u"Readout pulse:", None))
         self.btnMeasureRabiPulse.setText(QCoreApplication.translate("odmr", u"Measure", None))
         self.measurmentTabs.setTabText(self.measurmentTabs.indexOf(self.RabiPulseTab), QCoreApplication.translate("odmr", u"Rabi Pulse Sequence", None))
+        self.DataSave_4.setTitle(QCoreApplication.translate("odmr", u"Save Data", None))
+        self.lblPathRabi_3.setText(QCoreApplication.translate("odmr", u"Path", None))
+        self.lblCommentRabi_3.setText(QCoreApplication.translate("odmr", u"Comment:", None))
         self.Scan_2.setTitle(QCoreApplication.translate("odmr", u"Scan Control", None))
-        self.label_2.setText(QCoreApplication.translate("odmr", u"Scan parameter:", None))
-        self.lblRange_2.setText(QCoreApplication.translate("odmr", u"Range:", None))
-        self.txtRange_2.setPlaceholderText(QCoreApplication.translate("odmr", u"start,stop,step_size", None))
-        self.btnScanRabi_2.setText(QCoreApplication.translate("odmr", u"Scan Rabi", None))
-        self.lblCurrentValue_2.setText("")
-        self.lblIterations_2.setText(QCoreApplication.translate("odmr", u"Iterations:", None))
-        self.lblCurrentIterations_2.setText("")
-        self.measurmentTabs.setTabText(self.measurmentTabs.indexOf(self.FullRabiTab), QCoreApplication.translate("odmr", u"Full Rabi", None))
+        self.btnScanRabi_3.setText(QCoreApplication.translate("odmr", u"Scan Rabi", None))
+        self.lblIterations_3.setText(QCoreApplication.translate("odmr", u"Iterations", None))
+        self.lblCurrentIterations.setText(QCoreApplication.translate("odmr", u"0", None))
+        self.lblRange_4.setText(QCoreApplication.translate("odmr", u"Start [us]", None))
+        self.lblRange_5.setText(QCoreApplication.translate("odmr", u"Stop [us]", None))
+        self.lblRange_6.setText(QCoreApplication.translate("odmr", u"Time Step [us]", None))
+        self.lblIterations_4.setText(QCoreApplication.translate("odmr", u"Current Iteration", None))
+        self.measurmentTabs.setTabText(self.measurmentTabs.indexOf(self.tab), QCoreApplication.translate("odmr", u"Rabi Scan", None))
     # retranslateUi
 
