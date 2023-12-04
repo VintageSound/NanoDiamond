@@ -402,16 +402,6 @@
                 <property name="sizeConstraint">
                  <enum>QLayout::SetNoConstraint</enum>
                 </property>
-                <item row="0" column="0">
-                 <widget class="QWidget" name="ODMRPlotWidget" native="true">
-                  <property name="minimumSize">
-                   <size>
-                    <width>690</width>
-                    <height>839</height>
-                   </size>
-                  </property>
-                 </widget>
-                </item>
                 <item row="0" column="1">
                  <widget class="QWidget" name="verticalWidget_2" native="true">
                   <property name="sizePolicy">
@@ -750,6 +740,9 @@
                   </layout>
                  </widget>
                 </item>
+                <item row="0" column="0">
+                 <layout class="QGridLayout" name="ODMRPlotLayout"/>
+                </item>
                </layout>
               </item>
              </layout>
@@ -764,16 +757,6 @@
                 <property name="sizeConstraint">
                  <enum>QLayout::SetNoConstraint</enum>
                 </property>
-                <item row="0" column="0">
-                 <widget class="QWidget" name="RabiPlotWidget" native="true">
-                  <property name="minimumSize">
-                   <size>
-                    <width>690</width>
-                    <height>839</height>
-                   </size>
-                  </property>
-                 </widget>
-                </item>
                 <item row="0" column="1">
                  <widget class="QWidget" name="verticalWidget_3" native="true">
                   <property name="sizePolicy">
@@ -1092,6 +1075,9 @@
                   </layout>
                  </widget>
                 </item>
+                <item row="0" column="0">
+                 <layout class="QGridLayout" name="rabiPulsePlotLayout"/>
+                </item>
                </layout>
               </item>
              </layout>
@@ -1106,16 +1092,6 @@
                 <property name="sizeConstraint">
                  <enum>QLayout::SetNoConstraint</enum>
                 </property>
-                <item row="0" column="0">
-                 <widget class="QWidget" name="RabiScanPlotwidget" native="true">
-                  <property name="minimumSize">
-                   <size>
-                    <width>690</width>
-                    <height>839</height>
-                   </size>
-                  </property>
-                 </widget>
-                </item>
                 <item row="0" column="1">
                  <widget class="QWidget" name="verticalWidget_5" native="true">
                   <property name="sizePolicy">
@@ -1337,6 +1313,9 @@
                    </item>
                   </layout>
                  </widget>
+                </item>
+                <item row="0" column="0">
+                 <layout class="QGridLayout" name="rabiScanPlotLayout"/>
                 </item>
                </layout>
               </item>

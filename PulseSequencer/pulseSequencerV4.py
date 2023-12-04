@@ -138,7 +138,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         figure.set_facecolor('none')
 
         self.odmrCanvas = FigureCanvas(figure)
-        self.ODMRPlotWidget.addWidget(self.odmrCanvas)
+        self.ODMRPlotLayout.addWidget(self.odmrCanvas)
 
         # Create navigation toolbar
         self.toolbar = NavigationToolbar(self.odmrCanvas, self.ODMRPlotWidget, False)
@@ -147,7 +147,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         # Remove subplots action
         actions = self.toolbar.actions()
         self.toolbar.removeAction(actions[7])
-        self.ODMRPlotWidget.addWidget(self.toolbar)
+        self.ODMRPlotLayout.addWidget(self.toolbar)
 
     def initializeRabiAxes(self):
         # Create figure
@@ -157,7 +157,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         self.axesRabi2 = self.axesRabi1.twinx()
 
         self.rabiCanvas = FigureCanvas(figure)
-        self.RabiPlotWidget.addWidget(self.rabiCanvas)
+        self.rabiPulsePlotLayout.addWidget(self.rabiCanvas)
 
         # Create navigation toolbar
         self.rabiToolbar = NavigationToolbar(self.canvas, self.RabiPlotWidget, False)
@@ -166,7 +166,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         # Remove subplots action
         actions = self.rabiToolbar.actions()
         self.rabiToolbar.removeAction(actions[7])
-        self.RabiPlotWidget.addWidget(self.toolbar)
+        self.rabiPulsePlotLayout.addWidget(self.toolbar)
 
     # Action Methods
     def applyChangesOfMicrowaveSettings(self):

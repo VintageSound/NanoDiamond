@@ -177,12 +177,6 @@ class Ui_odmr(object):
         self.gridLayout_2 = QGridLayout()
         self.gridLayout_2.setObjectName(u"gridLayout_2")
         self.gridLayout_2.setSizeConstraint(QLayout.SetNoConstraint)
-        self.ODMRPlotWidget = QWidget(self.ODMRTab)
-        self.ODMRPlotWidget.setObjectName(u"ODMRPlotWidget")
-        self.ODMRPlotWidget.setMinimumSize(QSize(690, 839))
-
-        self.gridLayout_2.addWidget(self.ODMRPlotWidget, 0, 0, 1, 1)
-
         self.verticalWidget_2 = QWidget(self.ODMRTab)
         self.verticalWidget_2.setObjectName(u"verticalWidget_2")
         sizePolicy3.setHeightForWidth(self.verticalWidget_2.sizePolicy().hasHeightForWidth())
@@ -388,6 +382,11 @@ class Ui_odmr(object):
 
         self.gridLayout_2.addWidget(self.verticalWidget_2, 0, 1, 1, 1)
 
+        self.ODMRPlotLayout = QGridLayout()
+        self.ODMRPlotLayout.setObjectName(u"ODMRPlotLayout")
+
+        self.gridLayout_2.addLayout(self.ODMRPlotLayout, 0, 0, 1, 1)
+
 
         self.gridLayout_4.addLayout(self.gridLayout_2, 0, 0, 1, 1)
 
@@ -399,12 +398,6 @@ class Ui_odmr(object):
         self.gridLayout_9 = QGridLayout()
         self.gridLayout_9.setObjectName(u"gridLayout_9")
         self.gridLayout_9.setSizeConstraint(QLayout.SetNoConstraint)
-        self.RabiPlotWidget = QWidget(self.RabiPulseTab)
-        self.RabiPlotWidget.setObjectName(u"RabiPlotWidget")
-        self.RabiPlotWidget.setMinimumSize(QSize(690, 839))
-
-        self.gridLayout_9.addWidget(self.RabiPlotWidget, 0, 0, 1, 1)
-
         self.verticalWidget_3 = QWidget(self.RabiPulseTab)
         self.verticalWidget_3.setObjectName(u"verticalWidget_3")
         sizePolicy3.setHeightForWidth(self.verticalWidget_3.sizePolicy().hasHeightForWidth())
@@ -649,6 +642,11 @@ class Ui_odmr(object):
 
         self.gridLayout_9.addWidget(self.verticalWidget_3, 0, 1, 1, 1)
 
+        self.rabiPulsePlotLayout = QGridLayout()
+        self.rabiPulsePlotLayout.setObjectName(u"rabiPulsePlotLayout")
+
+        self.gridLayout_9.addLayout(self.rabiPulsePlotLayout, 0, 0, 1, 1)
+
 
         self.gridLayout_11.addLayout(self.gridLayout_9, 0, 0, 1, 1)
 
@@ -660,12 +658,6 @@ class Ui_odmr(object):
         self.gridLayout_17 = QGridLayout()
         self.gridLayout_17.setObjectName(u"gridLayout_17")
         self.gridLayout_17.setSizeConstraint(QLayout.SetNoConstraint)
-        self.RabiScanPlotwidget = QWidget(self.tab)
-        self.RabiScanPlotwidget.setObjectName(u"RabiScanPlotwidget")
-        self.RabiScanPlotwidget.setMinimumSize(QSize(690, 839))
-
-        self.gridLayout_17.addWidget(self.RabiScanPlotwidget, 0, 0, 1, 1)
-
         self.verticalWidget_5 = QWidget(self.tab)
         self.verticalWidget_5.setObjectName(u"verticalWidget_5")
         sizePolicy3.setHeightForWidth(self.verticalWidget_5.sizePolicy().hasHeightForWidth())
@@ -758,6 +750,11 @@ class Ui_odmr(object):
 
 
         self.gridLayout_17.addWidget(self.verticalWidget_5, 0, 1, 1, 1)
+
+        self.rabiScanPlotLayout = QGridLayout()
+        self.rabiScanPlotLayout.setObjectName(u"rabiScanPlotLayout")
+
+        self.gridLayout_17.addLayout(self.rabiScanPlotLayout, 0, 0, 1, 1)
 
 
         self.gridLayout_3.addLayout(self.gridLayout_17, 0, 0, 1, 1)
