@@ -3,7 +3,8 @@ import serial
 import traceback
 import numpy as np
 
-from Data.microwaveConfiguration import microwaveConfiguration 
+from Data.microwaveConfiguration import microwaveConfiguration
+from Data.measurementType import measurementType 
 
 class microwaveInterface():
     _instance = None
@@ -47,7 +48,6 @@ class microwaveInterface():
 
         print("WindFreak is connected")
 
-    # TODO:  self.ser.is_open is false when called twice...
     def checkIfMicrowaveIsOn(self):
         if not self.ser.is_open:
             raise Exception('Windfreak is disconnected')
@@ -82,12 +82,12 @@ class microwaveInterface():
 
     def sendCenterFrequencyAndTriggerTypeCommand(self, config : microwaveConfiguration):
         trigMode = ('w' + str(config.TrigMode)).encode()
-        self.ser.write(config.enterFreq + trigMode)
+        self.ser.write(config.centerFreq + trigMode)
 
         print("Windfreak configuration sent:", config.centerFreq, trigMode)
 
     def createSweepCommandFromConfig(self, config : microwaveConfiguration):
-        centerFreq = ('f' + str(config.centerFreq)).encode()
+        # centerFreq = ('f' + str(config.centerFreq)).encode()
         power = ('W' + str(config.power)).encode()
         powerSweepStart = ('[' + str(config.powerSweepStart)).encode()
         powerSweepStop = (']' + str(config.powerSweepStop)).encode()

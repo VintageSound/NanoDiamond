@@ -319,7 +319,7 @@ class Ui_odmr(object):
         self.comboBoxMWdevice = QComboBox(self.MW)
         self.comboBoxMWdevice.addItem("")
         self.comboBoxMWdevice.setObjectName(u"comboBoxMWdevice")
-        self.comboBoxMWdevice.setGeometry(QRect(20, 30, 99, 30))
+        self.comboBoxMWdevice.setGeometry(QRect(20, 30, 82, 26))
         self.comboBoxMWdevice.setAutoFillBackground(False)
         self.comboBoxMWdevice.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.connectMicrowaveODMRButton = QPushButton(self.MW)
@@ -339,7 +339,7 @@ class Ui_odmr(object):
         self.DataSave.setFont(font2)
         self.formLayoutWidget_2 = QWidget(self.DataSave)
         self.formLayoutWidget_2.setObjectName(u"formLayoutWidget_2")
-        self.formLayoutWidget_2.setGeometry(QRect(9, 22, 431, 171))
+        self.formLayoutWidget_2.setGeometry(QRect(9, 22, 431, 151))
         self.formLayout_4 = QFormLayout(self.formLayoutWidget_2)
         self.formLayout_4.setObjectName(u"formLayout_4")
         self.formLayout_4.setContentsMargins(0, 0, 0, 0)
@@ -375,17 +375,19 @@ class Ui_odmr(object):
 
         self.btnSaveODMR = QPushButton(self.DataSave)
         self.btnSaveODMR.setObjectName(u"btnSaveODMR")
-        self.btnSaveODMR.setGeometry(QRect(190, 210, 241, 33))
+        self.btnSaveODMR.setGeometry(QRect(230, 180, 211, 51))
 
         self.gridLayout.addWidget(self.DataSave, 2, 0, 1, 1)
 
 
         self.gridLayout_2.addWidget(self.verticalWidget_2, 0, 1, 1, 1)
 
-        self.ODMRPlotLayout = QGridLayout()
+        self.ODMRPlotWidget = QWidget(self.ODMRTab)
+        self.ODMRPlotWidget.setObjectName(u"ODMRPlotWidget")
+        self.ODMRPlotLayout = QGridLayout(self.ODMRPlotWidget)
         self.ODMRPlotLayout.setObjectName(u"ODMRPlotLayout")
 
-        self.gridLayout_2.addLayout(self.ODMRPlotLayout, 0, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.ODMRPlotWidget, 0, 0, 1, 1)
 
 
         self.gridLayout_4.addLayout(self.gridLayout_2, 0, 0, 1, 1)
@@ -412,7 +414,7 @@ class Ui_odmr(object):
         sizePolicy5.setVerticalStretch(0)
         sizePolicy5.setHeightForWidth(self.MW_3.sizePolicy().hasHeightForWidth())
         self.MW_3.setSizePolicy(sizePolicy5)
-        self.MW_3.setMinimumSize(QSize(450, 250))
+        self.MW_3.setMinimumSize(QSize(450, 220))
         self.MW_3.setFont(font2)
         self.gridLayout_6 = QGridLayout(self.MW_3)
         self.gridLayout_6.setObjectName(u"gridLayout_6")
@@ -423,29 +425,6 @@ class Ui_odmr(object):
         self.comboBoxMWdevice_3.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
         self.gridLayout_6.addWidget(self.comboBoxMWdevice_3, 0, 0, 1, 1)
-
-        self.horizontalLayout_3 = QHBoxLayout()
-        self.horizontalLayout_3.setSpacing(7)
-        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.horizontalLayout_3.setSizeConstraint(QLayout.SetMinimumSize)
-        self.connectMicrowaveRabiButton = QPushButton(self.MW_3)
-        self.connectMicrowaveRabiButton.setObjectName(u"connectMicrowaveRabiButton")
-
-        self.horizontalLayout_3.addWidget(self.connectMicrowaveRabiButton)
-
-        self.onOffRabiConnectButton = QPushButton(self.MW_3)
-        self.onOffRabiConnectButton.setObjectName(u"onOffRabiConnectButton")
-        self.onOffRabiConnectButton.setEnabled(True)
-
-        self.horizontalLayout_3.addWidget(self.onOffRabiConnectButton)
-
-        self.applyMicrowaveRabiButton = QPushButton(self.MW_3)
-        self.applyMicrowaveRabiButton.setObjectName(u"applyMicrowaveRabiButton")
-
-        self.horizontalLayout_3.addWidget(self.applyMicrowaveRabiButton)
-
-
-        self.gridLayout_6.addLayout(self.horizontalLayout_3, 2, 0, 1, 1)
 
         self.formLayout_5 = QFormLayout()
         self.formLayout_5.setObjectName(u"formLayout_5")
@@ -471,6 +450,31 @@ class Ui_odmr(object):
 
 
         self.gridLayout_6.addLayout(self.formLayout_5, 1, 0, 1, 1)
+
+        self.widget = QWidget(self.MW_3)
+        self.widget.setObjectName(u"widget")
+        self.horizontalLayout_3 = QHBoxLayout(self.widget)
+        self.horizontalLayout_3.setSpacing(7)
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.horizontalLayout_3.setSizeConstraint(QLayout.SetMinimumSize)
+        self.connectMicrowaveRabiButton = QPushButton(self.widget)
+        self.connectMicrowaveRabiButton.setObjectName(u"connectMicrowaveRabiButton")
+
+        self.horizontalLayout_3.addWidget(self.connectMicrowaveRabiButton)
+
+        self.onOffRabiConnectButton = QPushButton(self.widget)
+        self.onOffRabiConnectButton.setObjectName(u"onOffRabiConnectButton")
+        self.onOffRabiConnectButton.setEnabled(True)
+
+        self.horizontalLayout_3.addWidget(self.onOffRabiConnectButton)
+
+        self.applyMicrowaveRabiButton = QPushButton(self.widget)
+        self.applyMicrowaveRabiButton.setObjectName(u"applyMicrowaveRabiButton")
+
+        self.horizontalLayout_3.addWidget(self.applyMicrowaveRabiButton)
+
+
+        self.gridLayout_6.addWidget(self.widget, 2, 0, 1, 1)
 
 
         self.gridLayout_10.addWidget(self.MW_3, 0, 0, 1, 1)
@@ -536,10 +540,10 @@ class Ui_odmr(object):
 
         self.gridLayout_10.addWidget(self.DataSave_2, 3, 0, 1, 1)
 
-        self.widget = QWidget(self.verticalWidget_3)
-        self.widget.setObjectName(u"widget")
+        self.widget1 = QWidget(self.verticalWidget_3)
+        self.widget1.setObjectName(u"widget1")
 
-        self.gridLayout_10.addWidget(self.widget, 4, 0, 1, 1)
+        self.gridLayout_10.addWidget(self.widget1, 4, 0, 1, 1)
 
         self.Rabi = QGroupBox(self.verticalWidget_3)
         self.Rabi.setObjectName(u"Rabi")
@@ -642,10 +646,12 @@ class Ui_odmr(object):
 
         self.gridLayout_9.addWidget(self.verticalWidget_3, 0, 1, 1, 1)
 
-        self.rabiPulsePlotLayout = QGridLayout()
+        self.rabiPulsePlotWidget = QWidget(self.RabiPulseTab)
+        self.rabiPulsePlotWidget.setObjectName(u"rabiPulsePlotWidget")
+        self.rabiPulsePlotLayout = QGridLayout(self.rabiPulsePlotWidget)
         self.rabiPulsePlotLayout.setObjectName(u"rabiPulsePlotLayout")
 
-        self.gridLayout_9.addLayout(self.rabiPulsePlotLayout, 0, 0, 1, 1)
+        self.gridLayout_9.addWidget(self.rabiPulsePlotWidget, 0, 0, 1, 1)
 
 
         self.gridLayout_11.addLayout(self.gridLayout_9, 0, 0, 1, 1)
@@ -751,10 +757,12 @@ class Ui_odmr(object):
 
         self.gridLayout_17.addWidget(self.verticalWidget_5, 0, 1, 1, 1)
 
-        self.rabiScanPlotLayout = QGridLayout()
+        self.rabiScanPlotWidget = QWidget(self.tab)
+        self.rabiScanPlotWidget.setObjectName(u"rabiScanPlotWidget")
+        self.rabiScanPlotLayout = QGridLayout(self.rabiScanPlotWidget)
         self.rabiScanPlotLayout.setObjectName(u"rabiScanPlotLayout")
 
-        self.gridLayout_17.addLayout(self.rabiScanPlotLayout, 0, 0, 1, 1)
+        self.gridLayout_17.addWidget(self.rabiScanPlotWidget, 0, 0, 1, 1)
 
 
         self.gridLayout_3.addLayout(self.gridLayout_17, 0, 0, 1, 1)
@@ -776,7 +784,7 @@ class Ui_odmr(object):
 
         self.retranslateUi(odmr)
 
-        self.measurmentTabs.setCurrentIndex(2)
+        self.measurmentTabs.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(odmr)
@@ -825,11 +833,11 @@ class Ui_odmr(object):
         self.MW_3.setTitle(QCoreApplication.translate("odmr", u"MW Generator Settings", None))
         self.comboBoxMWdevice_3.setItemText(0, QCoreApplication.translate("odmr", u"SynthHD", None))
 
+        self.lblRFPower_3.setText(QCoreApplication.translate("odmr", u"RF Power [dBm]", None))
+        self.lblCenterFreq_2.setText(QCoreApplication.translate("odmr", u"Center Freq, MHz:", None))
         self.connectMicrowaveRabiButton.setText(QCoreApplication.translate("odmr", u"Connect", None))
         self.onOffRabiConnectButton.setText(QCoreApplication.translate("odmr", u"RF is Off", None))
         self.applyMicrowaveRabiButton.setText(QCoreApplication.translate("odmr", u"Apply", None))
-        self.lblRFPower_3.setText(QCoreApplication.translate("odmr", u"RF Power [dBm]", None))
-        self.lblCenterFreq_2.setText(QCoreApplication.translate("odmr", u"Center Freq, MHz:", None))
         self.DataSave_2.setTitle(QCoreApplication.translate("odmr", u"Save Data", None))
         self.lblPathRabi.setText(QCoreApplication.translate("odmr", u"Path", None))
         self.lblParamValue_2.setText(QCoreApplication.translate("odmr", u"Measurment Index", None))

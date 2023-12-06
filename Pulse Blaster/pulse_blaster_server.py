@@ -204,7 +204,7 @@ def programm_pb_sequence():
                 print("sequence started")
 
             else:
-                # leave MW constantly on
+                # ODMR - leave MW constantly on
                 pb_start_programming(PULSE_PROGRAM)
                 start = pb_inst_pbonly(ON | 0xE, CONTINUE, 0, 5 * us)
                 pb_inst_pbonly(ON | 0xE, BRANCH, start, 5 * us)

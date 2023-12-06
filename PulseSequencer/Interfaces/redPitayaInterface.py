@@ -96,9 +96,13 @@ class redPitayaInterface():
         self.ip = ip
         self.port = port
                 
-    def connect(self):
+    def connect(self, ip = None, port = None):
         if self.getIsConnectionOpen():
             return
+
+        if ip is not None and port is not None:
+            self.ip = ip 
+            self.port = port
 
         print("trying to connect to red pitaya:", self.ip, self.port)
         self.socket.connectToHost(self.ip, self.port)
