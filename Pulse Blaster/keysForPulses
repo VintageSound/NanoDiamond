@@ -1,0 +1,13 @@
+ODMR:
+no need for keys
+
+Rabi:
+start_pump
+start_image
+duration_mw
+
+Ramsey:
+start_pump
+start_image
+half_pi_duration
+tau
