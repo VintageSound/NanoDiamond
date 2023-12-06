@@ -12,7 +12,6 @@ from Interfaces.microwaveInterface import microwaveInterface
 from Data.measurementType import measurementType
 from Data.repetition import repetition
 
-# add microwave status change event TODO: Test
 # turn off microwave when rabi TODO: Test
 # turn on microwave when ODMR TODO: Test
 # add pulse blaster toggle TODO: Test
@@ -102,11 +101,11 @@ class measurementManager():
 
     def updateMicrowaveODMRConfig(self, config : microwaveConfiguration):
         self.microwaveODMRConfig = config
-        self.microwaveDevice.sendSweepCommand(self.microwaveODMRConfig)
+        self.microwaveDevice.sendODMRSweepCommand(self.microwaveODMRConfig)
     
     def updateMicrowaveRabiConfig(self, config : microwaveConfiguration):
         self.microwaveRabiConfig = config
-        self.microwaveDevice.sendCenterFrequencyAndTriggerTypeCommand(self.microwaveRabiConfig)
+        self.microwaveDevice.sendRabiCommand(self.microwaveRabiConfig)
 
     # Getters
     def getHaveODMRData(self):
@@ -158,7 +157,9 @@ class measurementManager():
     def connectToPulseBlaster(self, ip = None, port = None):
         if not self.pulseBlaster.isConnected:
             self.pulseBlaster.connect(ip, port)
-            self.pulseBlaster.configurePulseBlaster(self.getCurrentPulseConfig(), self.measurementType)
+
+            # TODO: check if needed
+            # self.pulseBlaster.configurePulseBlaster(self.getCurrentPulseConfig(), self.measurementType)
 
     def disconnectFromPulseBlaster(self):
         if self.pulseBlaster.isConnected:
@@ -224,20 +225,25 @@ class measurementManager():
 
     # Measurement Methods
     def _ODMRMeasurement(self):
-        self.redPitaya.startODMR(self.pulseConfig)
+        self.redPitaya.startODMR(self.pulseConfigODMR)
 
     def _RabiPulseMeasurement(self):
-        self.redPitaya.startRabiMeasurement(self.pulseConfig)
+        self.redPitaya.startRabiMeasurement(self.pulseConfigRabi)
 
     def startNewRabiPulseMeasurement(self, 
                                     pulseConfig : pulseConfiguration = None, 
                                     micrwaveConfig : microwaveConfiguration = None):
-                                
+        if pulseConfig is not None:
+            self.pulseConfigRabi = pulseConfig
+
+        if micrwaveConfig is not None:
+            self.microwaveRabiConfig = micrwaveConfig
+
         self.measurementType = measurementType.RabiPulse
         self.isMeasurementActive = True
         self.initializeBufferRabi()
-        self.configurePulseSequenceForRabi(pulseConfig)
-        self.configurePulseSequenceForRabi(micrwaveConfig)
+        self.configurePulseSequenceForRabi(self.pulseConfigRabi)
+        self.updateMicrowaveRabiConfig(self.microwaveRabiConfig)
 
         self.redPitaya.closeAOM()
         self.raiseAOMStatusChangedEvent()
@@ -247,23 +253,32 @@ class measurementManager():
 
         self._RabiPulseMeasurement()
 
-    def startNewODMRMeasuremnt(self, 
-                                repet=repetition.RepeatAndSum, 
-                                pulseConfig : pulseConfiguration = None, 
+    def startNewODMRMeasurement(self,
+                                pulseConfig : pulseConfiguration = None,
                                 micrwaveConfig : microwaveConfiguration = None,
+                                repet=repetition.RepeatAndSum,
                                 maxRepetitions=None):
         self.repetition = repet
         self.maxRepetitions = maxRepetitions
-        self.measurementCountODMR = 0
 
+        if micrwaveConfig is not None:
+            self.microwaveODMRConfig = micrwaveConfig
+
+        if pulseConfig is not None:
+            self.pulseConfigODMR = pulseConfig
+
+        self.measurementCountODMR = 0
         self.measurementType = measurementType.ODMR
         self.isMeasurementActive = True
         self.initializeBufferODMR()
-        self.configurePulseSequenceForODMR(pulseConfig)
-        self.updateMicrowaveODMRConfig(micrwaveConfig)
+        self.configurePulseSequenceForODMR(self.pulseConfigODMR)
+        self.updateMicrowaveODMRConfig(self.microwaveODMRConfig)
         
         self.microwaveDevice.turnOnMicrowave()
         self.raiseMicrowaveStatusChangeEvent()
+
+        self.redPitaya.openAOM()
+        self.raiseAOMStatusChangedEvent()
 
         self._ODMRMeasurement()
 
@@ -272,7 +287,7 @@ class measurementManager():
 
     # Data Convertion
     def saveODMRDataToDataFrame(self, data):
-        xData = np.linspace(self.microwaveConfig.startFreq, self.microwaveConfig.stopFreq, int(self.size / 2))
+        xData = np.linspace(self.microwaveODMRConfig.startFreq, self.microwaveODMRConfig.stopFreq, int(self.size / 2))
         yData = data
 
         # Add the recived data to the stored data if needed

@@ -40,12 +40,16 @@ class pulseBlasterInterface():
         self.client_socket.connect((self.server_ip, self.server_port))
         self.isConnected = True
 
+        print("connected to pulse blaster")
+
     def disconnect(self):
         if not self.isConnected:
             return
 
         self.client_socket.close()
         self.initialize()
+
+        print("disconnected from pulse blaster")
 
     def configurePulseBlaster(self, pulseConfig : pulseConfiguration, measurementType : measurementType):
         isRabi = (measurementType == measurementType.RabiPulse)

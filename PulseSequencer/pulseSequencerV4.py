@@ -66,14 +66,12 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         # ODMR
         self.btnStartODMR.clicked.connect(self.clearAndStartODMR)
         self.btnStopODMR.clicked.connect(self.stopCurrentMeasurement)
-        self.applyMicrowaveODMRButton.clicked.connect(self.applyChangesOfMicrowaveSettings)
         self.btnOpenCloseAOM.clicked.connect(self.laserOpenCloseToggle)
         self.connectMicrowaveODMRButton.clicked.connect(self.microwaveDeviceConnectionToggle)
         self.onOffODMRConnectButton.clicked.connect(self.microwaveOnOffToggle)
         self.btnSaveODMR.clicked.connect(self.saveODMR)
 
         # rabi
-        self.applyMicrowaveRabiButton.clicked.connect(self.applyChangesOfMicrowaveSettings)
         self.btnMeasureRabiPulse.clicked.connect(self.clearAndStartRabiMeasurement)
         self.connectMicrowaveRabiButton.clicked.connect(self.microwaveDeviceConnectionToggle)
         self.onOffRabiConnectButton.clicked.connect(self.microwaveOnOffToggle)
@@ -161,15 +159,17 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         self.rabiToolbar.removeAction(actions[7])
         self.rabiPulsePlotLayout.addWidget(self.rabiToolbar)
 
-    # Action Methods
-    def applyChangesOfMicrowaveSettings(self):
-        try:
-            self.updateMicrowaveSweepConfig()
-            self.refreshPlot()
-        except Exception as ex:
-            print(ex)
-            traceback.print_exc()
+    # Getters
+    def getCurrentMeasurementTab(self):
+        if self.measurmentTabs.currentIndex() == measurementType.ODMR.value:
+            return measurementType.ODMR
 
+        if self.measurmentTabs.currentIndex() == measurementType.RabiPulse.value:
+            return measurementType.RabiPulse
+
+        raise NotImplementedError("Ramsey not implemented")
+
+    # Action Methods
     def laserOpenCloseToggle(self):
         try:
             self.measurementManager.laserOpenCloseToggle()
@@ -221,8 +221,8 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
     def clearAndStartODMR(self):
         try:
             self.lblCurrentRepetetion.setText('0')
-            self.updateMicrowaveSweepConfig()
-            config = self.createPulseConfiguration()
+            microwave_config = self.createRabiMicrowaveConfig()
+            pulse_config = self.createPulseConfiguration()
             repeat = repetition[self.repetitionComboBox.currentText()]
 
             max_repetitions = self.txtRepetitionMax.text()
@@ -232,7 +232,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
             else:
                 max_repetitions = int(max_repetitions)
 
-            self.measurementManager.startNewODMRMeasuremnt(repeat, config, max_repetitions)
+            self.measurementManager.startNewODMRMeasurement(pulse_config, microwave_config, repeat, max_repetitions)
         except Exception as ex:
             print(ex)
             traceback.print_exc()
@@ -246,9 +246,9 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
 
     def clearAndStartRabiMeasurement(self):
         try:
-            self.updateMicrowaveSweepConfig()
-            config = self.createPulseConfiguration()
-            self.measurementManager.startNewRabiPulseMeasurement(config)
+            microwave_config = self.createRabiMicrowaveConfig()
+            pulse_config = self.createPulseConfiguration()
+            self.measurementManager.startNewRabiPulseMeasurement(pulse_config, microwave_config)
         except Exception:
             traceback.print_exc()
 
@@ -308,7 +308,9 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
             timeStep = measurementManager.redPitayaTimeStep
             pulseConfig = pulseConfiguration()
 
-            if self.measurmentTabs.currentIndex() == measurementType.ODMR.value:
+            type = self.getCurrentMeasurementTab()
+
+            if type == measurementType.ODMR:
                 pulseConfig.CountDuration = np.uint32(int(float(self.txtCountDuration.text()) / timeStep))
             else:
                 pulseConfig.CountDuration = np.uint32(1)
@@ -330,32 +332,46 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         except Exception:
             traceback.print_exc()
 
-    def updateMicrowaveSweepConfig(self):
-        currentTriggerMode = 0
-        RFPower = float(self.txtRFPowerRabi.text())
+    def updateMicrowaveODMRConfig(self):
+        config = self.createODMRMicrowaveConfig()
+        self.measurementManager.updateMicrowaveODMRConfig(config)
 
-        if self.measurmentTabs.currentIndex() == measurementType.ODMR.value:
-            # Sweep Mode
-            currentTriggerMode = 1
-            RFPower = float(self.txtRFPower.text())
-        
+    def createODMRMicrowaveConfig(self):
+        current_trigger_mode = 1
+        rf_power = float(self.txtRFPower.text())
+
         config = microwaveConfiguration(
-            centerFreq=float(self.txtCenterFreq.text()), 
-            power=RFPower, 
-            powerSweepStart=RFPower,
-            powerSweepStop=RFPower,
+            centerFreq=float(self.txtCenterFreq.text()),
+            power=rf_power,
+            powerSweepStart=rf_power,
+            powerSweepStop=rf_power,
             startFreq=float(self.txtStartFreq.text()),
             stopFreq=float(self.txtStopFreq.text()),
-            trigMode=currentTriggerMode)
+            trigMode=current_trigger_mode)
 
         config.stepSize = (config.stopFreq - config.startFreq) / int(self.txtCountNumber.text())
-        config.stepTime = float(self.txtCountDuration.text()) / constConvertMicroSecondToMilisecond 
+        config.stepTime = float(self.txtCountDuration.text()) / constConvertMicroSecondToMilisecond
 
-        self.measurementManager.updateMicrowaveODMRConfig(config)
-    
+        return config
+
+    def updateMicrowaveRabiConfig(self):
+        config = self.createRabiMicrowaveConfig()
+        self.measurementManager.updateMicrowaveRabiConfig(config)
+
+    def createRabiMicrowaveConfig(self):
+        current_trigger_mode = 0
+        rf_power = float(self.txtRFPowerRabi.text())
+
+        config = microwaveConfiguration(
+            centerFreq=float(self.txtCenterFreq.text()),
+            power=rf_power,
+            trigMode=current_trigger_mode)
+
+        return config
+
     # Plot Methods
     def refreshPlot(self):
-        type = self.measurementManager.getMeasurementType()
+        type = self.getCurrentMeasurementTab()
 
         if type == measurementType.ODMR and self.measurementManager.getHaveODMRData():
             self.plotODMRData(self.measurementManager.getODMRData())
@@ -455,7 +471,13 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
 
             if self.measurementManager.getIsMicrowaveOn():
                 self.indicateMicrowaveIsOn()
-                self.applyChangesOfMicrowaveSettings()
+
+                type = self.getCurrentMeasurementTab()
+
+                if type == measurementType.ODMR:
+                    self.updateMicrowaveODMRConfig()
+                elif type == measurementType.RabiPulse:
+                    self.updateMicrowaveRabiConfig()
             else:
                 self.indicateMicrowaveIsOff()
         except Exception as ex:
