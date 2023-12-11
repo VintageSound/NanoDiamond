@@ -25,7 +25,6 @@ from Data.repetition import repetition
 # TODO: nootebook of series of measerements - Change MW, change Laser intensity, change initial pulse beginings
 
 class measurementManager():
-    maxPower = 2 ** 13  # not sure why...
     redPitayaTimeStep = redPitayaInterface.timeStep
 
     def __init__(self, QMainObject) -> None:
@@ -158,9 +157,6 @@ class measurementManager():
         if not self.pulseBlaster.isConnected:
             self.pulseBlaster.connect(ip, port)
 
-            # TODO: check if needed
-            # self.pulseBlaster.configurePulseBlaster(self.getCurrentPulseConfig(), self.measurementType)
-
     def disconnectFromPulseBlaster(self):
         if self.pulseBlaster.isConnected:
             self.pulseBlaster.disconnect()
@@ -200,15 +196,19 @@ class measurementManager():
         if config is not None:
             self.pulseConfigODMR = config
 
+        self.pulseConfigODMR.measurementType = measurementType.ODMR
+
         self.redPitaya.congifurePulse(self.pulseConfigODMR)
-        self.pulseBlaster.configurePulseBlaster(self.pulseConfigODMR, measurementType.ODMR)
+        self.pulseBlaster.configurePulseBlaster(self.pulseConfigODMR)
 
     def configurePulseSequenceForRabi(self, config=None):
         if config is not None:
             self.pulseConfigRabi = config
 
+        self.pulseConfigRabi.measurementType = measurementType.RabiPulse
+
         self.redPitaya.congifurePulse(self.pulseConfigRabi)
-        self.pulseBlaster.configurePulseBlaster(self.pulseConfigRabi, measurementType.RabiPulse)
+        self.pulseBlaster.configurePulseBlaster(self.pulseConfigRabi)
 
     # Status Methods
     def getIsRedPitayaConnected(self):

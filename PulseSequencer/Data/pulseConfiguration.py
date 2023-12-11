@@ -14,6 +14,7 @@ class pulseConfiguration():
         self.LaserLow = 0
         self.LaserHigh = 0
         self.RFPower = 0
+        self.measurementType = None
 
     # def __init__(self, countDuration, countNumber, threshold, averagesNumber, 
     #                 startPump, widthPump, startMW, widthMW, startImage, widthImage, 
