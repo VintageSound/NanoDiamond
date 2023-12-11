@@ -8,8 +8,12 @@ import serial
 import traceback
 import numpy as np
 
+from Data.pulseConfiguration import pulseConfiguration
+from Data.measurementType import measurementType
+
 class redPitayaInterface():
     _instance = None
+    maxPower = 2 ** 13  # not sure why...
     timeStep = 0.008 # micro second. 
     defaultRpHost = 'rp-f09ded.local'
     defaultPort = 1001
@@ -121,21 +125,46 @@ class redPitayaInterface():
         self.disconnect()
         self.connect()
 
+    def convertConfigurationToRedPitayaType(self, pulseConfig : pulseConfiguration):
+        newConfig = pulseConfiguration()
+        
+        if pulseConfig.measurementType == measurementType.ODMR:
+            newConfig.CountDuration = np.uint32(int(pulseConfig.CountDuration.text()) / redPitayaInterface.timeStep)
+        else:
+            newConfig.CountDuration = np.uint32(1)
+
+        newConfig.CountNumber = np.uint32(int(np.log2(pulseConfig.CountNumber)))
+        newConfig.Threshold = np.uint32(int(pulseConfig.Threshold) * redPitayaInterface.maxPower / 20) # why 20 ????
+        newConfig.AveragesNumber = np.uint32(int(self.AveragesNumber))
+        newConfig.StartPump = np.uint32(int(self.StartPump / redPitayaInterface.timeStep))
+        newConfig.WidthPump = np.uint32(int(self.WidthPump / redPitayaInterface.timeStep))
+        newConfig.StartMW = np.uint32(int(self.StartMW / redPitayaInterface.timeStep))
+        newConfig.WidthMW = np.uint32(int(self.WidthMW / redPitayaInterface.timeStep))
+        newConfig.StartImage = np.uint32(int(self.StartImage / redPitayaInterface.timeStep))
+        newConfig.WidthImage = np.uint32(int(self.WidthImage / redPitayaInterface.timeStep))
+        newConfig.StartReadout = np.uint32(int(self.StartReadout / redPitayaInterface.timeStep))
+        newConfig.LaserLow = np.uint32(int(self.LowLevel * redPitayaInterface.maxPower))
+        newConfig.LaserHigh = np.uint32(int(self.HighLevel * redPitayaInterface.maxPower))
+
+        return newConfig
+
     def congifurePulse(self, pulseConfig):
-        self.socket.write(struct.pack('<Q', 1 << 58 | pulseConfig.CountDuration))
-        self.socket.write(struct.pack('<Q', 2 << 58 | pulseConfig.CountNumber))
-        self.socket.write(struct.pack('<Q', 3 << 58 | pulseConfig.Threshold))
-        self.socket.write(struct.pack('<Q', 5 << 58 | pulseConfig.AveragesNumber))
-        self.socket.write(struct.pack('<Q', 7 << 58 | pulseConfig.StartPump))
-        self.socket.write(struct.pack('<Q', 8 << 58 | pulseConfig.WidthPump))
-        self.socket.write(struct.pack('<Q', 9 << 58 | pulseConfig.StartMW))
-        self.socket.write(struct.pack('<Q', 10 << 58 | pulseConfig.WidthMW))
-        self.socket.write(struct.pack('<Q', 11 << 58 | pulseConfig.StartImage))
-        self.socket.write(struct.pack('<Q', 12 << 58 | pulseConfig.WidthImage))
-        self.socket.write(struct.pack('<Q', 13 << 58 | pulseConfig.StartReadout))
-        self.socket.write(struct.pack('<Q', 14 << 58 | pulseConfig.LaserLow))
-        self.socket.write(struct.pack('<Q', 15 << 58 | pulseConfig.LaserHigh))
-        self.socket.write(struct.pack('<Q', 0 << 58 | pulseConfig.Threshold))
+        config = self.convertConfigurationToRedPitayaType(pulseConfig)
+
+        self.socket.write(struct.pack('<Q', 1 << 58 | config.CountDuration))
+        self.socket.write(struct.pack('<Q', 2 << 58 | config.CountNumber))
+        self.socket.write(struct.pack('<Q', 3 << 58 | config.Threshold))
+        self.socket.write(struct.pack('<Q', 5 << 58 | config.AveragesNumber))
+        self.socket.write(struct.pack('<Q', 7 << 58 | config.StartPump))
+        self.socket.write(struct.pack('<Q', 8 << 58 | config.WidthPump))
+        self.socket.write(struct.pack('<Q', 9 << 58 | config.StartMW))
+        self.socket.write(struct.pack('<Q', 10 << 58 | config.WidthMW))
+        self.socket.write(struct.pack('<Q', 11 << 58 | config.StartImage))
+        self.socket.write(struct.pack('<Q', 12 << 58 | config.WidthImage))
+        self.socket.write(struct.pack('<Q', 13 << 58 | config.StartReadout))
+        self.socket.write(struct.pack('<Q', 14 << 58 | config.LaserLow))
+        self.socket.write(struct.pack('<Q', 15 << 58 | config.LaserHigh))
+        self.socket.write(struct.pack('<Q', 0 << 58 | config.Threshold))
         
         print("Configuration sent to red pitaya")
 

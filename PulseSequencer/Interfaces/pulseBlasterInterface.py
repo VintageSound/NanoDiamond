@@ -51,10 +51,10 @@ class pulseBlasterInterface():
 
         print("disconnected from pulse blaster")
 
-    def configurePulseBlaster(self, pulseConfig : pulseConfiguration, measurementType : measurementType):
-        isRabi = (measurementType == measurementType.RabiPulse)
+    def configurePulseBlaster(self, pulseConfig : pulseConfiguration):
+        isRabi = (pulseConfig.measurementType == measurementType.RabiPulse)
 
-        if measurementType == measurementType.RamziPulse:
+        if pulseConfig.measurementType == measurementType.RamziPulse:
             raise NotImplementedError("ramzi not implemented!")
 
         data_to_send = json.dumps(
