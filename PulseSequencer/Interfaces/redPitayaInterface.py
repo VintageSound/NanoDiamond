@@ -13,7 +13,7 @@ from Data.measurementType import measurementType
 
 class redPitayaInterface():
     _instance = None
-    maxPower = 2 ** 13  # not sure why...
+    maxPower = 2 ** 13  #◙ not sure why...
     timeStep = 0.008 # micro second. 
     defaultRpHost = 'rp-f09ded.local'
     defaultPort = 1001
@@ -128,43 +128,45 @@ class redPitayaInterface():
     def convertConfigurationToRedPitayaType(self, pulseConfig : pulseConfiguration):
         newConfig = pulseConfiguration()
         
-        if pulseConfig.measurementType == measurementType.ODMR:
-            newConfig.CountDuration = np.uint32(int(pulseConfig.CountDuration.text()) / redPitayaInterface.timeStep)
+        if pulseConfig.measurement_type == measurementType.ODMR:
+            newConfig.count_duration = np.uint32(int(pulseConfig.count_duration / redPitayaInterface.timeStep))
         else:
-            newConfig.CountDuration = np.uint32(1)
+            newConfig.count_duration = np.uint32(1)
 
-        newConfig.CountNumber = np.uint32(int(np.log2(pulseConfig.CountNumber)))
-        newConfig.Threshold = np.uint32(int(pulseConfig.Threshold) * redPitayaInterface.maxPower / 20) # why 20 ????
-        newConfig.AveragesNumber = np.uint32(int(self.AveragesNumber))
-        newConfig.StartPump = np.uint32(int(self.StartPump / redPitayaInterface.timeStep))
-        newConfig.WidthPump = np.uint32(int(self.WidthPump / redPitayaInterface.timeStep))
-        newConfig.StartMW = np.uint32(int(self.StartMW / redPitayaInterface.timeStep))
-        newConfig.WidthMW = np.uint32(int(self.WidthMW / redPitayaInterface.timeStep))
-        newConfig.StartImage = np.uint32(int(self.StartImage / redPitayaInterface.timeStep))
-        newConfig.WidthImage = np.uint32(int(self.WidthImage / redPitayaInterface.timeStep))
-        newConfig.StartReadout = np.uint32(int(self.StartReadout / redPitayaInterface.timeStep))
-        newConfig.LaserLow = np.uint32(int(self.LowLevel * redPitayaInterface.maxPower))
-        newConfig.LaserHigh = np.uint32(int(self.HighLevel * redPitayaInterface.maxPower))
+        newConfig.count_number = np.uint32(int(np.log2(pulseConfig.count_number)))
+        newConfig.threshold = np.uint32(int(pulseConfig.threshold) * redPitayaInterface.maxPower / 20) # why 20 ????
+        newConfig.iterations = np.uint32(int(pulseConfig.iterations))
+        newConfig.pump_start = np.uint32(int(pulseConfig.pump_start / redPitayaInterface.timeStep))
+        newConfig.pump_duration = np.uint32(int(pulseConfig.pump_duration / redPitayaInterface.timeStep))
+        newConfig.microwave_start = np.uint32(int(pulseConfig.microwave_start / redPitayaInterface.timeStep))
+        newConfig.microwave_duration = np.uint32(int(pulseConfig.microwave_duration / redPitayaInterface.timeStep))
+        newConfig.image_start = np.uint32(int(pulseConfig.image_start / redPitayaInterface.timeStep))
+        newConfig.image_duration = np.uint32(int(pulseConfig.image_duration / redPitayaInterface.timeStep))
+        newConfig.readout_start = np.uint32(int(pulseConfig.readout_start / redPitayaInterface.timeStep))
+        newConfig.low_voltage_AOM = np.uint32(int(pulseConfig.low_voltage_AOM * redPitayaInterface.maxPower))
+        newConfig.high_voltage_AOM = np.uint32(int(pulseConfig.high_voltage_AOM * redPitayaInterface.maxPower))
 
         return newConfig
 
     def congifurePulse(self, pulseConfig):
         config = self.convertConfigurationToRedPitayaType(pulseConfig)
 
-        self.socket.write(struct.pack('<Q', 1 << 58 | config.CountDuration))
-        self.socket.write(struct.pack('<Q', 2 << 58 | config.CountNumber))
-        self.socket.write(struct.pack('<Q', 3 << 58 | config.Threshold))
-        self.socket.write(struct.pack('<Q', 5 << 58 | config.AveragesNumber))
-        self.socket.write(struct.pack('<Q', 7 << 58 | config.StartPump))
-        self.socket.write(struct.pack('<Q', 8 << 58 | config.WidthPump))
-        self.socket.write(struct.pack('<Q', 9 << 58 | config.StartMW))
-        self.socket.write(struct.pack('<Q', 10 << 58 | config.WidthMW))
-        self.socket.write(struct.pack('<Q', 11 << 58 | config.StartImage))
-        self.socket.write(struct.pack('<Q', 12 << 58 | config.WidthImage))
-        self.socket.write(struct.pack('<Q', 13 << 58 | config.StartReadout))
-        self.socket.write(struct.pack('<Q', 14 << 58 | config.LaserLow))
-        self.socket.write(struct.pack('<Q', 15 << 58 | config.LaserHigh))
-        self.socket.write(struct.pack('<Q', 0 << 58 | config.Threshold))
+        print(pulseConfig.high_voltage_AOM)
+
+        self.socket.write(struct.pack('<Q', 1 << 58 | config.count_duration))
+        self.socket.write(struct.pack('<Q', 2 << 58 | config.count_number))
+        self.socket.write(struct.pack('<Q', 3 << 58 | config.threshold))
+        self.socket.write(struct.pack('<Q', 5 << 58 | config.iterations))
+        self.socket.write(struct.pack('<Q', 7 << 58 | config.pump_start))
+        self.socket.write(struct.pack('<Q', 8 << 58 | config.pump_duration))
+        self.socket.write(struct.pack('<Q', 9 << 58 | config.microwave_start))
+        self.socket.write(struct.pack('<Q', 10 << 58 | config.microwave_duration))
+        self.socket.write(struct.pack('<Q', 11 << 58 | config.image_start))
+        self.socket.write(struct.pack('<Q', 12 << 58 | config.image_duration))
+        self.socket.write(struct.pack('<Q', 13 << 58 | config.readout_start))
+        self.socket.write(struct.pack('<Q', 14 << 58 | config.low_voltage_AOM))
+        self.socket.write(struct.pack('<Q', 15 << 58 | config.high_voltage_AOM))
+        self.socket.write(struct.pack('<Q', 0 << 58 | config.threshold))
         
         print("Configuration sent to red pitaya")
 
@@ -199,11 +201,14 @@ class redPitayaInterface():
 
         return convertedData
 
-    def startODMR(self, pulseConfig):
-        self.socket.write(struct.pack('<Q', 4 << 58 | pulseConfig.CountDuration))
+    def startODMR(self, pulseConfig : pulseConfiguration):
+        config = self.convertConfigurationToRedPitayaType(pulseConfig)
+        self.socket.write(struct.pack('<Q', 4 << 58 | config.count_duration))
 
-    def startRabiMeasurement(self, pulseConfig):
-        self.socket.write(struct.pack('<Q', 6 << 58 | pulseConfig.CountDuration))
+    def startRabiMeasurement(self, pulseConfig : pulseConfiguration):
+        count_duration = np.uint32(1)
+        self.socket.write(struct.pack('<Q', 6 << 58 | count_duration))
+        
     # ---------------- Events -----------------
     def connectedMessageRecived(self):
         try:

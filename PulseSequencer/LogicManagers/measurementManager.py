@@ -12,14 +12,10 @@ from Interfaces.microwaveInterface import microwaveInterface
 from Data.measurementType import measurementType
 from Data.repetition import repetition
 
-# turn off microwave when rabi TODO: Test
-# turn on microwave when ODMR TODO: Test
-# add pulse blaster toggle TODO: Test
-# TODO: add "connect to everything" method
+# add "connect to everything" method TODO:  Test
 # add load methods to data saver TODO: Test
 # TODO: add complete rabi scan prosses
 # TODO: add rabi scan normalization calaculation and plot the graph   
-# TODO: Change "apply" method in the UI class
 # TODO: add default path to save functions
 # TODO: check save and load functions
 # TODO: nootebook of series of measerements - Change MW, change Laser intensity, change initial pulse beginings
@@ -138,11 +134,16 @@ class measurementManager():
         self.pulseBlaster.connect()
         self.microwaveDevice.connect()
 
-    def laserOpenCloseToggle(self):
+    def laserOpenCloseToggle(self, newConfig : pulseConfiguration):
         if self.redPitaya.isAOMOpen:
             self.redPitaya.closeAOM()
         else:
-            self.redPitaya.congifurePulse(self.getCurrentPulseConfig())
+            if newConfig.measurement_type == measurementType.ODMR:
+                self.pulseConfigODMR = newConfig
+            elif newConfig.measurement_type == measurementType.RabiPulse: 
+                self.pulseConfigRabi = newConfig
+
+            self.redPitaya.congifurePulse(newConfig)
             self.redPitaya.openAOM()
 
         self.raiseAOMStatusChangedEvent()
@@ -196,7 +197,7 @@ class measurementManager():
         if config is not None:
             self.pulseConfigODMR = config
 
-        self.pulseConfigODMR.measurementType = measurementType.ODMR
+        self.pulseConfigODMR.measurement_type = measurementType.ODMR
 
         self.redPitaya.congifurePulse(self.pulseConfigODMR)
         self.pulseBlaster.configurePulseBlaster(self.pulseConfigODMR)
@@ -205,7 +206,7 @@ class measurementManager():
         if config is not None:
             self.pulseConfigRabi = config
 
-        self.pulseConfigRabi.measurementType = measurementType.RabiPulse
+        self.pulseConfigRabi.measurement_type = measurementType.RabiPulse
 
         self.redPitaya.congifurePulse(self.pulseConfigRabi)
         self.pulseBlaster.configurePulseBlaster(self.pulseConfigRabi)

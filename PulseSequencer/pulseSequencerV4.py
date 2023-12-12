@@ -70,12 +70,16 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         self.connectMicrowaveODMRButton.clicked.connect(self.microwaveDeviceConnectionToggle)
         self.onOffODMRConnectButton.clicked.connect(self.microwaveOnOffToggle)
         self.btnSaveODMR.clicked.connect(self.saveODMR)
+        self.ODMRPathTextBox.setText(self.dataSaver.getODMRFolderToSave())
+        self.ODMRFileNumber.setText(str(self.dataSaver.ODMRIndex))
 
         # rabi
         self.btnMeasureRabiPulse.clicked.connect(self.clearAndStartRabiMeasurement)
         self.connectMicrowaveRabiButton.clicked.connect(self.microwaveDeviceConnectionToggle)
         self.onOffRabiConnectButton.clicked.connect(self.microwaveOnOffToggle)
         self.btnSaveRabi.clicked.connect(self.saveRabi)
+        self.rabiPathTextBox.setText(self.dataSaver.getRabiFolderToSave())
+        self.rabiFileNumber.setText(str(self.dataSaver.rabiIndex))
 
         # initialize axes
         self.initializeODMRAxes()
@@ -172,7 +176,8 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
     # Action Methods
     def laserOpenCloseToggle(self):
         try:
-            self.measurementManager.laserOpenCloseToggle()
+            config = self.createPulseConfiguration()
+            self.measurementManager.laserOpenCloseToggle(config)
         except Exception as ex:
             print(ex)
             traceback.print_exc()
@@ -275,7 +280,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         self.onOffODMRConnectButton.setStyleSheet("background-color:none")
         self.onOffRabiConnectButton.setStyleSheet("background-color:none")
 
-    # TODO: Add Save
+    # TODO: Test
     def saveODMR(self):
         try:
             self.dataSaver.setODMRFolderToSave(self.ODMRPathTextBox.text())
@@ -289,44 +294,45 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
             print(ex)
             traceback.print_exc()
 
-    # TODO: ADd
+    # TODO: Test
     def saveRabi(self):
+        try:
+            self.dataSaver.setRabiFolderToSave(self.rabiPathTextBox.text())
+            self.dataSaver.ODMRIndex = int(self.rabiFileNumber.text())
+
+            comment = self.rabiComment.text()
+
+            self.dataSaver.saveRabiPulse(comment)      
+            self.rabiFileNumber.setText(str(self.dataSaver.rabiIndex))
+        except Exception as ex:
+            print(ex)
+            traceback.print_exc()
         pass 
-    # def save(self):
-    #     try:
-    #         if self.measurmentTabs.currentIndex() == measurementType.ODMR.value:
-    #             self.saveODMR()
-    #         elif self.measurmentTabs.currentIndex() == measurementType.RabiPulse.value:
-    #             self.saveRabi()
-    #     except Exception as ex:
-    #         print(ex)
-    #         traceback.print_exc()
 
     # Config Methods
     def createPulseConfiguration(self):
         try:
-            timeStep = measurementManager.redPitayaTimeStep
             pulseConfig = pulseConfiguration()
 
             type = self.getCurrentMeasurementTab()
 
             if type == measurementType.ODMR:
-                pulseConfig.CountDuration = np.uint32(int(float(self.txtCountDuration.text()) / timeStep))
+                pulseConfig.count_duration = int(self.txtCountDuration.text())
             else:
-                pulseConfig.CountDuration = np.uint32(1)
+                pulseConfig.count_duration = 1
 
-            pulseConfig.CountNumber = np.uint32(int(np.log2(float(self.txtCountNumber.text()))))
-            pulseConfig.Threshold = np.uint32(int(float(self.txtThreshold.text()) * measurementManager.maxPower / 20)) # why 20 ????
-            pulseConfig.AveragesNumber = np.uint32(int(self.txtAveragesNumber.text()))
-            pulseConfig.StartPump = np.uint32(int(float(self.txtStartPump.text()) / timeStep))
-            pulseConfig.WidthPump = np.uint32(int(float(self.txtWidthPump.text()) / timeStep))
-            pulseConfig.StartMW = np.uint32(int(float(self.txtStartMW.text()) / timeStep))
-            pulseConfig.WidthMW = np.uint32(int(float(self.txtWidthMW.text()) / timeStep))
-            pulseConfig.StartImage = np.uint32(int(float(self.txtStartImage.text()) / timeStep))
-            pulseConfig.WidthImage = np.uint32(int(float(self.txtWidthImage.text()) / timeStep))
-            pulseConfig.StartReadout = np.uint32(int(float(self.txtStartReadout.text()) / timeStep))
-            pulseConfig.LaserLow = np.uint32(int(float(self.txtLowLevel.text()) * measurementManager.maxPower))
-            pulseConfig.LaserHigh = np.uint32(int(float(self.txtHighLevel.text()) * measurementManager.maxPower))
+            pulseConfig.count_number = float(self.txtCountNumber.text())
+            pulseConfig.threshold = float(self.txtThreshold.text())
+            pulseConfig.iterations = int(self.txtAveragesNumber.text())
+            pulseConfig.pump_start = float(self.txtStartPump.text())
+            pulseConfig.pump_duration = float(self.txtWidthPump.text())
+            pulseConfig.microwave_start = float(self.txtStartMW.text())
+            pulseConfig.microwave_duration = float(self.txtWidthMW.text())
+            pulseConfig.image_start = float(self.txtStartImage.text())
+            pulseConfig.image_duration = float(self.txtWidthImage.text())
+            pulseConfig.readout_start = float(self.txtStartReadout.text())
+            pulseConfig.low_voltage_AOM = float(self.txtLowLevel.text())
+            pulseConfig.high_voltage_AOM = float(self.txtHighLevel.text())
 
             return pulseConfig
         except Exception:
@@ -483,49 +489,6 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         except Exception as ex:
             print('Error in sending command to windfreak', ex)
             traceback.print_exc()
-
-    #TODO: Rewrite to make sense...
-    # def startRabiScan(self):
-    #     try:
-    #         if self.scan_idle:
-    #             self.scan_idle = False
-    #             self.btnScanRabi.setText('Stop')
-
-    #             if self.lblCurrentValue.text() == '':
-    #                 self.lblCurrentValue.setText(str(self.Range[0]))
-    #                 self.CurrentIteration = 0
-    #                 self.lblCurrentIterations.setText(str(self.CurrentIteration) + r'/' + str(self.Iterations))
-    #                 print(self.lblCurrentIterations.text().split("/")[0])
-    #                 self.ScanStatus = True
-    #             else:
-    #                 self.CurrentIteration = self.CurrentIteration + 1
-    #                 self.lblCurrentIterations.setText(str(self.CurrentIteration) + r'/' + str(self.Iterations))
-    #                 if int(self.CurrentIteration) > int(self.Iterations):
-    #                     self.lblCurrentValue.setText(str(float(self.lblCurrentValue.text()) + self.Step))
-    #                     self.CurrentIteration = 1
-    #                     self.lblCurrentIterations.setText(str(self.CurrentIteration) + r'/' + str(self.Iterations))
-
-    #             if self.cmbScanParam.currentIndex() == 0:
-    #                 self.txtWidthMW.setText(str(self.lblCurrentValue.text()))
-
-    #             self.txtParamValue.setText(str(self.lblCurrentValue.text()))
-
-    #             if float(self.lblCurrentValue.text()) >= float(self.Range[-1]):
-    #                 self.ScanStatus = False
-    #                 self.lblCurrentValue.setText('')
-    #                 self.scan_idle = True
-    #                 self.btnScanRabi.setText('Scan')
-    #             if self.ScanStatus:
-    #                 self.clearAndStartRabiMeasurment()
-    #         else:
-    #             self.lblCurrentValue.setText('')
-    #             self.lblCurrentIterations.setText('')
-    #             self.ScanStatus = False
-    #             self.scan_idle = True
-    #             self.btnScanRabi.setText('Scan')
-    #             self.save()
-    #     except Exception:
-    #         traceback.print_exc()
 
 app = QApplication(sys.argv)
 window = PhaseLockedLoop()

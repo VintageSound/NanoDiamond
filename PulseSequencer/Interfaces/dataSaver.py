@@ -16,7 +16,7 @@ class dataSaver():
         self.ODMRIndex = 0
         self.rabiIndex = 0
 
-        self.basePath = path.join(r'D:/Experiments', str(self.currentDate))
+        self.basePath = path.join(r'D:\Experiments', str(self.currentDate))
         self.ODMRFolder = path.join(self.basePath, "ODMR")
         self.rabiFolder = path.join(self.basePath, "Rabi")
 
@@ -27,27 +27,27 @@ class dataSaver():
         return self.rabiFolder
 
     def setODMRFolderToSave(self, newPath):
-        if path.realpath(newPath):
-            raise(Exception(newPath + " invalid path"))
-        
-        self.ODMRFolder = newPath    
+        # # if path.realpath(newPath):
+        # #     raise(Exception(newPath + " invalid path"))
+        # os.makedirs(newPath)
+        self.ODMRFolder = path.realpath(newPath)    
 
     def setRabiFolderToSave(self, newPath):
-        if path.realpath(newPath):
-            raise(Exception(newPath + " invalid path"))
-        
-        self.rabiFolder = newPath
+        # os.makedirs(newPath)
+        self.rabiFolder = path.realpath(newPath)
 
-    def saveODMR(self, data, pulseConfig, comment):
+    def saveODMR(self, comment):
         data = self.measurmentManager.ODMRData
         pulseConfig = self.measurmentManager.pulseConfigODMR
+        number_of_iterations = self.measurmentManager.ODMRIndex
 
         metadata = {'Measurement type:': measurementType.ODMR.name,
-                'RF Power [dBm]:': pulseConfig.RFPower,
-                'Measurment Duration [us]:': pulseConfig.CountDuration * redPitayaInterface.timeStep,
+                'RF Power [dBm]:': pulseConfig.microwave_power,
+                'Measurment Duration [us]:': pulseConfig.count_duration * redPitayaInterface.timeStep,
                 'Comment:': comment,
                 'Scan Start Frequency [MHz]:': pulseConfig.startFreq,
-                'Scan Stop Frequency [MHz]:': pulseConfig.stopFreq}
+                'Scan Stop Frequency [MHz]:': pulseConfig.stopFreq,
+                'Number of Iterations:' : number_of_iterations}
 
         filePath = os.path.join(self.ODMRFolder, str(self.ODMRIndex) + ".pkl")
 
@@ -59,18 +59,18 @@ class dataSaver():
         pulseConfig = self.measurmentManager.pulseConfigRabi
 
         metadata = {'Measurement type': measurementType.RabiPulse.name,
-                'RF Power [dBm]': pulseConfig.RFPower,
-                'Measurement Duration [us]': pulseConfig.CountDuration * redPitayaInterface.timeStep,
+                'RF Power [dBm]': pulseConfig.microwave_power,
+                'Measurement Duration [us]': pulseConfig.count_duration * redPitayaInterface.timeStep,
                 'Comment': comment,
                 'MW frequency [MHz]': pulseConfig.CenterFreq,
-                'Pump pulse time [us]': pulseConfig.StartPump,
-                'Pump pulse duration [us]': pulseConfig.WidthPump * redPitayaInterface.timeStep,
-                'MW pulse time [us]': pulseConfig.StartMW * redPitayaInterface.timeStep,
-                'MW pulse duration [us]': pulseConfig.WidthMW * redPitayaInterface.timeStep,
-                'Imaging pulse time [us]': pulseConfig.StartImage * redPitayaInterface.timeStep,
-                'Imaging Pulse duration [us]': pulseConfig.WidthImage * redPitayaInterface.timeStep,
-                'Readout pulse time [us]': pulseConfig.StartReadout * redPitayaInterface.timeStep,
-                'Averages Number': pulseConfig.AveragesNumber}
+                'Pump pulse time [us]': pulseConfig.pump_start,
+                'Pump pulse duration [us]': pulseConfig.pump_duration * redPitayaInterface.timeStep,
+                'MW pulse time [us]': pulseConfig.microwave_start * redPitayaInterface.timeStep,
+                'MW pulse duration [us]': pulseConfig.microwave_duration * redPitayaInterface.timeStep,
+                'Imaging pulse time [us]': pulseConfig.image_start * redPitayaInterface.timeStep,
+                'Imaging Pulse duration [us]': pulseConfig.image_duration * redPitayaInterface.timeStep,
+                'Readout pulse time [us]': pulseConfig.readout_start * redPitayaInterface.timeStep,
+                'Averages Number': pulseConfig.iterations}
    
         filePath = os.path.join(self.rabiFolder, str(self.rabiFolder) + ".pkl")
 

@@ -75,6 +75,7 @@ class microwaveInterface():
             raise Exception('Windfreak is disconnected')
 
         if not self.checkIfMicrowaveIsOn():
+            self.ser.write(b'C0')
             self.ser.write(b'E1')
 
     def turnOffMicrowave(self):

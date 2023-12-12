@@ -1,20 +1,20 @@
 class pulseConfiguration():
     def __init__(self):
-        self.CountDuration = 0
-        self.CountNumber = 0
-        self.Threshold = 0
-        self.AveragesNumber = 0
-        self.StartPump = 0
-        self.WidthPump = 0
-        self.StartMW = 0
-        self.WidthMW = 0
-        self.StartImage = 0
-        self.WidthImage = 0
-        self.StartReadout = 0
-        self.LaserLow = 0
-        self.LaserHigh = 0
-        self.RFPower = 0
-        self.measurementType = None
+        self.count_duration = 0
+        self.count_number = 0
+        self.threshold = 0
+        self.iterations = 0
+        self.pump_start = 0
+        self.pump_duration = 0
+        self.microwave_start = 0
+        self.microwave_duration = 0
+        self.image_start = 0
+        self.image_duration = 0
+        self.readout_start = 0
+        self.low_voltage_AOM = 0
+        self.high_voltage_AOM = 0
+        self.microwave_power = 0
+        self.measurement_type = None
 
     # def __init__(self, countDuration, countNumber, threshold, averagesNumber, 
     #                 startPump, widthPump, startMW, widthMW, startImage, widthImage, 

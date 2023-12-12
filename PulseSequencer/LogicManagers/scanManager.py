@@ -30,15 +30,15 @@ class scanManager():
         self.config = pulseConfig
         self.timeRange = list(range(startTime, endTime, timeStep))
         self.currentIteration = 0
-        self.config.WidthMW = self.timeRange[self.currentIteration] 
+        self.config.microwave_duration = self.timeRange[self.currentIteration] 
         self.isMeasurementActive = True
 
         self.measurementManager.registerToRabiPulseDataRecivedEvent(self.rabiPulseEndedEventHandler)
         self.measurementManager.startNewRabiPulseMeasurement(config=self.config)
         
     def rabiPulseEndedEventHandler(self, data):
-        self.measurementData[self.config.WidthMW] = data
-        self.rabiPulseEndedEvent(data, self.config.WidthMW)
+        self.measurementData[self.config.microwave_duration] = data
+        self.rabiPulseEndedEvent(data, self.config.microwave_duration)
         # TODO: add calculation of rabi point 
 
         self.continueCurrentScan()
@@ -48,6 +48,6 @@ class scanManager():
             return
 
         self.currentIteration += 1
-        self.config.WidthMW = self.timeRange[self.currentIteration] 
+        self.config.microwave_duration = self.timeRange[self.currentIteration] 
         self.measurementManager.startNewRabiPulseMeasurement(config=self.config)
     
