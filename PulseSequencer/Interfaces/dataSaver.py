@@ -10,7 +10,7 @@ from Interfaces.redPitayaInterface import redPitayaInterface
 from LogicManagers.measurementManager import measurementManager
 
 class dataSaver():
-    def __init__(self, measurmentManager : measurementManager) -> None:
+    def __init__(self, measurmentManager : measurementManager = None):
         self.currentDate = datetime.date(datetime.now())
         self.measurmentManager = measurmentManager
         self.ODMRIndex = 0

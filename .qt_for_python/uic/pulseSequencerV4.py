@@ -470,10 +470,10 @@ class Ui_odmr(object):
 
         self.formLayout_41.setWidget(2, QFormLayout.LabelRole, self.lblParamValue1)
 
-        self.ODMRFileNumber_2 = QLineEdit(self.formLayoutWidget_21)
-        self.ODMRFileNumber_2.setObjectName(u"ODMRFileNumber_2")
+        self.rabiFileNumber = QLineEdit(self.formLayoutWidget_21)
+        self.rabiFileNumber.setObjectName(u"rabiFileNumber")
 
-        self.formLayout_41.setWidget(2, QFormLayout.FieldRole, self.ODMRFileNumber_2)
+        self.formLayout_41.setWidget(2, QFormLayout.FieldRole, self.rabiFileNumber)
 
         self.lblComment1 = QLabel(self.formLayoutWidget_21)
         self.lblComment1.setObjectName(u"lblComment1")
@@ -733,7 +733,7 @@ class Ui_odmr(object):
 
         self.retranslateUi(odmr)
 
-        self.measurmentTabs.setCurrentIndex(1)
+        self.measurmentTabs.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(odmr)

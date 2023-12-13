@@ -24,6 +24,7 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 import matplotlib.pyplot as plt
 
 from LogicManagers.measurementManager import measurementManager
+from LogicManagers.scanManager import scanManager
 
 QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True) # enable high-dpi scaling
 QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True) # use high-dpi icons
@@ -41,6 +42,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         self.setupUi(self)
         self.measurementManager = measurementManager(self)
         self.dataSaver = dataSaver(self.measurementManager)
+        self.scanManager = scanManager(self.measurementManager)
 
         self.txtIPRedPitaya.setText(str(self.measurementManager.redPitaya.ip))
         self.txtPortRedPitaya.setText(str(self.measurementManager.redPitaya.port))
