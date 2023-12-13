@@ -16,7 +16,6 @@ from Data.repetition import repetition
 # add load methods to data saver TODO: Test
 # TODO: add complete rabi scan prosses
 # TODO: add rabi scan normalization calaculation and plot the graph   
-# TODO: add default path to save functions
 # TODO: check save and load functions
 # TODO: nootebook of series of measerements - Change MW, change Laser intensity, change initial pulse beginings
 
