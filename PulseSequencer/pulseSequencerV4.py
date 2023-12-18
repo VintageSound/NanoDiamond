@@ -25,6 +25,7 @@ import matplotlib.pyplot as plt
 
 from LogicManagers.measurementManager import measurementManager
 from LogicManagers.scanManager import scanManager
+from LogicManagers import pulseAnalayzer
 
 QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True) # enable high-dpi scaling
 QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True) # use high-dpi icons
@@ -82,6 +83,9 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         self.btnSaveRabi.clicked.connect(self.saveRabi)
         self.rabiPathTextBox.setText(self.dataSaver.getRabiFolderToSave())
         self.rabiFileNumber.setText(str(self.dataSaver.rabiIndex))
+
+        # scan
+
 
         # initialize axes
         self.initializeODMRAxes()
@@ -149,10 +153,8 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
 
     def initializeRabiAxes(self):
         # Create figure
-        figure, self.axesRabi1 = plt.subplots()
+        figure, (self.axesRabi_complete, self.axesRabi_overlap) = plt.subplots(nrows=2, ncols=1)
         figure.set_facecolor('none')
-
-        self.axesRabi2 = self.axesRabi1.twinx()
 
         self.rabiCanvas = FigureCanvas(figure)
         self.rabiPulsePlotLayout.addWidget(self.rabiCanvas)
@@ -394,7 +396,6 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
 
             # reset plot
             self.axesODMR.clear()
-            # self.axes2.clear()
             self.axesODMR.grid()
 
             x_label = self.measurementManager.ODMRXAxisLabel
@@ -417,25 +418,48 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
             self.rabiToolbar.home()
             self.rabiToolbar.update()
 
-            # reset plot
-            self.axesRabi1.clear()
-            self.axesRabi2.clear()
-            self.axesRabi1.grid()
-
             # plot
-            xLabel = self.measurementManager.RabiXAxisLabel
-            yLabel = self.measurementManager.RabiYAxisLabel
-
-            self.curveRabi1 = self.axesRabi1.scatter(data[xLabel], data[yLabel], s=1, c='black')
-            self.curveRabi2 = self.axesRabi1.plot(data[xLabel], data[yLabel], linewidth=0.5, c='black')
+            self.plotRabiCompletePulse(data)
+            self.plotRabiOverlapPulses(data)
             
-            self.axesRabi1.set_xlabel(xLabel)
-            self.axesRabi1.set_ylabel(yLabel)
-            
-            self.axesRabi1.set_position([0.15, 0.15, 0.8, 0.8])
             self.rabiCanvas.draw()
         except Exception:
             traceback.print_exc()
+
+    def plotRabiCompletePulse(self, data):
+        axes = self.axesRabi_complete 
+        xLabel = self.measurementManager.RabiXAxisLabel
+        yLabel = self.measurementManager.RabiYAxisLabel
+
+        # reset plot
+        axes.clear()
+        axes.grid()
+
+        self.curveRabi1 = axes.scatter(data[xLabel], data[yLabel], s=1, c='black')
+        self.curveRabi2 = axes.plot(data[xLabel], data[yLabel], linewidth=0.5, c='black')
+        
+        axes.set_xlabel(xLabel)
+        axes.set_ylabel(yLabel)
+        
+        # axes.set_position([0.15, 0.15, 0.8, 0.8])
+
+    def plotRabiOverlapPulses(self, data):
+        axes = self.axesRabi_overlap 
+        xLabel = self.measurementManager.RabiXAxisLabel
+        yLabel = self.measurementManager.RabiYAxisLabel
+
+        # reset plot
+        axes.clear()
+        axes.grid()
+
+        t_image, y_image = pulseAnalayzer.getOnlyImage(data[xLabel], data[yLabel])
+        t_pump, y_pump = pulseAnalayzer.getOnlyPump(data[xLabel], data[yLabel])
+
+        axes.plot(t_pump, y_pump, label = "Pump")
+        axes.plot(t_image, y_image, label = "Image")
+        
+        axes.set_xlabel(xLabel)
+        axes.set_ylabel(yLabel)
 
     # Event Handler
     def connectionErrorEventHandler(self, error):
