@@ -13,10 +13,8 @@ from Data.measurementType import measurementType
 from Data.repetition import repetition
 
 # add "connect to everything" method TODO:  Test
-# add load methods to data saver TODO: Test
 # TODO: add complete rabi scan prosses
 # TODO: add rabi scan normalization calaculation and plot the graph   
-# TODO: check save and load functions
 # TODO: nootebook of series of measerements - Change MW, change Laser intensity, change initial pulse beginings
 
 class measurementManager():
@@ -27,6 +25,12 @@ class measurementManager():
         self.redPitaya = redPitayaInterface(QMainObject)
         self.pulseBlaster = pulseBlasterInterface()
         self.microwaveDevice = microwaveInterface()
+
+        # Column Names
+        self.ODMRXAxisLabel = self.redPitaya.ODMRXAxisLabel
+        self.ODMRYAxisLabel = self.redPitaya.ODMRYAxisLabel
+        self.RabiXAxisLabel = self.redPitaya.RabiXAxisLabel 
+        self.RabiYAxisLabel = self.redPitaya.RabiYAxisLabel
 
         # register Events:
         self.redPitaya.registerReciveData(self.receiveDataHandler)
@@ -80,11 +84,11 @@ class measurementManager():
     def initializeODMRData(self):
         self.HaveODMRData = False
         self.measurementCountODMR = 0
-        self.ODMRData = pd.DataFrame(0, index=np.arange(1024), columns=[self.redPitaya.ODMRXAxisLabel, self.redPitaya.ODMRYAxisLabel])
+        self.ODMRData = pd.DataFrame(0, index=np.arange(1024), columns=[self.ODMRXAxisLabel, self.ODMRYAxisLabel])
 
     def initializeRabiData(self):
         self.HaveRabiData = False
-        self.RabiData = pd.DataFrame(0, index=np.arange(1024), columns=[self.redPitaya.RabiXAxisLabel, self.redPitaya.RabiYAxisLabel])
+        self.RabiData = pd.DataFrame(0, index=np.arange(1024), columns=[self.RabiXAxisLabel, self.RabiYAxisLabel])
 
     def updateMicrowaveODMRConfig(self, config : microwaveConfiguration):
         self.microwaveODMRConfig = config
@@ -282,8 +286,6 @@ class measurementManager():
             self.ODMRData = self.sumTwoDataframes(self.ODMRData, data)
         else:
             self.ODMRData = data
-        #     yData = self.ODMRData[self.ODMRYAxisLabel].tolist() + data
-        # self.ODMRData = pd.DataFrame({self.ODMRXAxisLabel: xData, self.ODMRYAxisLabel: yData})
         self.HaveODMRData = True
     
     def sumTwoDataframes(self, df1, df2):
@@ -349,13 +351,10 @@ class measurementManager():
     # Event Handlers    
     def redPitayaConnectedHandler(self):
         try:
-            # TODO: Check if needed
-            # self.configurePulseSequence(self.pulseConfig)
             self.raiseRedPitayaConnectedEvent()
 
             # Take another measurement if needed
             self.continueCurrentMeasurement()
-
         except Exception:
             traceback.print_exc()
 
@@ -373,9 +372,6 @@ class measurementManager():
             self.isMeasurementActive = False
             return
 
-        # ----- delay loop -------
-        time.sleep(0.5)
-        # ------------------------
         self._ODMRMeasurement()
 
     def receiveDataHandler(self, data):

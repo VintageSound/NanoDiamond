@@ -18,7 +18,7 @@ class dataSaver():
 
         self.basePath = path.join(r'D:\Experiments', str(self.currentDate))
         self.ODMRFolder = path.join(self.basePath, "ODMR")
-        self.rabiFolder = path.join(self.basePath, "Pulse_Sqeunce")
+        self.rabiFolder = path.join(self.basePath, "Pulse_Sequence")
         self.scanFolder = path.join(self.basePath, "Scans")
 
     def getODMRFolderToSave(self):
@@ -59,10 +59,13 @@ class dataSaver():
         self.savePickle(filePath, metadata, data)
         self.ODMRIndex += 1
 
-    def saveRabiPulse(self, comment):
+    def saveRabiPulse(self, comment, file_name = None):
         data = self.measurmentManager.RabiData
         pulseConfig = self.measurmentManager.pulseConfigRabi
         microwaveConfig = self.measurmentManager.microwaveRabiConfig
+
+        if file_name is None:
+            file_name = str(self.rabiIndex)
 
         metadata = {'Measurement type': measurementType.RabiPulse.name,
                 'RF Power [dBm]': pulseConfig.microwave_power,
@@ -78,7 +81,7 @@ class dataSaver():
                 'Readout pulse time [us]': pulseConfig.readout_start * redPitayaInterface.timeStep,
                 'Averages Number': pulseConfig.iterations}
    
-        filePath = os.path.join(self.rabiFolder, str(self.rabiIndex) + ".pkl")
+        filePath = os.path.join(self.rabiFolder, file_name + ".pkl")
 
         self.savePickle(filePath, metadata, data)
         self.rabiIndex += 1
@@ -96,9 +99,9 @@ class dataSaver():
         # with open(filePath, 'ab') as fout:
             data.to_pickle(fout)
 
-def loadPickle(filePath):
-    with open(filePath, 'rb') as fin:
-        pdMetadata = pd.read_pickle(fin)
-        data = pd.read_pickle(fin)
+    def loadPickle(self, filePath):
+        with open(filePath, 'rb') as fin:
+            pdMetadata = pd.read_pickle(fin)
+            data = pd.read_pickle(fin)
 
-    return pdMetadata, data
+        return pdMetadata, data

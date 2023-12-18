@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1312</width>
-    <height>1130</height>
+    <height>1117</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -390,7 +390,7 @@
           <item>
            <widget class="QTabWidget" name="measurmentTabs">
             <property name="currentIndex">
-             <number>1</number>
+             <number>2</number>
             </property>
             <widget class="QWidget" name="ODMRTab">
              <attribute name="title">
@@ -413,10 +413,16 @@
                   <layout class="QGridLayout" name="gridLayout">
                    <item row="1" column="0">
                     <widget class="QGroupBox" name="ODMR">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
                      <property name="minimumSize">
                       <size>
                        <width>450</width>
-                       <height>300</height>
+                       <height>260</height>
                       </size>
                      </property>
                      <property name="font">
@@ -447,7 +453,7 @@
                         <x>10</x>
                         <y>30</y>
                         <width>431</width>
-                        <height>242</height>
+                        <height>181</height>
                        </rect>
                       </property>
                       <layout class="QFormLayout" name="formLayout_3">
@@ -517,31 +523,31 @@
                        </item>
                       </layout>
                      </widget>
-                     <widget class="QWidget" name="horizontalLayoutWidget_2">
+                     <widget class="QPushButton" name="btnStartODMR">
                       <property name="geometry">
                        <rect>
                         <x>10</x>
-                        <y>240</y>
-                        <width>431</width>
-                        <height>51</height>
+                        <y>220</y>
+                        <width>212</width>
+                        <height>28</height>
                        </rect>
                       </property>
-                      <layout class="QHBoxLayout" name="horizontalLayout_5">
-                       <item>
-                        <widget class="QPushButton" name="btnStartODMR">
-                         <property name="text">
-                          <string>Start</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QPushButton" name="btnStopODMR">
-                         <property name="text">
-                          <string>Stop</string>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
+                      <property name="text">
+                       <string>Start</string>
+                      </property>
+                     </widget>
+                     <widget class="QPushButton" name="btnStopODMR">
+                      <property name="geometry">
+                       <rect>
+                        <x>230</x>
+                        <y>220</y>
+                        <width>211</width>
+                        <height>28</height>
+                       </rect>
+                      </property>
+                      <property name="text">
+                       <string>Stop</string>
+                      </property>
                      </widget>
                     </widget>
                    </item>
@@ -550,10 +556,16 @@
                      <property name="enabled">
                       <bool>true</bool>
                      </property>
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
                      <property name="minimumSize">
                       <size>
                        <width>450</width>
-                       <height>250</height>
+                       <height>220</height>
                       </size>
                      </property>
                      <property name="font">
@@ -571,7 +583,7 @@
                         <x>18</x>
                         <y>70</y>
                         <width>421</width>
-                        <height>121</height>
+                        <height>101</height>
                        </rect>
                       </property>
                       <layout class="QFormLayout" name="formLayout">
@@ -612,8 +624,8 @@
                        <rect>
                         <x>20</x>
                         <y>30</y>
-                        <width>99</width>
-                        <height>30</height>
+                        <width>82</width>
+                        <height>26</height>
                        </rect>
                       </property>
                       <property name="autoFillBackground">
@@ -631,9 +643,9 @@
                      <widget class="QPushButton" name="connectMicrowaveODMRButton">
                       <property name="geometry">
                        <rect>
-                        <x>20</x>
-                        <y>210</y>
-                        <width>121</width>
+                        <x>10</x>
+                        <y>180</y>
+                        <width>211</width>
                         <height>28</height>
                        </rect>
                       </property>
@@ -644,27 +656,14 @@
                      <widget class="QPushButton" name="onOffODMRConnectButton">
                       <property name="geometry">
                        <rect>
-                        <x>160</x>
-                        <y>210</y>
-                        <width>111</width>
+                        <x>230</x>
+                        <y>180</y>
+                        <width>211</width>
                         <height>28</height>
                        </rect>
                       </property>
                       <property name="text">
                        <string>RF is Off</string>
-                      </property>
-                     </widget>
-                     <widget class="QPushButton" name="applyMicrowaveODMRButton">
-                      <property name="geometry">
-                       <rect>
-                        <x>300</x>
-                        <y>210</y>
-                        <width>121</width>
-                        <height>28</height>
-                       </rect>
-                      </property>
-                      <property name="text">
-                       <string>Apply</string>
                       </property>
                      </widget>
                     </widget>
@@ -686,7 +685,7 @@
                         <x>9</x>
                         <y>22</y>
                         <width>431</width>
-                        <height>168</height>
+                        <height>151</height>
                        </rect>
                       </property>
                       <layout class="QFormLayout" name="formLayout_4">
@@ -696,6 +695,9 @@
                           <string>Path</string>
                          </property>
                         </widget>
+                       </item>
+                       <item row="1" column="0" colspan="2">
+                        <widget class="QLineEdit" name="ODMRPathTextBox"/>
                        </item>
                        <item row="2" column="0">
                         <widget class="QLabel" name="lblParamValue">
@@ -713,9 +715,6 @@
                           <string>Comment:</string>
                          </property>
                         </widget>
-                       </item>
-                       <item row="1" column="0" colspan="2">
-                        <widget class="QLineEdit" name="ODMRPathTextBox"/>
                        </item>
                        <item row="4" column="0" colspan="2">
                         <widget class="QLineEdit" name="ODMRComment"/>
@@ -751,30 +750,30 @@
             </widget>
             <widget class="QWidget" name="RabiPulseTab">
              <attribute name="title">
-              <string>Rabi Pulse Sequence</string>
+              <string>Rabi Sequence Single Pulse</string>
              </attribute>
-             <layout class="QGridLayout" name="gridLayout_11">
+             <layout class="QGridLayout" name="gridLayout_4">
               <item row="0" column="0">
-               <layout class="QGridLayout" name="gridLayout_9">
+               <layout class="QGridLayout" name="gridLayout_2">
                 <property name="sizeConstraint">
                  <enum>QLayout::SetNoConstraint</enum>
                 </property>
                 <item row="0" column="1">
-                 <widget class="QWidget" name="verticalWidget_3" native="true">
+                 <widget class="QWidget" name="verticalWidget_2" native="true">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
-                  <layout class="QGridLayout" name="gridLayout_10">
+                  <layout class="QGridLayout" name="gridLayout">
                    <item row="0" column="0">
-                    <widget class="QGroupBox" name="MW_3">
+                    <widget class="QGroupBox" name="MW">
                      <property name="enabled">
                       <bool>true</bool>
                      </property>
                      <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                        <horstretch>0</horstretch>
                        <verstretch>0</verstretch>
                       </sizepolicy>
@@ -782,7 +781,7 @@
                      <property name="minimumSize">
                       <size>
                        <width>450</width>
-                       <height>220</height>
+                       <height>170</height>
                       </size>
                      </property>
                      <property name="font">
@@ -794,93 +793,92 @@
                      <property name="title">
                       <string>MW Generator Settings</string>
                      </property>
-                     <layout class="QGridLayout" name="gridLayout_6">
-                      <item row="0" column="0">
-                       <widget class="QComboBox" name="comboBoxMWdevice_3">
-                        <property name="autoFillBackground">
-                         <bool>false</bool>
-                        </property>
-                        <property name="sizeAdjustPolicy">
-                         <enum>QComboBox::AdjustToContents</enum>
-                        </property>
-                        <item>
+                     <widget class="QComboBox" name="comboBoxMWdeviceRabi">
+                      <property name="geometry">
+                       <rect>
+                        <x>20</x>
+                        <y>30</y>
+                        <width>82</width>
+                        <height>26</height>
+                       </rect>
+                      </property>
+                      <property name="autoFillBackground">
+                       <bool>false</bool>
+                      </property>
+                      <property name="sizeAdjustPolicy">
+                       <enum>QComboBox::AdjustToContents</enum>
+                      </property>
+                      <item>
+                       <property name="text">
+                        <string>SynthHD</string>
+                       </property>
+                      </item>
+                     </widget>
+                     <widget class="QPushButton" name="connectMicrowaveRabiButton">
+                      <property name="geometry">
+                       <rect>
+                        <x>10</x>
+                        <y>130</y>
+                        <width>211</width>
+                        <height>28</height>
+                       </rect>
+                      </property>
+                      <property name="text">
+                       <string>Connect</string>
+                      </property>
+                     </widget>
+                     <widget class="QPushButton" name="onOffRabiConnectButton">
+                      <property name="geometry">
+                       <rect>
+                        <x>230</x>
+                        <y>130</y>
+                        <width>211</width>
+                        <height>28</height>
+                       </rect>
+                      </property>
+                      <property name="text">
+                       <string>RF is Off</string>
+                      </property>
+                     </widget>
+                     <widget class="QWidget" name="layoutWidget_2">
+                      <property name="geometry">
+                       <rect>
+                        <x>10</x>
+                        <y>60</y>
+                        <width>431</width>
+                        <height>58</height>
+                       </rect>
+                      </property>
+                      <layout class="QFormLayout" name="formLayout_7">
+                       <property name="sizeConstraint">
+                        <enum>QLayout::SetDefaultConstraint</enum>
+                       </property>
+                       <item row="0" column="0">
+                        <widget class="QLabel" name="lblCenterFreq">
                          <property name="text">
-                          <string>SynthHD</string>
+                          <string>Center Freq, MHz:</string>
                          </property>
-                        </item>
-                       </widget>
-                      </item>
-                      <item row="1" column="0">
-                       <layout class="QFormLayout" name="formLayout_5">
-                        <item row="1" column="0">
-                         <widget class="QLabel" name="lblRFPower_3">
-                          <property name="text">
-                           <string>RF Power [dBm]</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="1" column="1">
-                         <widget class="QLineEdit" name="txtRFPowerRabi"/>
-                        </item>
-                        <item row="0" column="0">
-                         <widget class="QLabel" name="lblCenterFreq_2">
-                          <property name="text">
-                           <string>Center Freq, MHz:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="0" column="1">
-                         <widget class="QLineEdit" name="txtCenterFreq"/>
-                        </item>
-                       </layout>
-                      </item>
-                      <item row="2" column="0">
-                       <widget class="QWidget" name="widget" native="true">
-                        <layout class="QHBoxLayout" name="horizontalLayout_3">
-                         <property name="spacing">
-                          <number>7</number>
+                        </widget>
+                       </item>
+                       <item row="0" column="1">
+                        <widget class="QLineEdit" name="txtCenterFreq"/>
+                       </item>
+                       <item row="1" column="0">
+                        <widget class="QLabel" name="lblRFPowerRabi">
+                         <property name="text">
+                          <string>RF Power [dBm]</string>
                          </property>
-                         <property name="sizeConstraint">
-                          <enum>QLayout::SetMinimumSize</enum>
-                         </property>
-                         <item>
-                          <widget class="QPushButton" name="connectMicrowaveRabiButton">
-                           <property name="text">
-                            <string>Connect</string>
-                           </property>
-                          </widget>
-                         </item>
-                         <item>
-                          <widget class="QPushButton" name="onOffRabiConnectButton">
-                           <property name="enabled">
-                            <bool>true</bool>
-                           </property>
-                           <property name="text">
-                            <string>RF is Off</string>
-                           </property>
-                          </widget>
-                         </item>
-                         <item>
-                          <widget class="QPushButton" name="applyMicrowaveRabiButton">
-                           <property name="text">
-                            <string>Apply</string>
-                           </property>
-                          </widget>
-                         </item>
-                        </layout>
-                       </widget>
-                      </item>
-                     </layout>
+                        </widget>
+                       </item>
+                       <item row="1" column="1">
+                        <widget class="QLineEdit" name="txtRFPowerRabi"/>
+                       </item>
+                      </layout>
+                     </widget>
                     </widget>
                    </item>
-                   <item row="3" column="0">
-                    <widget class="QGroupBox" name="DataSave_2">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
+                   <item row="2" column="0">
+                    <widget class="QGroupBox" name="DataSave">
                      <property name="font">
                       <font>
                        <family>Calibri Light</family>
@@ -890,69 +888,62 @@
                      <property name="title">
                       <string>Save Data</string>
                      </property>
-                     <layout class="QGridLayout" name="gridLayout_8">
-                      <item row="0" column="0">
-                       <layout class="QFormLayout" name="formLayout_6">
-                        <property name="sizeConstraint">
-                         <enum>QLayout::SetNoConstraint</enum>
-                        </property>
-                        <property name="formAlignment">
-                         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                        </property>
-                        <item row="0" column="0">
-                         <widget class="QLabel" name="lblPathRabi">
-                          <property name="text">
-                           <string>Path</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="2" column="0">
-                         <widget class="QLabel" name="lblParamValue_2">
-                          <property name="text">
-                           <string>Measurment Index</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="2" column="1">
-                         <widget class="QLineEdit" name="txtIndexRai"/>
-                        </item>
-                        <item row="4" column="0">
-                         <widget class="QLabel" name="lblCommentRabi">
-                          <property name="text">
-                           <string>Comment:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="1" column="0" colspan="2">
-                         <widget class="QLineEdit" name="txtPathRabi"/>
-                        </item>
-                        <item row="5" column="0" colspan="2">
-                         <widget class="QLineEdit" name="txtCommentRabi"/>
-                        </item>
-                        <item row="7" column="0">
-                         <widget class="QWidget" name="widget_4" native="true">
-                          <property name="minimumSize">
-                           <size>
-                            <width>0</width>
-                            <height>50</height>
-                           </size>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="7" column="1">
-                         <widget class="QPushButton" name="btnSaveRabi">
-                          <property name="text">
-                           <string>Save</string>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
-                      </item>
-                     </layout>
+                     <widget class="QWidget" name="formLayoutWidget_2">
+                      <property name="geometry">
+                       <rect>
+                        <x>9</x>
+                        <y>22</y>
+                        <width>431</width>
+                        <height>151</height>
+                       </rect>
+                      </property>
+                      <layout class="QFormLayout" name="formLayout_4">
+                       <item row="0" column="0">
+                        <widget class="QLabel" name="lblPath">
+                         <property name="text">
+                          <string>Path</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="1" column="0" colspan="2">
+                        <widget class="QLineEdit" name="rabiPathTextBox"/>
+                       </item>
+                       <item row="2" column="0">
+                        <widget class="QLabel" name="lblParamValue">
+                         <property name="text">
+                          <string>Measurment Number</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="2" column="1">
+                        <widget class="QLineEdit" name="rabiFileNumber"/>
+                       </item>
+                       <item row="3" column="0">
+                        <widget class="QLabel" name="lblComment">
+                         <property name="text">
+                          <string>Comment:</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="4" column="0" colspan="2">
+                        <widget class="QLineEdit" name="rabiCommentTextBox"/>
+                       </item>
+                      </layout>
+                     </widget>
+                     <widget class="QPushButton" name="btnSaveRabi">
+                      <property name="geometry">
+                       <rect>
+                        <x>230</x>
+                        <y>180</y>
+                        <width>211</width>
+                        <height>51</height>
+                       </rect>
+                      </property>
+                      <property name="text">
+                       <string>Save</string>
+                      </property>
+                     </widget>
                     </widget>
-                   </item>
-                   <item row="4" column="0">
-                    <widget class="QWidget" name="widget" native="true"/>
                    </item>
                    <item row="1" column="0">
                     <widget class="QGroupBox" name="Rabi">
@@ -987,79 +978,6 @@
                       <string>Rabi Pulse Settings</string>
                      </property>
                      <layout class="QGridLayout" name="gridLayout_7">
-                      <item row="4" column="1">
-                       <widget class="QLineEdit" name="txtStartReadout"/>
-                      </item>
-                      <item row="0" column="3">
-                       <widget class="QLabel" name="lblDuration">
-                        <property name="text">
-                         <string>Duration, us:</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="1" column="3">
-                       <widget class="QLineEdit" name="txtWidthPump"/>
-                      </item>
-                      <item row="2" column="3">
-                       <widget class="QLineEdit" name="txtWidthMW"/>
-                      </item>
-                      <item row="3" column="3">
-                       <widget class="QLineEdit" name="txtWidthImage"/>
-                      </item>
-                      <item row="5" column="1">
-                       <widget class="QLineEdit" name="txtAveragesNumber"/>
-                      </item>
-                      <item row="2" column="0">
-                       <widget class="QLabel" name="lblMW">
-                        <property name="text">
-                         <string>MW pulse:</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="2" column="1">
-                       <widget class="QLineEdit" name="txtStartMW"/>
-                      </item>
-                      <item row="1" column="0">
-                       <widget class="QLabel" name="lblPump">
-                        <property name="text">
-                         <string>Pump pulse:</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="3" column="0">
-                       <widget class="QLabel" name="lblImaging">
-                        <property name="text">
-                         <string>Imaging pulse:</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="3" column="1">
-                       <widget class="QLineEdit" name="txtStartImage"/>
-                      </item>
-                      <item row="1" column="1">
-                       <widget class="QLineEdit" name="txtStartPump"/>
-                      </item>
-                      <item row="5" column="0">
-                       <widget class="QLabel" name="lblAveragesNumber">
-                        <property name="text">
-                         <string>Average Number:</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="0" column="1" colspan="2">
-                       <widget class="QLabel" name="lblStartTime">
-                        <property name="text">
-                         <string>Start time, us:</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="4" column="0">
-                       <widget class="QLabel" name="lblReadout">
-                        <property name="text">
-                         <string>Readout pulse:</string>
-                        </property>
-                       </widget>
-                      </item>
                       <item row="4" column="3" rowspan="2">
                        <widget class="QPushButton" name="btnMeasureRabiPulse">
                         <property name="sizePolicy">
@@ -1072,6 +990,79 @@
                          <string>Measure</string>
                         </property>
                        </widget>
+                      </item>
+                      <item row="2" column="3">
+                       <widget class="QLineEdit" name="txtWidthMW"/>
+                      </item>
+                      <item row="3" column="3">
+                       <widget class="QLineEdit" name="txtWidthImage"/>
+                      </item>
+                      <item row="0" column="3">
+                       <widget class="QLabel" name="lblDuration">
+                        <property name="text">
+                         <string>Duration, us:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="1" column="3">
+                       <widget class="QLineEdit" name="txtWidthPump"/>
+                      </item>
+                      <item row="4" column="1">
+                       <widget class="QLineEdit" name="txtStartReadout"/>
+                      </item>
+                      <item row="2" column="1">
+                       <widget class="QLineEdit" name="txtStartMW"/>
+                      </item>
+                      <item row="3" column="0">
+                       <widget class="QLabel" name="lblImaging">
+                        <property name="text">
+                         <string>Imaging pulse:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="1" column="0">
+                       <widget class="QLabel" name="lblPump">
+                        <property name="text">
+                         <string>Pump pulse:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="2" column="0">
+                       <widget class="QLabel" name="lblMW">
+                        <property name="text">
+                         <string>MW pulse:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="4" column="0">
+                       <widget class="QLabel" name="lblReadout">
+                        <property name="text">
+                         <string>Readout pulse:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="1" column="1">
+                       <widget class="QLineEdit" name="txtStartPump"/>
+                      </item>
+                      <item row="0" column="1" colspan="2">
+                       <widget class="QLabel" name="lblStartTime">
+                        <property name="text">
+                         <string>Start time, us:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="3" column="1">
+                       <widget class="QLineEdit" name="txtStartImage"/>
+                      </item>
+                      <item row="5" column="0">
+                       <widget class="QLabel" name="lblAveragesNumber">
+                        <property name="text">
+                         <string>Average Number:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="5" column="1">
+                       <widget class="QLineEdit" name="txtAveragesNumber"/>
                       </item>
                      </layout>
                     </widget>
@@ -1110,6 +1101,92 @@
                    <item row="3" column="0">
                     <widget class="QWidget" name="widget_3" native="true"/>
                    </item>
+                   <item row="2" column="0">
+                    <widget class="QGroupBox" name="DataSave_2">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>250</height>
+                      </size>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>16777215</width>
+                       <height>16777215</height>
+                      </size>
+                     </property>
+                     <property name="font">
+                      <font>
+                       <family>Calibri Light</family>
+                       <pointsize>12</pointsize>
+                      </font>
+                     </property>
+                     <property name="title">
+                      <string>Save Data</string>
+                     </property>
+                     <widget class="QWidget" name="formLayoutWidget_3">
+                      <property name="geometry">
+                       <rect>
+                        <x>9</x>
+                        <y>22</y>
+                        <width>431</width>
+                        <height>151</height>
+                       </rect>
+                      </property>
+                      <layout class="QFormLayout" name="formLayout_5">
+                       <item row="0" column="0">
+                        <widget class="QLabel" name="lblPath_2">
+                         <property name="text">
+                          <string>Path</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="1" column="0" colspan="2">
+                        <widget class="QLineEdit" name="rabiPathTextBox_2"/>
+                       </item>
+                       <item row="2" column="0">
+                        <widget class="QLabel" name="lblParamValue_2">
+                         <property name="text">
+                          <string>Measurment Number</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="2" column="1">
+                        <widget class="QLineEdit" name="ODMRFileNumber_3"/>
+                       </item>
+                       <item row="3" column="0">
+                        <widget class="QLabel" name="lblComment_2">
+                         <property name="text">
+                          <string>Comment:</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="4" column="0" colspan="2">
+                        <widget class="QLineEdit" name="rabiComment_2"/>
+                       </item>
+                      </layout>
+                     </widget>
+                     <widget class="QPushButton" name="btnSaveRabi_2">
+                      <property name="geometry">
+                       <rect>
+                        <x>230</x>
+                        <y>180</y>
+                        <width>211</width>
+                        <height>51</height>
+                       </rect>
+                      </property>
+                      <property name="text">
+                       <string>Save</string>
+                      </property>
+                     </widget>
+                    </widget>
+                   </item>
                    <item row="1" column="0">
                     <widget class="QGroupBox" name="Scan_2">
                      <property name="sizePolicy">
@@ -1121,7 +1198,7 @@
                      <property name="minimumSize">
                       <size>
                        <width>450</width>
-                       <height>160</height>
+                       <height>140</height>
                       </size>
                      </property>
                      <property name="font">
@@ -1133,24 +1210,24 @@
                      <property name="title">
                       <string>Scan Control</string>
                      </property>
-                     <widget class="QPushButton" name="btnScanRabi">
+                     <widget class="QPushButton" name="btnScan">
                       <property name="geometry">
                        <rect>
-                        <x>230</x>
-                        <y>100</y>
-                        <width>201</width>
-                        <height>51</height>
+                        <x>20</x>
+                        <y>90</y>
+                        <width>411</width>
+                        <height>31</height>
                        </rect>
                       </property>
                       <property name="text">
                        <string>Scan Rabi</string>
                       </property>
                      </widget>
-                     <widget class="QLabel" name="lblCurrentIterations">
+                     <widget class="QLabel" name="lblScanCurrentIterations">
                       <property name="geometry">
                        <rect>
-                        <x>166</x>
-                        <y>100</y>
+                        <x>330</x>
+                        <y>60</y>
                         <width>61</width>
                         <height>20</height>
                        </rect>
@@ -1175,14 +1252,14 @@
                      <widget class="QLineEdit" name="txtScanStart">
                       <property name="geometry">
                        <rect>
-                        <x>150</x>
+                        <x>100</x>
                         <y>30</y>
-                        <width>81</width>
+                        <width>101</width>
                         <height>20</height>
                        </rect>
                       </property>
                      </widget>
-                     <widget class="QLineEdit" name="txtScanStop">
+                     <widget class="QLineEdit" name="txtScanTimestep">
                       <property name="geometry">
                        <rect>
                         <x>330</x>
@@ -1195,8 +1272,8 @@
                      <widget class="QLabel" name="lblRange_5">
                       <property name="geometry">
                        <rect>
-                        <x>240</x>
-                        <y>30</y>
+                        <x>20</x>
+                        <y>60</y>
                         <width>81</width>
                         <height>21</height>
                        </rect>
@@ -1208,8 +1285,8 @@
                      <widget class="QLabel" name="lblRange_6">
                       <property name="geometry">
                        <rect>
-                        <x>20</x>
-                        <y>60</y>
+                        <x>210</x>
+                        <y>30</y>
                         <width>121</width>
                         <height>21</height>
                        </rect>
@@ -1218,12 +1295,12 @@
                        <string>Time Step [us]</string>
                       </property>
                      </widget>
-                     <widget class="QLineEdit" name="txtScanStep">
+                     <widget class="QLineEdit" name="txtScanStop">
                       <property name="geometry">
                        <rect>
-                        <x>150</x>
+                        <x>100</x>
                         <y>60</y>
-                        <width>81</width>
+                        <width>101</width>
                         <height>20</height>
                        </rect>
                       </property>
@@ -1231,9 +1308,9 @@
                      <widget class="QLabel" name="lblIterations_4">
                       <property name="geometry">
                        <rect>
-                        <x>20</x>
-                        <y>100</y>
-                        <width>141</width>
+                        <x>210</x>
+                        <y>60</y>
+                        <width>111</width>
                         <height>16</height>
                        </rect>
                       </property>
@@ -1243,90 +1320,12 @@
                      </widget>
                     </widget>
                    </item>
-                   <item row="2" column="0">
-                    <widget class="QGroupBox" name="DataSave_3">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="font">
-                      <font>
-                       <family>Calibri Light</family>
-                       <pointsize>12</pointsize>
-                      </font>
-                     </property>
-                     <property name="title">
-                      <string>Save Data</string>
-                     </property>
-                     <layout class="QGridLayout" name="gridLayout_12">
-                      <item row="0" column="0">
-                       <layout class="QFormLayout" name="formLayout_7">
-                        <property name="sizeConstraint">
-                         <enum>QLayout::SetNoConstraint</enum>
-                        </property>
-                        <property name="formAlignment">
-                         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                        </property>
-                        <item row="0" column="0">
-                         <widget class="QLabel" name="lblPathRabi_2">
-                          <property name="text">
-                           <string>Path</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="2" column="0">
-                         <widget class="QLabel" name="lblParamValue_3">
-                          <property name="text">
-                           <string>Measurment Index</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="2" column="1">
-                         <widget class="QLineEdit" name="txtIndexRai_2"/>
-                        </item>
-                        <item row="4" column="0">
-                         <widget class="QLabel" name="lblCommentRabi_2">
-                          <property name="text">
-                           <string>Comment:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="1" column="0" colspan="2">
-                         <widget class="QLineEdit" name="txtPathRabi_2"/>
-                        </item>
-                        <item row="5" column="0" colspan="2">
-                         <widget class="QLineEdit" name="txtCommentRabi_2"/>
-                        </item>
-                        <item row="7" column="0">
-                         <widget class="QWidget" name="widget_5" native="true">
-                          <property name="minimumSize">
-                           <size>
-                            <width>0</width>
-                            <height>50</height>
-                           </size>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="7" column="1">
-                         <widget class="QPushButton" name="btnSaveRabi_2">
-                          <property name="text">
-                           <string>Save</string>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
-                      </item>
-                     </layout>
-                    </widget>
-                   </item>
                   </layout>
                  </widget>
                 </item>
                 <item row="0" column="0">
-                 <widget class="QWidget" name="rabiScanPlotWidget" native="true">
-                  <layout class="QGridLayout" name="rabiScanPlotLayout"/>
+                 <widget class="QWidget" name="scanPlotWidget" native="true">
+                  <layout class="QGridLayout" name="scanPlotLayout"/>
                  </widget>
                 </item>
                </layout>

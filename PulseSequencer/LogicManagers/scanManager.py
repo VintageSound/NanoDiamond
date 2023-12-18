@@ -8,7 +8,7 @@ from Data.measurementType import measurementType
 from Data.repetition import repetition
 from Data.pulseConfiguration import pulseConfiguration
 from LogicManagers.measurementManager import measurementManager
-import pulseAnalayzer 
+from LogicManagers import pulseAnalayzer 
 
 class scanManager():
     def __init__(self, measurementManager: measurementManager) -> None:
@@ -23,7 +23,8 @@ class scanManager():
         self.timeColumn = self.measurementManager.RabiXAxisLabel
         self.valueColumn = self.measurementManager.RabiYAxisLabel
 
-        self.config = None
+        self.pulseConfig = None
+        self.microwaveConfig = None
         self.rabiPulseEndedEvent = []
 
         self.isMeasurementActive = False
@@ -35,15 +36,18 @@ class scanManager():
         for callback in self.rabiPulseEndedEvent:
             callback()
 
-    def startRabiScanSequence(self, pulseConfig : pulseConfiguration, startTime, endTime, timeStep):
-        self.config = pulseConfig
+    def startRabiScanSequence(self, pulse_config : pulseConfiguration, microwave_config : pulseConfiguration, startTime, endTime, timeStep):
+        self.pulseConfig = pulse_config
+        self.microwaveConfig = microwave_config
         self.timeRange = list(range(startTime, endTime, timeStep))
+        self.extractedData = {}
+        self.measurementData = {}
         self.currentIteration = 0
-        self.config.microwave_duration = self.timeRange[self.currentIteration] 
+        self.pulseConfig.microwave_duration = self.timeRange[self.currentIteration] 
         self.isMeasurementActive = True
 
         self.measurementManager.registerToRabiPulseDataRecivedEvent(self.rabiPulseEndedEventHandler)
-        self.measurementManager.startNewRabiPulseMeasurement(config=self.config)
+        self.measurementManager.startNewRabiPulseMeasurement(pulseConfig = self.pulseConfig, microwaveConfig = self.microwaveConfig)
         
     def rabiPulseEndedEventHandler(self, data):
         self.measurementData[self.config.microwave_duration] = data
@@ -51,7 +55,7 @@ class scanManager():
         newPoint = self.extractPointFromPulseSequence(data)
 
         self.measurementData[self.timeRange[self.currentIteration]] = data
-        self.extractedDataData[self.timeRange[self.currentIteration]] = newPoint
+        self.extractedData[self.timeRange[self.currentIteration]] = newPoint
 
         self.continueCurrentScan()
 

@@ -61,6 +61,8 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         self.measurementManager.registerConnectionErrorEvent(self.connectionErrorEventHandler)
         self.measurementManager.registerMicrowaveStatusChangeEvent(self.microwaveStatusChanged)
 
+        self.scanManager.registerToRabiPulseEndedEvent(self.scanUpdatedEventHandler)
+
         # settings for buttons
         # general
         self.btnConnectPulseBlaster.clicked.connect(self.connectToPulseBlasterToggle)
@@ -85,11 +87,15 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         self.rabiFileNumber.setText(str(self.dataSaver.rabiIndex))
 
         # scan
-
+        self.btnScan.clicked.connect(self.clearAndStartScan)
+        self.txtScanStart.setText('0')
+        self.txtScanStop.setText('2')
+        self.txtScanTimestep.setText('0.01')
 
         # initialize axes
         self.initializeODMRAxes()
         self.initializeRabiAxes()
+        self.initializeScanAxes()
 
         # TODO: Add full rabi sequence
         # self.btnScanRabi.clicked.connect(self.startRabiScan)
@@ -124,11 +130,6 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         self.txtStartImage.setText('8')
         self.txtWidthImage.setText('4')
         self.txtStartReadout.setText('0')
-        
-        # declare File Path
-        # self.txtPath.setText(self.measurementManager.dataSaver.getFolderToSave())
-        # self.txtPath.textChanged.connect(self.path_changed)
-        # self.txtNum.setText('0')
 
         # declare Laser level
         self.txtLowLevel.setText('0.014')
@@ -166,6 +167,22 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         actions = self.rabiToolbar.actions()
         self.rabiToolbar.removeAction(actions[7])
         self.rabiPulsePlotLayout.addWidget(self.rabiToolbar)
+
+    def initializeScanAxes(self):
+        # Create figure
+        figure, self.axesScan = plt.subplots()
+        figure.set_facecolor('none')
+
+        self.scanCanvas = FigureCanvas(figure)
+        self.scanPlotLayout.addWidget(self.scanCanvas)
+
+        # Create navigation toolbar
+        self.scanToolbar = NavigationToolbar(self.scanCanvas, self.scanPlotWidget, False)
+
+        # Remove subplots action
+        actions = self.scanToolbar.actions()
+        self.scanToolbar.removeAction(actions[7])
+        self.scanPlotLayout.addWidget(self.scanToolbar)
 
     # Getters
     def getCurrentMeasurementTab(self):
@@ -261,6 +278,20 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         except Exception:
             traceback.print_exc()
 
+    def clearAndStartScan(self):
+        try:
+            microwave_config = self.createRabiMicrowaveConfig()
+            pulse_config = self.createPulseConfiguration()
+            start_time = int(self.txtScanStart.text())
+            stop_time = int(self.txtScanStop.text())
+            time_step = int(self.txtScanTimestep.text())
+            
+            self.scanManager.startRabiScanSequence(pulse_config, microwave_config, 
+                                                   start_time, stop_time, time_step)
+        except Exception as ex:
+            print(ex)
+            traceback.print_exc()
+
     def indicateMicrowaveIsConnected(self):
         self.connectMicrowaveODMRButton.setText('Disconnect')
         self.connectMicrowaveRabiButton.setText('Disconnect')
@@ -302,9 +333,9 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
     def saveRabi(self):
         try:
             self.dataSaver.setRabiFolderToSave(self.rabiPathTextBox.text())
-            self.dataSaver.ODMRIndex = int(self.rabiFileNumber.text())
+            self.dataSaver.rabiIndex = int(self.rabiFileNumber.text())
 
-            comment = self.rabiComment.text()
+            comment = self.rabiCommentTextBox.text()
 
             self.dataSaver.saveRabiPulse(comment)      
             self.rabiFileNumber.setText(str(self.dataSaver.rabiIndex))
@@ -458,6 +489,8 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         axes.plot(t_pump, y_pump, label = "Pump")
         axes.plot(t_image, y_image, label = "Image")
         
+        axes.legend()
+
         axes.set_xlabel(xLabel)
         axes.set_ylabel(yLabel)
 
@@ -491,6 +524,10 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
     def reciveRabiDataHandler(self, data):
         # self.lblCurrentRepetetion.setText(str(count))
         self.plotRabiData(data)
+
+    def scanUpdatedEventHandler(self):
+        pass
+        # self.scanManager.
     
     # TODO: Test
     def microwaveStatusChanged(self):

@@ -7,6 +7,7 @@ import struct
 import serial
 import traceback
 import numpy as np
+import pandas as pd
 
 from Data.pulseConfiguration import pulseConfiguration
 from Data.measurementType import measurementType
@@ -28,6 +29,11 @@ class redPitayaInterface():
         return cls._instance
         
     def initialize(self, qObjectMain):
+        self.ODMRXAxisLabel = "Frequency [MHz]"
+        self.ODMRYAxisLabel = "Photons Counted"
+        self.RabiXAxisLabel = "Time [micro seconds]"
+        self.RabiYAxisLabel = "Photons Counted"
+
         # TODO: check if qObjectMain is needed
         self.socket = QTcpSocket(qObjectMain)
         self.socket.connected.connect(self.connectedMessageRecived)
@@ -45,16 +51,24 @@ class redPitayaInterface():
 
         # state variable
         # self.isConnected = False
-        self.initalizeBuffer(1024 * 4) # Not sure why is this number...
-
+        self.size = 2048
+        
         self.isAOMOpen = False
         self.connectedCallBack = None
         self.reciveDataCallBack = None
         self.connectionErrorCallBack = None
         self.pulseConfig = None
-        self.initalizeBuffer(1024)
+        self.initializeBufferODMR()
     
-    def initalizeBuffer(self, bufferSize):
+    def initializeBufferODMR(self):
+        self.size = 2048
+        self.initializeBuffer(self.size * 4)  # God knows why is it 4 
+
+    def initializeBufferRabi(self):
+        self.size = 1024
+        self.initializeBuffer(self.size * 4)  # God knows why is it 4 
+
+    def initializeBuffer(self, bufferSize):
         self.offset = 0  
         self.bufferSize = bufferSize
         self.buffer = bytearray(self.bufferSize)
@@ -188,18 +202,32 @@ class redPitayaInterface():
         self.isOpen = False
         print('Laser and MW are closed')
 
-    def convertODMRData(self, data, size):
+    def convertODMRData(self, data, microwaveConfig):
         # TODO: Figure out WHAT THE HELL is this code...
         # set data
-        channel1 = np.array(data[0:int(size / 2)], dtype=float)
-        channel2 = np.array(data[int(size / 2):size], dtype=float)
+        channel1 = np.array(data[0:int(self.size / 2)], dtype=float)
+        channel2 = np.array(data[int(self.size / 2):self.size], dtype=float)
         convertedData = np.zeros(len(channel2)) + channel1[0]
         offset = 3.5 * channel2[0] # WHYYYYYYY
 
         for i in range(1, len(convertedData)):
             convertedData[i] = channel1[i] * ((channel2[0] + offset) / (channel2[i] + offset))
 
-        return convertedData
+        x_axis = np.linspace(microwaveConfig.startFreq, microwaveConfig.stopFreq, int(self.size / 2))
+        
+        converted_df = pd.DataFrame({self.ODMRXAxisLabel: x_axis, self.ODMRYAxisLabel: convertedData})
+
+        return converted_df
+
+    def convertRabiData(self, data):
+        dataToPlot = np.array(data[0:int(self.size)], dtype=float)
+
+        # TODO: This is a mistake!! the time step is longer than we think
+        x_data = np.arange(0, len(dataToPlot) * redPitayaInterface.timeStep, redPitayaInterface.timeStep)
+
+        rabi_dataframe = pd.DataFrame({self.RabiXAxisLabel: x_data, self.RabiYAxisLabel: data})
+
+        return rabi_dataframe
 
     def startODMR(self, pulseConfig : pulseConfiguration):
         config = self.convertConfigurationToRedPitayaType(pulseConfig)
