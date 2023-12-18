@@ -11,7 +11,7 @@ plt.rcParams['font.size'] = 18
 plt.rcParams['axes.linewidth'] = 1.5
 
 # path properties
-path_name = str(r'E:\Diamond\Diamond Experiments\2023-11-08')
+path_name = str(r'D:\Experiments\2023-12-10')
 file_name = str(r'\0.csv')
 number_files = len(os.listdir(path_name))
 result = np.zeros(number_files, dtype=float)
@@ -23,17 +23,17 @@ for i in range(0, number_files):
     file_name = r'/' + str(i) + '.csv'
     file_data = pd.read_csv(path_name + file_name, skiprows=14, dtype=float)
     counts = file_data['Photon counts number'].astype(float)
-    start_1 = int(340 + counts[340:].argmax())
+    start_1 = int(340 + counts[340:355].argmax())
     end_1 = start_1 + step
     start_2 = end_1 + 370
     end_2 = start_2 + step
     A = np.sum(counts[start_1:end_1])
     B = np.sum(counts[start_2:end_2])
     result[i] = (A - B)/(A + B)
-    #print(A, B, result[i])
+    print(A, B, result[i])
 
 # time array
-time_step = 0.008                       # [us]
+time_step = 0.02                       # [us]
 time = np.arange(0, len(result)*time_step, time_step)
 fit_time = np.linspace(0, 1.5, 1000)
 

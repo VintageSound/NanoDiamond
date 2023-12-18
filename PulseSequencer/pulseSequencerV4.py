@@ -230,7 +230,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
     def clearAndStartODMR(self):
         try:
             self.lblCurrentRepetetion.setText('0')
-            microwave_config = self.createRabiMicrowaveConfig()
+            microwave_config = self.createODMRMicrowaveConfig()
             pulse_config = self.createPulseConfiguration()
             repeat = repetition[self.repetitionComboBox.currentText()]
 
@@ -398,8 +398,8 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
             self.axesODMR.clear()
             self.axesODMR.grid()
 
-            x_label = self.measurementManager.ODMRXAxisLabel
-            y_label = self.measurementManager.ODMRYAxisLabel
+            x_label = data.columns[0]
+            y_label = data.columns[1]
 
             # plot
             self.curveODMR, = self.axesODMR.plot(data[x_label], data[y_label], linewidth=0.5, c='black', label="Normalized signal")
@@ -421,7 +421,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
             # plot
             self.plotRabiCompletePulse(data)
             self.plotRabiOverlapPulses(data)
-            
+
             self.rabiCanvas.draw()
         except Exception:
             traceback.print_exc()
