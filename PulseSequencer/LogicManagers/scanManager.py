@@ -44,7 +44,7 @@ class scanManager():
         self.continueCurrentScan()
 
     def extractPointFromPulseSequence(self, pulseSequence):
-        
+        pass
 
     def continueCurrentScan(self):
         if not self.isMeasurementActive:

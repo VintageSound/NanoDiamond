@@ -37,8 +37,6 @@ class measurementManager():
         self.pulseConfigODMR = pulseConfiguration()
         self.microwaveODMRConfig = microwaveConfiguration()
         self.HaveODMRData = False
-        self.ODMRXAxisLabel = "Frequency [MHz]"
-        self.ODMRYAxisLabel = "Photons Counted"
         self.ODMRData = None
         self.measurementCountODMR = 0
         self.initializeODMRData()
@@ -47,8 +45,6 @@ class measurementManager():
         self.pulseConfigRabi = pulseConfiguration()
         self.microwaveRabiConfig = microwaveConfiguration()
         self.HaveRabiData = False
-        self.RabiXAxisLabel = "Time [micro seconds]"
-        self.RabiYAxisLabel = "Photons Counted"
         self.RabiData = None
         self.measurementCountRabi = 0
         self.initializeRabiData()
@@ -62,7 +58,6 @@ class measurementManager():
         self.repeatMeasurement = True
 
         self.maxRepetitions = None
-        self.size = 2048  # number of samples to show on the plot # max size
         self.initializeBufferODMR()
 
         # Events 
@@ -75,23 +70,21 @@ class measurementManager():
 
     # Data Methods
     def initializeBufferODMR(self):
-        self.size = 2048
-        self.redPitaya.initalizeBuffer(self.size * 4)  # not sure why 4...
+        self.redPitaya.initializeBufferODMR()
         self.initializeODMRData()
 
     def initializeBufferRabi(self):
-        self.size = 1024
-        self.redPitaya.initalizeBuffer(self.size * 4)  # not sure why 4...
+        self.redPitaya.initializeBufferRabi()
         self.initializeRabiData()
 
     def initializeODMRData(self):
         self.HaveODMRData = False
         self.measurementCountODMR = 0
-        self.ODMRData = pd.DataFrame(0, index=np.arange(1024), columns=[self.ODMRXAxisLabel, self.ODMRYAxisLabel])
+        self.ODMRData = pd.DataFrame(0, index=np.arange(1024), columns=[self.redPitaya.ODMRXAxisLabel, self.redPitaya.ODMRYAxisLabel])
 
     def initializeRabiData(self):
         self.HaveRabiData = False
-        self.RabiData = pd.DataFrame(0, index=np.arange(1024), columns=[self.RabiXAxisLabel, self.RabiYAxisLabel])
+        self.RabiData = pd.DataFrame(0, index=np.arange(1024), columns=[self.redPitaya.RabiXAxisLabel, self.redPitaya.RabiYAxisLabel])
 
     def updateMicrowaveODMRConfig(self, config : microwaveConfiguration):
         self.microwaveODMRConfig = config
@@ -161,10 +154,7 @@ class measurementManager():
         if self.pulseBlaster.isConnected:
             self.pulseBlaster.disconnect()
 
-    def microwaveDeviceConnectionToggle(self, config=None):
-        if config is not None:
-            self.microwaveConfig = config
-
+    def microwaveDeviceConnectionToggle(self):
         if self.microwaveDevice.getIsConnected():
             self.microwaveDevice.disconnect()
         else:
@@ -287,23 +277,23 @@ class measurementManager():
 
     # Data Convertion
     def saveODMRDataToDataFrame(self, data):
-        xData = np.linspace(self.microwaveODMRConfig.startFreq, self.microwaveODMRConfig.stopFreq, int(self.size / 2))
-        yData = data
-
         # Add the recived data to the stored data if needed
         if self.repetition == repetition.RepeatAndSum:
-            yData = self.ODMRData[self.ODMRYAxisLabel].tolist() + data
-
-        self.ODMRData = pd.DataFrame({self.ODMRXAxisLabel: xData, self.ODMRYAxisLabel: yData})
+            self.ODMRData = self.sumTwoDataframes(self.ODMRData, data)
+        else:
+            self.ODMRData = data
+        #     yData = self.ODMRData[self.ODMRYAxisLabel].tolist() + data
+        # self.ODMRData = pd.DataFrame({self.ODMRXAxisLabel: xData, self.ODMRYAxisLabel: yData})
         self.HaveODMRData = True
+    
+    def sumTwoDataframes(self, df1, df2):
+        # Sum the two y columns and create a new dataframe
+        df_sum = pd.DataFrame({df2.columns[0]: df2.iloc[:, 0], df2.columns[1]: df1.iloc[:, 1] + df2.iloc[:, 1]})
+        
+        return df_sum
 
     def saveRabiDataToDataFrame(self, data):
-        dataToPlot = np.array(data[0:int(self.size)], dtype=float)
-
-        xData = np.arange(0, len(dataToPlot) * self.redPitayaTimeStep, self.redPitayaTimeStep)
-        yData = dataToPlot
-
-        self.RabiData = pd.DataFrame({self.RabiXAxisLabel: xData, self.RabiYAxisLabel: yData})
+        self.RabiData = data
         self.HaveRabiData = True
 
     # Register Events
@@ -391,13 +381,14 @@ class measurementManager():
     def receiveDataHandler(self, data):
         try:
             if self.measurementType == measurementType.ODMR:
-                converted_data = self.redPitaya.convertODMRData(data, self.size)
-                self.saveODMRDataToDataFrame(converted_data)
+                converted_dataframe = self.redPitaya.convertODMRData(data, self.microwaveODMRConfig)
+                self.saveODMRDataToDataFrame(converted_dataframe)
                 self.measurementCountODMR += 1
                 self.raiseODMRDataRecivedEvent()
 
             if self.measurementType == measurementType.RabiPulse:
-                self.saveRabiDataToDataFrame(data)
+                converted_dataframe = self.redPitaya.convertRabiData(data)
+                self.saveRabiDataToDataFrame(converted_dataframe)
                 self.measurementCountRabi += 1
                 self.raiseRabiDataRecivedEvent()
         except Exception as ex:

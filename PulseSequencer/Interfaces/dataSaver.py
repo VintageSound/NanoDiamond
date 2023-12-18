@@ -18,13 +18,17 @@ class dataSaver():
 
         self.basePath = path.join(r'D:\Experiments', str(self.currentDate))
         self.ODMRFolder = path.join(self.basePath, "ODMR")
-        self.rabiFolder = path.join(self.basePath, "Rabi")
+        self.rabiFolder = path.join(self.basePath, "Pulse_Sqeunce")
+        self.scanFolder = path.join(self.basePath, "Scans")
 
     def getODMRFolderToSave(self):
         return self.ODMRFolder
 
     def getRabiFolderToSave(self):
         return self.rabiFolder
+
+    def getScansFolderToSave(self):
+        return self.scanFolder
 
     def setODMRFolderToSave(self, newPath):
         # # if path.realpath(newPath):
@@ -39,30 +43,32 @@ class dataSaver():
     def saveODMR(self, comment):
         data = self.measurmentManager.ODMRData
         pulseConfig = self.measurmentManager.pulseConfigODMR
-        number_of_iterations = self.measurmentManager.ODMRIndex
+        number_of_iterations = self.measurmentManager.measurementCountODMR
+        microwaveConfig = self.measurmentManager.microwaveODMRConfig
 
         metadata = {'Measurement type:': measurementType.ODMR.name,
                 'RF Power [dBm]:': pulseConfig.microwave_power,
                 'Measurment Duration [us]:': pulseConfig.count_duration * redPitayaInterface.timeStep,
                 'Comment:': comment,
-                'Scan Start Frequency [MHz]:': pulseConfig.startFreq,
-                'Scan Stop Frequency [MHz]:': pulseConfig.stopFreq,
+                'Scan Start Frequency [MHz]:': microwaveConfig.startFreq,
+                'Scan Stop Frequency [MHz]:': microwaveConfig.stopFreq,
                 'Number of Iterations:' : number_of_iterations}
 
         filePath = os.path.join(self.ODMRFolder, str(self.ODMRIndex) + ".pkl")
 
-        self.save(filePath, filePath, metadata, data)
+        self.savePickle(filePath, metadata, data)
         self.ODMRIndex += 1
 
     def saveRabiPulse(self, comment):
         data = self.measurmentManager.RabiData
         pulseConfig = self.measurmentManager.pulseConfigRabi
+        microwaveConfig = self.measurmentManager.microwaveRabiConfig
 
         metadata = {'Measurement type': measurementType.RabiPulse.name,
                 'RF Power [dBm]': pulseConfig.microwave_power,
                 'Measurement Duration [us]': pulseConfig.count_duration * redPitayaInterface.timeStep,
                 'Comment': comment,
-                'MW frequency [MHz]': pulseConfig.CenterFreq,
+                'MW frequency [MHz]': microwaveConfig.centerFreq,
                 'Pump pulse time [us]': pulseConfig.pump_start,
                 'Pump pulse duration [us]': pulseConfig.pump_duration * redPitayaInterface.timeStep,
                 'MW pulse time [us]': pulseConfig.microwave_start * redPitayaInterface.timeStep,
@@ -72,9 +78,9 @@ class dataSaver():
                 'Readout pulse time [us]': pulseConfig.readout_start * redPitayaInterface.timeStep,
                 'Averages Number': pulseConfig.iterations}
    
-        filePath = os.path.join(self.rabiFolder, str(self.rabiFolder) + ".pkl")
+        filePath = os.path.join(self.rabiFolder, str(self.rabiIndex) + ".pkl")
 
-        self.savePickle(filePath, filePath, metadata, data)
+        self.savePickle(filePath, metadata, data)
         self.rabiIndex += 1
 
     def savePickle(self, filePath, metadata, data : pd.DataFrame):
