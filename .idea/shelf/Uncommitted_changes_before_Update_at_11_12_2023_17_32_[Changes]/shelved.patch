@@ -1,0 +1,435 @@
+Index: Rabi/rabi_plot_rabi_sequence_type.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import pandas as pd\r\nimport numpy as np\r\nimport matplotlib.pyplot as plt\r\nimport matplotlib as mpl\r\nimport os\r\nfrom scipy.optimize import curve_fit\r\n\r\n# font and plot properties\r\n#mpl.rcParams['font.family'] = 'Century Gothic'\r\nplt.rcParams['font.size'] = 18\r\nplt.rcParams['axes.linewidth'] = 1.5\r\n\r\n# path properties\r\npath_name = str(r'D:\\Experiments\\2023-11-08')\r\nfile_name = str(r'\\30.csv')\r\nnumber_files = len(os.listdir(path_name))\r\n\r\n# integration boundaries\r\nstep = int(37)  # for 300 ns\r\n\r\n# load the first data file to use it for normalization and prepare result array\r\nfile_data = pd.read_csv(path_name + file_name, skiprows=14, dtype=float)\r\ncounts_0 = file_data['Photon counts number'].astype(float)\r\nresult = np.zeros(number_files, dtype=float)\r\nfirst_max_index_0 = counts_0[:340].argmax()\r\nnorm_factor_0 = np.sum(counts_0[first_max_index_0:first_max_index_0 + 160])\r\n\r\nfor i in range(0, number_files):\r\n    # load each data file one by one\r\n    file_name = r'/' + str(i) + '.csv'\r\n    file_data = pd.read_csv(path_name + file_name, skiprows=14, dtype=float)\r\n    counts = file_data['Photon counts number'].astype(float)\r\n    # Because of the laser power drift it's necessary to make normalization.\r\n    # For that just integrate first fluorescence pulse counts for each data file\r\n    # and compare it with the same value but for first data file.\r\n    # Their ratio gives you factor which you need just multiply by current data\r\n    # and that's it, you implemented your normalization. You're amazing!\r\n    first_max_index = counts[:340].argmax()\r\n    norm_factor = np.sum(counts[first_max_index:first_max_index + 160])\r\n    counts = counts * (norm_factor_0 / norm_factor)\r\n    # Now you need to measure decrease in fluoresce signal of the second pulse at its beginning.\r\n    # Eventually, it will show your desired Rabi oscillation.\r\n    # For that just integrate second fluorescence pulse (at the beginning) for 0.5 msec.\r\n    # Okay, it seems that now you got it! Just plot it.\r\n    start_1 = int(340 + counts[340:].argmax())\r\n    end_1 = start_1 + step\r\n    result[i] = np.sum(counts[start_1:end_1])\r\n\r\n# time array\r\ntime_step = 0.008                       # [us]\r\ntime = np.arange(0, len(result)*time_step, time_step)\r\nfit_time = np.linspace(0, 1.5, 1000)\r\n\r\n\r\ndef fit_func(t, a, omega, T, phi, b, f):\r\n    return (a - b * np.cos(omega * t + phi)) * np.exp(-t / T) + f\r\n\r\n# fitting\r\ninit_guess = np.array([1.1e8, 0.0009, 0.2, 3.14, 0, 1e8])\r\npopt, pcov = curve_fit(fit_func, time, result, init_guess)\r\n\r\n# plotting\r\nfig2 = plt.figure(figsize=(7, 4))\r\nax = fig2.add_axes([0.15, 0.18, 0.8, 0.8])\r\nax.plot(time, result, c='tab:blue')\r\nax.plot(fit_time, fit_func(fit_time, *popt), c='tab:red')\r\nax.set_xlabel(r'MW pulse duration, [$\\mu$s]')\r\nax.set_ylabel(r'Fluorescence signal, [a.u.]')\r\nax.set_xlim([np.amin(fit_time), np.amax(fit_time)])\r\nax.text(0.9, 1.20, r'$\\Omega$ = ' + str(np.round(popt[1], 2)) + r' $\\pm$ ' + str(np.round(np.sqrt(np.diag(pcov))[1], 2)) + r' MHz')\r\nax.text(0.9, 1.14, r'$T_2$ = ' + str(np.round(popt[2], 2)) + r' $\\pm$ ' + str(np.round(np.sqrt(np.diag(pcov))[2], 2)) + r' $\\mu$s')\r\n\r\nprint(popt)\r\n#print(pcov)\r\n\r\nplt.savefig('Rabi_oscillations.png', dpi=300)\r\n\r\nplt.show()
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Rabi/rabi_plot_rabi_sequence_type.py b/Rabi/rabi_plot_rabi_sequence_type.py
+--- a/Rabi/rabi_plot_rabi_sequence_type.py	(revision 7f6bc23a090d7622a6f1b132332ade54bc89cfcc)
++++ b/Rabi/rabi_plot_rabi_sequence_type.py	(date 1702308729955)
+@@ -11,8 +11,8 @@
+ plt.rcParams['axes.linewidth'] = 1.5
+ 
+ # path properties
+-path_name = str(r'D:\Experiments\2023-11-08')
+-file_name = str(r'\30.csv')
++path_name = str(r'D:\Experiments\2023-12-06B')
++file_name = str(r'\0.csv')
+ number_files = len(os.listdir(path_name))
+ 
+ # integration boundaries
+@@ -47,30 +47,30 @@
+     result[i] = np.sum(counts[start_1:end_1])
+ 
+ # time array
+-time_step = 0.008                       # [us]
++time_step = 0.02                       # [us]
+ time = np.arange(0, len(result)*time_step, time_step)
+-fit_time = np.linspace(0, 1.5, 1000)
++# fit_time = np.linspace(0, 1.5, 1000)
+ 
+ 
+ def fit_func(t, a, omega, T, phi, b, f):
+     return (a - b * np.cos(omega * t + phi)) * np.exp(-t / T) + f
+ 
+ # fitting
+-init_guess = np.array([1.1e8, 0.0009, 0.2, 3.14, 0, 1e8])
+-popt, pcov = curve_fit(fit_func, time, result, init_guess)
++# init_guess = np.array([1.1e8, 0.0009, 0.2, 3.14, 0, 1e8])
++# popt, pcov = curve_fit(fit_func, time, result, init_guess)
+ 
+ # plotting
+ fig2 = plt.figure(figsize=(7, 4))
+ ax = fig2.add_axes([0.15, 0.18, 0.8, 0.8])
+ ax.plot(time, result, c='tab:blue')
+-ax.plot(fit_time, fit_func(fit_time, *popt), c='tab:red')
++# ax.plot(fit_time, fit_func(fit_time, *popt), c='tab:red')
+ ax.set_xlabel(r'MW pulse duration, [$\mu$s]')
+ ax.set_ylabel(r'Fluorescence signal, [a.u.]')
+-ax.set_xlim([np.amin(fit_time), np.amax(fit_time)])
+-ax.text(0.9, 1.20, r'$\Omega$ = ' + str(np.round(popt[1], 2)) + r' $\pm$ ' + str(np.round(np.sqrt(np.diag(pcov))[1], 2)) + r' MHz')
+-ax.text(0.9, 1.14, r'$T_2$ = ' + str(np.round(popt[2], 2)) + r' $\pm$ ' + str(np.round(np.sqrt(np.diag(pcov))[2], 2)) + r' $\mu$s')
++# ax.set_xlim([np.amin(fit_time), np.amax(fit_time)])
++# ax.text(0.9, 1.20, r'$\Omega$ = ' + str(np.round(popt[1], 2)) + r' $\pm$ ' + str(np.round(np.sqrt(np.diag(pcov))[1], 2)) + r' MHz')
++# ax.text(0.9, 1.14, r'$T_2$ = ' + str(np.round(popt[2], 2)) + r' $\pm$ ' + str(np.round(np.sqrt(np.diag(pcov))[2], 2)) + r' $\mu$s')
+ 
+-print(popt)
++# print(popt)
+ #print(pcov)
+ 
+ plt.savefig('Rabi_oscillations.png', dpi=300)
+Index: Rabi/rabi_plot_rabi_sequence_type_v2.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import pandas as pd\r\nimport numpy as np\r\nimport matplotlib.pyplot as plt\r\nimport matplotlib as mpl\r\nimport os\r\nfrom scipy.optimize import curve_fit\r\n\r\n# font and plot properties\r\n#mpl.rcParams['font.family'] = 'Century Gothic'\r\nplt.rcParams['font.size'] = 18\r\nplt.rcParams['axes.linewidth'] = 1.5\r\n\r\n# path properties\r\npath_name = str(r'E:\\Diamond\\Diamond Experiments\\2023-11-08')\r\nfile_name = str(r'\\0.csv')\r\nnumber_files = len(os.listdir(path_name))\r\nresult = np.zeros(number_files, dtype=float)\r\nstep = int(37)  # for 300 ns\r\n\r\n# This version uses Hezi's way of normalization\r\n\r\nfor i in range(0, number_files):\r\n    file_name = r'/' + str(i) + '.csv'\r\n    file_data = pd.read_csv(path_name + file_name, skiprows=14, dtype=float)\r\n    counts = file_data['Photon counts number'].astype(float)\r\n    start_1 = int(340 + counts[340:].argmax())\r\n    end_1 = start_1 + step\r\n    start_2 = end_1 + 370\r\n    end_2 = start_2 + step\r\n    A = np.sum(counts[start_1:end_1])\r\n    B = np.sum(counts[start_2:end_2])\r\n    result[i] = (A - B)/(A + B)\r\n    #print(A, B, result[i])\r\n\r\n# time array\r\ntime_step = 0.008                       # [us]\r\ntime = np.arange(0, len(result)*time_step, time_step)\r\nfit_time = np.linspace(0, 1.5, 1000)\r\n\r\n\r\ndef fit_func(t, a, omega, T, phi, b, f):\r\n    return (a - b * np.cos(omega * t + phi)) * np.exp(-t / T) + f\r\n\r\n# fitting\r\ninit_guess = np.array([1.1e8, 0.0009, 0.2, 3.14, 0, 1e8])\r\npopt, pcov = curve_fit(fit_func, time, result, init_guess)\r\n\r\n# plotting\r\nfig2 = plt.figure(figsize=(7, 4))\r\nax = fig2.add_axes([0.15, 0.18, 0.8, 0.8])\r\nax.plot(time, result, c='tab:blue')\r\nax.plot(fit_time, fit_func(fit_time, *popt), c='tab:red')\r\nax.set_xlabel(r'MW pulse duration, [$\\mu$s]')\r\nax.set_ylabel(r'Fluorescence signal, [a.u.]')\r\nax.set_xlim([np.amin(fit_time), np.amax(fit_time)])\r\nax.text(0.9, 1.20, r'$\\Omega$ = ' + str(np.round(popt[1], 2)) + r' $\\pm$ ' + str(np.round(np.sqrt(np.diag(pcov))[1], 2)) + r' MHz')\r\nax.text(0.9, 1.14, r'$T_2$ = ' + str(np.round(popt[2], 2)) + r' $\\pm$ ' + str(np.round(np.sqrt(np.diag(pcov))[2], 2)) + r' $\\mu$s')\r\n\r\nprint(popt)\r\n#print(pcov)\r\n\r\nplt.savefig('Rabi_oscillations.png', dpi=300)\r\n\r\nplt.show()
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Rabi/rabi_plot_rabi_sequence_type_v2.py b/Rabi/rabi_plot_rabi_sequence_type_v2.py
+--- a/Rabi/rabi_plot_rabi_sequence_type_v2.py	(revision 7f6bc23a090d7622a6f1b132332ade54bc89cfcc)
++++ b/Rabi/rabi_plot_rabi_sequence_type_v2.py	(date 1702308729955)
+@@ -11,7 +11,7 @@
+ plt.rcParams['axes.linewidth'] = 1.5
+ 
+ # path properties
+-path_name = str(r'E:\Diamond\Diamond Experiments\2023-11-08')
++path_name = str(r'D:\Experiments\2023-12-10')
+ file_name = str(r'\0.csv')
+ number_files = len(os.listdir(path_name))
+ result = np.zeros(number_files, dtype=float)
+@@ -23,17 +23,17 @@
+     file_name = r'/' + str(i) + '.csv'
+     file_data = pd.read_csv(path_name + file_name, skiprows=14, dtype=float)
+     counts = file_data['Photon counts number'].astype(float)
+-    start_1 = int(340 + counts[340:].argmax())
++    start_1 = int(340 + counts[340:355].argmax())
+     end_1 = start_1 + step
+     start_2 = end_1 + 370
+     end_2 = start_2 + step
+     A = np.sum(counts[start_1:end_1])
+     B = np.sum(counts[start_2:end_2])
+     result[i] = (A - B)/(A + B)
+-    #print(A, B, result[i])
++    print(A, B, result[i])
+ 
+ # time array
+-time_step = 0.008                       # [us]
++time_step = 0.02                       # [us]
+ time = np.arange(0, len(result)*time_step, time_step)
+ fit_time = np.linspace(0, 1.5, 1000)
+ 
+Index: Levitated_particle/ImageDataProcessingAndAnalysis.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Levitated_particle/ImageDataProcessingAndAnalysis.py b/Levitated_particle/ImageDataProcessingAndAnalysis.py
+new file mode 100644
+--- /dev/null	(date 1702308729948)
++++ b/Levitated_particle/ImageDataProcessingAndAnalysis.py	(date 1702308729948)
+@@ -0,0 +1,226 @@
++from datetime import datetime
++import numpy as np
++import matplotlib.pyplot as plt
++import scipy.io as sio
++from scipy.optimize import curve_fit
++from scipy.signal import savgol_filter
++
++
++# Function to load settings
++def load_settings(data_dir, exp_num):
++    # Define the settings file name
++    set_name = f'{data_dir}/data_{exp_num}/settings.txt'
++    # Load the settings file
++    settings = np.loadtxt(set_name, delimiter=' ', dtype=str, max_rows=4)
++    print(settings)
++    return settings
++
++
++def sin_fit(i, a, b, c, d):
++    return a * np.sin(b * i + c) + d
++
++
++def twoD_Gaussian(X, amplitude, xo, yo, sigma_x, sigma_y, theta, offset):
++    x, y = X
++    xo = float(xo)
++    yo = float(yo)
++    a = (np.cos(theta) ** 2) / (2 * sigma_x ** 2) + (np.sin(theta) ** 2) / (2 * sigma_y ** 2)
++    b = -(np.sin(2 * theta)) / (4 * sigma_x ** 2) + (np.sin(2 * theta)) / (4 * sigma_y ** 2)
++    c = (np.sin(theta) ** 2) / (2 * sigma_x ** 2) + (np.cos(theta) ** 2) / (2 * sigma_y ** 2)
++    g = offset + amplitude * np.exp(- (a * ((x - xo) ** 2) + 2 * b * (x - xo) * (y - yo) + c * ((y - yo) ** 2)))
++    return g.ravel()
++
++
++# Function to process data
++def process_data(data_dir, exp_num, settings):
++    # Extract parameters from settings
++    pic_num = int(settings[3, 1])
++    numbers = 4
++    width = int(settings[0, 1])
++    height = int(settings[1, 1])
++    fps = float(settings[2, 1])
++    duration = 1 / fps
++
++    x_position = np.zeros(pic_num)
++    y_position = np.zeros(pic_num)
++    amplitude = np.zeros(pic_num)
++    x_width = np.zeros(pic_num)
++    y_width = np.zeros(pic_num)
++    time = np.linspace(0, duration * pic_num, pic_num, dtype=float)
++    exc_array = np.array([0])
++
++    x = np.linspace(0, width - 1, width)
++    y = np.linspace(0, height - 1, height)
++    x, y = np.meshgrid(x, y)
++
++    for iii in range(pic_num):
++        name = f'{data_dir}/data_{exp_num}/data_{iii}'
++        name_txt = name + '.txt'
++        file = np.loadtxt(name_txt, delimiter=';')
++        data = np.zeros([height, width, numbers])
++
++        var = 0
++        for i in range(height):
++            for ii in range(width):
++                data[i, ii] = file[var:var + 4]
++                var += 4
++
++        if np.amax(data[:, :, 0]) >= 5:
++            index = np.where(data[:, :, 0] == np.amax(data[:, :, 0]))
++            if len(index[0]) == 1:
++                x_guess = int(index[1])
++                y_guess = int(index[0])
++            else:
++                x_guess = int(index[1][0])
++                y_guess = int(index[0][0])
++            initial_guess = (np.amax(data[:, :, 0]), x_guess, y_guess, 3, 3, 0, 5)
++            data1 = data[:, :, 0].ravel()
++            popt, pcov = curve_fit(twoD_Gaussian, (x, y), data1, p0=initial_guess)
++            print(iii, popt)
++            x_position[iii] = popt[1]
++            y_position[iii] = popt[2]
++            amplitude[iii] = popt[0]
++            x_width[iii] = popt[3]
++            y_width[iii] = popt[4]
++        else:
++            exc_array = np.append(exc_array, iii)
++
++    exc_array = np.delete(exc_array, [0])
++    time = np.delete(time, exc_array)
++    x_position = np.delete(x_position, exc_array)
++    y_position = np.delete(y_position, exc_array)
++    amplitude = np.delete(amplitude, exc_array)
++    x_width = np.delete(x_width, exc_array)
++    y_width = np.delete(y_width, exc_array)
++
++    # FFT
++    x_fft = np.abs(np.fft.rfft(x_position))
++    y_fft = np.abs(np.fft.rfft(y_position))
++    freq = np.fft.rfftfreq(2 * len(x_fft) - 1, (time[-1] - time[0]) / (2 * len(x_fft) - 1))
++    amp_fft = np.abs(np.fft.rfft(amplitude))
++    fit_freq = freq[20 + np.argmax(x_fft[20:])]
++
++    return time, x_position, y_position, amplitude, x_width, y_width, x_fft, y_fft, freq, amp_fft, fit_freq
++
++
++# Function to save results
++def save_results(data_dir, exp_num, time, freq, x_fft, y_fft, x_position, y_position, amplitude):
++    save_name = f'{data_dir}/data_{exp_num}/FFT_results.txt'
++    np.savetxt(save_name, (freq, x_fft, y_fft), delimiter=' ')
++    save_name = f'{data_dir}/data_{exp_num}/position_results.txt'
++    np.savetxt(save_name, (time, x_position, y_position), delimiter=' ')
++    save_name = f'{data_dir}/data_{exp_num}/Amplitude_results.txt'
++    np.savetxt(save_name, (time, amplitude), delimiter=' ')
++
++
++# Function to plot X-axis analysis
++def plot_x_axis_analysis(data_dir, exp_num, time, x_position):
++    fig1 = plt.figure()
++    plt.scatter(time * 1000, x_position, s=0.2)
++    plt.plot(time * 1000, x_position, label='X-coordinate', linewidth=0.5)
++    plt.xlabel('Time, msec')
++    plt.ylabel('Position, $\mu$m')
++    plt.legend()
++    plt.savefig(f'{data_dir}/data_{exp_num}/picture_particle_oscillations.pdf', dpi=500)
++
++
++# Function to plot Y-axis analysis
++def plot_y_axis_analysis(data_dir, exp_num, time, y_position):
++    fig2 = plt.figure()
++    plt.scatter(time * 1000, y_position, s=0.2)
++    plt.plot(time * 1000, y_position, label='Y-coordinate', linewidth=0.5)
++    plt.xlabel('Time, msec')
++    plt.ylabel('Position, $\mu$m')
++    plt.legend()
++    plt.savefig(f'{data_dir}/data_{exp_num}/picture_particle_oscillations.pdf', dpi=500)
++
++
++# Function to plot Y-axis width analysis
++def plot_y_axis_width_analysis(data_dir, exp_num, time, y_width):
++    fig7 = plt.figure()
++    plt.scatter(time * 1000, y_width, s=0.2)
++    plt.plot(time * 1000, y_width, linewidth=0.5)
++    plt.xlabel('Time, msec')
++    plt.ylabel('Amplitude, arb.un.')
++    plt.title('$\sigma$ along Y-axis')
++    plt.savefig(f'{data_dir}/data_{exp_num}/picture_y_width.png')
++
++
++# Function to plot Y-axis FFT analysis
++def plot_y_axis_fft_analysis(data_dir, exp_num, freq, y_fft, fit_freq):
++    fig8 = plt.figure()
++    plt.plot(freq, y_fft, label='Y-coordinate')
++    plt.yscale('log')
++    plt.xlabel('Frequency, Hz')
++    plt.ylabel('Amplitude, arb.un.')
++    plt.title('FFT for Y-axis')
++    plt.legend()
++    text = str(int(fit_freq)) + 'Hz'
++    plt.annotate(text=text, xy=(fit_freq + 5, np.amax(y_fft[50:])))
++    plt.savefig(f'{data_dir}/data_{exp_num}/picture_y_fft.png')
++
++
++# Function to plot amplitude analysis
++def plot_amplitude_analysis(data_dir, exp_num, time, amplitude):
++    fig9 = plt.figure()
++    plt.scatter(time * 1000, amplitude, s=0.2)
++    plt.plot(time * 1000, amplitude, linewidth=0.5)
++    plt.xlabel('Time, msec')
++    plt.ylabel('Amplitude, arb.un.')
++    plt.title('Fluorescence intensity')
++    plt.savefig(f'{data_dir}/data_{exp_num}/picture_total_intencity.pdf', dpi=500)
++
++
++# Function to plot amplitude FFT analysis
++def plot_amplitude_fft_analysis(data_dir, exp_num, freq, amp_fft, fit_freq):
++    fig10 = plt.figure()
++    plt.plot(freq, amp_fft, label='Amp')
++    plt.yscale('log')
++    plt.xlabel('Frequency, Hz')
++    plt.ylabel('Amplitude, arb.un.')
++    plt.title('FFT for amplitude')
++    plt.legend()
++    text = str(int(fit_freq)) + 'Hz'
++    plt.annotate(text=text, xy=(fit_freq + 5, np.amax(amp_fft[10:])))
++    plt.savefig(f'{data_dir}/data_{exp_num}/picture_amp_fft.png')
++
++
++def today_date():
++    # Get today's date
++    today = datetime.today()
++
++    # Format it as dd.mm.yy
++    date_string = today.strftime("%d.%m.%y")
++    return date_string
++
++
++# Main function
++def main():
++    # Define experiment number and data directory
++    exp_num = 37
++    data_dir = 'imaging/' + today_date()
++    # Load settings
++    settings = load_settings(data_dir, exp_num)
++    # Process data
++    time, x_position, y_position, amplitude, x_width, y_width, x_fft, y_fft, freq, amp_fft, fit_freq = process_data(data_dir, exp_num, settings)
++    # Save results
++    save_results(data_dir, exp_num, time, freq, x_fft, y_fft, x_position, y_position, amplitude)
++    # Plot X-axis analysis
++    plot_x_axis_analysis(data_dir, exp_num, time, x_position)
++    # Plot Y-axis analysis
++    plot_y_axis_analysis(data_dir, exp_num, time, y_position)
++    # Plot Y-axis width analysis
++    plot_y_axis_width_analysis(data_dir, exp_num, time, y_width)
++    # Plot Y-axis FFT analysis
++    plot_y_axis_fft_analysis(data_dir, exp_num, freq, y_fft, fit_freq)
++    # Plot amplitude analysis
++    plot_amplitude_analysis(data_dir, exp_num, time, amplitude)
++    # Plot amplitude FFT analysis
++    plot_amplitude_fft_analysis(data_dir, exp_num, freq, amp_fft, fit_freq)
++    # Show all plots
++    plt.show()
++
++
++# Run main function if script is run directly
++if __name__ == "__main__":
++    main()
+Index: Levitated_particle/Labview_Images_to_png.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Levitated_particle/Labview_Images_to_png.py b/Levitated_particle/Labview_Images_to_png.py
+new file mode 100644
+--- /dev/null	(date 1702308729948)
++++ b/Levitated_particle/Labview_Images_to_png.py	(date 1702308729948)
+@@ -0,0 +1,88 @@
++import matplotlib
++import numpy as np
++import matplotlib.pyplot as plt
++from datetime import datetime
++import scipy.io as sio
++
++
++# Function to load settings
++def load_settings(data_dir, exp_num):
++    # Define the settings file name
++    set_name = f'{data_dir}/data_{exp_num}/settings.txt'
++    # Load the settings file
++    settings = np.loadtxt(set_name, delimiter=' ', dtype=str, max_rows=4)
++    # Print the settings
++    print(settings)
++    # Return the settings
++    return settings
++
++
++# Function to process data
++def process_data(data_dir, exp_num, settings):
++    # Extract parameters from settings
++    pic_num = int(settings[3, 1])
++    numbers = 4
++    width = int(settings[0, 1])
++    height = int(settings[1, 1])
++
++    # Loop over all pictures
++    for iii in range(pic_num):
++        # Define file names
++        name = f'{data_dir}/data_{exp_num}/data_{iii}'
++        name_txt = name + '.txt'
++        name_png = name + '.png'
++
++        # Load data file
++        file = np.loadtxt(name_txt, delimiter=';')
++        # Initialize data array
++        data = np.zeros([height, width, numbers])
++
++        # Reshape data
++        var = 0
++        for i in range(height):
++            for ii in range(width):
++                data[i, ii] = file[var:var + 4]
++                var += 4
++
++        # Plot and save data
++        plot_and_save(data, name_png)
++
++
++# Function to plot and save data
++def plot_and_save(data, name_png):
++    # Create a new figure
++    fig, ax = plt.subplots()
++    # Display data
++    image = ax.imshow(data[:, :, 0], vmin=0, vmax=50)
++    # Save figure
++    plt.savefig(name_png)
++    # Close figure
++    plt.close()
++    print('done')
++
++
++def today_date():
++    # Get today's date
++    today = datetime.today()
++
++    # Format it as dd.mm.yy
++    date_string = today.strftime("%d.%m.%y")
++    return date_string
++
++
++# Main function
++def main():
++    back = matplotlib.get_backend()
++    print(back)
++    # Define experiment number and data directory
++    exp_num = str(1)
++    data_dir = 'imaging/'+today_date()
++    # Load settings
++    settings = load_settings(data_dir, exp_num)
++    # Process data
++    process_data(data_dir, exp_num, settings)
++
++
++# Run main function if script is run directly
++if __name__ == "__main__":
++    main()
