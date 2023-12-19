@@ -16,6 +16,7 @@ class redPitayaInterface():
     _instance = None
     maxPower = 2 ** 13  #◙ not sure why...
     timeStep = 0.008 # micro second. 
+    rabiTimeStep = 0.02 # micro second. 
     defaultRpHost = 'rp-f09ded.local'
     defaultPort = 1001
 
@@ -28,14 +29,18 @@ class redPitayaInterface():
 
         return cls._instance
         
-    def initialize(self, qObjectMain):
+    def initialize(self, qObjectMain = None):
         self.ODMRXAxisLabel = "Frequency [MHz]"
         self.ODMRYAxisLabel = "Photons Counted"
         self.RabiXAxisLabel = "Time [micro seconds]"
         self.RabiYAxisLabel = "Photons Counted"
 
         # TODO: check if qObjectMain is needed
-        self.socket = QTcpSocket(qObjectMain)
+        if qObjectMain is None:
+            self.socket = QTcpSocket()
+        else:       
+            self.socket = QTcpSocket(qObjectMain)
+
         self.socket.connected.connect(self.connectedMessageRecived)
         self.socket.readyRead.connect(self.dataRecived)
         self.socket.error.connect(self.connectionErrorRecived)
@@ -58,6 +63,7 @@ class redPitayaInterface():
         self.reciveDataCallBack = None
         self.connectionErrorCallBack = None
         self.pulseConfig = None
+        self.gotNewData = None
         self.initializeBufferODMR()
     
     def initializeBufferODMR(self):
@@ -76,6 +82,10 @@ class redPitayaInterface():
 
     def getIsConnectionOpen(self):
         return self.socket.isOpen()
+
+    def raiseNewDataRecived(self):
+        if self.reciveDataCallBack is not None:
+            self.reciveDataCallBack(self.data)
 
     def registerRedPitayaConnected(self, callback):
         self.connectedCallBack = callback
@@ -109,6 +119,10 @@ class redPitayaInterface():
 
         self.isAOMOpen = False
         print('AOM is closed')
+
+    def waitForData(self, timeout_ms = -1):
+        while not self.gotNewData:
+            self.socket.waitForReadyRead(timeout_ms)
 
     def updateIpAndPort(self, ip, port):
         self.ip = ip
@@ -223,17 +237,19 @@ class redPitayaInterface():
         dataToPlot = np.array(data[0:int(self.size)], dtype=float)
 
         # TODO: This is a mistake!! the time step is longer than we think
-        x_data = np.arange(0, len(dataToPlot) * redPitayaInterface.timeStep, redPitayaInterface.timeStep)
+        x_data = np.arange(0, len(dataToPlot) * redPitayaInterface.rabiTimeStep, redPitayaInterface.rabiTimeStep)
 
         rabi_dataframe = pd.DataFrame({self.RabiXAxisLabel: x_data, self.RabiYAxisLabel: data})
 
         return rabi_dataframe
 
     def startODMR(self, pulseConfig : pulseConfiguration):
+        self.gotNewData = False
         config = self.convertConfigurationToRedPitayaType(pulseConfig)
         self.socket.write(struct.pack('<Q', 4 << 58 | config.count_duration))
 
     def startRabiMeasurement(self, pulseConfig : pulseConfiguration):
+        self.gotNewData = False
         count_duration = np.uint32(1)
         self.socket.write(struct.pack('<Q', 6 << 58 | count_duration))
         
@@ -273,11 +289,8 @@ class redPitayaInterface():
             self.buffer[self.offset:self.bufferSize] = self.socket.read(self.bufferSize - self.offset)
             
             self.offset = 0
-            
+            self.gotNewData = True
             self.reconnect()
-            
-            if self.reciveDataCallBack is not None:
-                self.reciveDataCallBack(self.data)
-                    
+            self.raiseNewDataRecived()        
         except Exception:
             traceback.print_exc()

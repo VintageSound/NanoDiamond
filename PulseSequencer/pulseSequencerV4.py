@@ -98,7 +98,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         self.initializeScanAxes()
 
         # TODO: Add full rabi sequence
-        # self.btnScanRabi.clicked.connect(self.startRabiScan)
+        self.btnScanRabi.clicked.connect(self.startRabiScan)
 
         # declare Counting Duration
         self.txtCountDuration.setText('1000')
@@ -319,11 +319,9 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
     def saveODMR(self):
         try:
             self.dataSaver.setODMRFolderToSave(self.ODMRPathTextBox.text())
-            self.dataSaver.ODMRIndex = int(self.ODMRFileNumber.text())
-
             comment = self.ODMRComment.text()
 
-            self.dataSaver.saveODMR(comment)      
+            self.dataSaver.saveODMR(comment, self.ODMRFileNumber.text())      
             self.ODMRFileNumber.setText(str(self.dataSaver.ODMRIndex))
         except Exception as ex:
             print(ex)

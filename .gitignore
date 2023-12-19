@@ -10095,3 +10095,10 @@ PulseSequencer/Data/__pycache__/MeasurmentType.cpython-310.pyc
 PulseSequencer/Data/__pycache__/microwaveConfiguration.cpython-310.pyc
 PulseSequencer/Data/__pycache__/pulseConfiguration.cpython-310.pyc
 PulseSequencer/Data/__pycache__/repetition.cpython-310.pyc
+PulseSequencer/Data/__pycache__/pulseConfiguration.cpython-310.pyc
+PulseSequencer/Interfaces/__pycache__/dataSaver.cpython-310.pyc
+PulseSequencer/Interfaces/__pycache__/microwaveInterface.cpython-310.pyc
+PulseSequencer/Interfaces/__pycache__/pulseBlasterInterface.cpython-310.pyc
+PulseSequencer/Interfaces/__pycache__/redPitayaInterface.cpython-310.pyc
+PulseSequencer/LogicManagers/__pycache__/measurementManager.cpython-310.pyc
+PulseSequencer/LogicManagers/__pycache__/scanManager.cpython-310.pyc

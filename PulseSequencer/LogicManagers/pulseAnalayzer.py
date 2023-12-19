@@ -8,6 +8,12 @@ def getIntegraionOfPump(time, data):
 
     return integration
 
+def getIntegraionOfImage(time, data):
+    pump_timestep, image_timestep = getPulsesTimesteps(time, data)
+    integration = np.trapz(y=data[image_timestep[0]:image_timestep[1]], x=time[image_timestep[0]:image_timestep[1]])
+
+    return integration
+
 def getOnlyImage(time, data):
     pump, image = getPulsesTimesteps(time, data)
 

@@ -20,7 +20,7 @@ from Data.repetition import repetition
 class measurementManager():
     redPitayaTimeStep = redPitayaInterface.timeStep
 
-    def __init__(self, QMainObject) -> None:
+    def __init__(self, QMainObject = None) -> None:
         # interfaces
         self.redPitaya = redPitayaInterface(QMainObject)
         self.pulseBlaster = pulseBlasterInterface()
