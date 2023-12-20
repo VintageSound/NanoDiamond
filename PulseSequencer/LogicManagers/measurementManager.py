@@ -125,10 +125,12 @@ class measurementManager():
         return self.pulseBlaster.isConnected
 
     # Connection Methods
-    def connectToEverything(self):
+    def connectToEverythingSync(self):
         self.redPitaya.connect()
         self.pulseBlaster.connect()
         self.microwaveDevice.connect()
+
+        self.redPitaya.waitForConnected()
 
     def laserOpenCloseToggle(self, newConfig : pulseConfiguration):
         if self.redPitaya.isAOMOpen:
@@ -218,11 +220,34 @@ class measurementManager():
         return self.microwaveDevice.checkIfMicrowaveIsOn()
 
     # Measurement Methods
+    def startNewRabiPulseMeasurementSync(self, 
+                                    pulseConfig : pulseConfiguration = None, 
+                                    micrwaveConfig : microwaveConfiguration = None):
+        if pulseConfig is not None:
+            self.pulseConfigRabi = pulseConfig
+
+        if micrwaveConfig is not None:
+            self.microwaveRabiConfig = micrwaveConfig
+
+        self.measurementType = measurementType.RabiPulse
+        self.isMeasurementActive = True
+        self.initializeBufferRabi()
+        self.configurePulseSequenceForRabi(self.pulseConfigRabi)
+        self.updateMicrowaveRabiConfig(self.microwaveRabiConfig)
+
+        self.redPitaya.closeAOM()
+        self.raiseAOMStatusChangedEvent()
+        
+        self.microwaveDevice.turnOffMicrowave()
+        self.raiseMicrowaveStatusChangeEvent()
+        data = self.redPitaya.startRabiMeasurementSync()
+        return data
+
     def _ODMRMeasurement(self):
         self.redPitaya.startODMR(self.pulseConfigODMR)
 
     def _RabiPulseMeasurement(self):
-        self.redPitaya.startRabiMeasurement(self.pulseConfigRabi)
+        self.redPitaya.startRabiMeasurement()
 
     def startNewRabiPulseMeasurement(self, 
                                     pulseConfig : pulseConfiguration = None, 
@@ -393,7 +418,7 @@ class measurementManager():
 
     def receiveRedPitayaConnectionError(self, error):
         try:
-            print("Red Pitaya connection error", error)
+            print("Red Pitaya connection error:", error)
             self.raiseConnectionErrorEvent(error)
 
         except Exception:

@@ -97,9 +97,6 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         self.initializeRabiAxes()
         self.initializeScanAxes()
 
-        # TODO: Add full rabi sequence
-        self.btnScanRabi.clicked.connect(self.startRabiScan)
-
         # declare Counting Duration
         self.txtCountDuration.setText('1000')
 
@@ -347,9 +344,9 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         try:
             pulseConfig = pulseConfiguration()
 
-            type = self.getCurrentMeasurementTab()
-
-            if type == measurementType.ODMR:
+            pulseConfig.measurement_type = self.getCurrentMeasurementTab()
+                 
+            if pulseConfig.measurement_type == measurementType.ODMR:
                 pulseConfig.count_duration = int(self.txtCountDuration.text())
             else:
                 pulseConfig.count_duration = 1

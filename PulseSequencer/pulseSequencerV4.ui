@@ -390,7 +390,7 @@
           <item>
            <widget class="QTabWidget" name="measurmentTabs">
             <property name="currentIndex">
-             <number>0</number>
+             <number>2</number>
             </property>
             <widget class="QWidget" name="ODMRTab">
              <attribute name="title">
@@ -453,7 +453,7 @@
                         <x>10</x>
                         <y>30</y>
                         <width>431</width>
-                        <height>211</height>
+                        <height>213</height>
                        </rect>
                       </property>
                       <layout class="QFormLayout" name="formLayout_3">
@@ -624,8 +624,8 @@
                        <rect>
                         <x>20</x>
                         <y>30</y>
-                        <width>99</width>
-                        <height>30</height>
+                        <width>82</width>
+                        <height>26</height>
                        </rect>
                       </property>
                       <property name="autoFillBackground">
@@ -685,7 +685,7 @@
                         <x>9</x>
                         <y>22</y>
                         <width>431</width>
-                        <height>168</height>
+                        <height>170</height>
                        </rect>
                       </property>
                       <layout class="QFormLayout" name="formLayout_4">
@@ -798,8 +798,8 @@
                        <rect>
                         <x>20</x>
                         <y>30</y>
-                        <width>99</width>
-                        <height>30</height>
+                        <width>82</width>
+                        <height>26</height>
                        </rect>
                       </property>
                       <property name="autoFillBackground">
@@ -894,7 +894,7 @@
                         <x>9</x>
                         <y>22</y>
                         <width>431</width>
-                        <height>168</height>
+                        <height>170</height>
                        </rect>
                       </property>
                       <layout class="QFormLayout" name="formLayout_4">
@@ -1136,7 +1136,7 @@
                         <x>9</x>
                         <y>22</y>
                         <width>431</width>
-                        <height>168</height>
+                        <height>170</height>
                        </rect>
                       </property>
                       <layout class="QFormLayout" name="formLayout_5">

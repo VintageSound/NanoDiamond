@@ -1,5 +1,3 @@
-from PyQt5.QtNetwork import QAbstractSocket, QTcpSocket
-from PyQt5.QtCore import QObject
 import time
 import socket
 import json
@@ -12,7 +10,7 @@ import pandas as pd
 from Data.pulseConfiguration import pulseConfiguration
 from Data.measurementType import measurementType
 
-class redPitayaInterface():
+class redPitayaInterfaceV2():
     _instance = None
     maxPower = 2 ** 13  #◙ not sure why...
     timeStep = 0.008 # micro second. 
@@ -24,7 +22,7 @@ class redPitayaInterface():
     # the same connection \ socket \ series twice
     def __new__(cls, qObjectMain):
         if cls._instance is None:
-            cls._instance = super(redPitayaInterface, cls).__new__(cls)
+            cls._instance = super(redPitayaInterfaceV2, cls).__new__(cls)
             cls._instance.initialize(qObjectMain)
 
         return cls._instance
@@ -35,8 +33,8 @@ class redPitayaInterface():
         self.RabiXAxisLabel = "Time [micro seconds]"
         self.RabiYAxisLabel = "Photons Counted"
 
-        self.socket = QTcpSocket()
-        self.socket.connected.connect(self.connectedMessageRecived)
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.con.connected.connect(self.connectedMessageRecived)
         self.socket.readyRead.connect(self.dataRecived)
         self.socket.error.connect(self.connectionErrorRecived)
 
