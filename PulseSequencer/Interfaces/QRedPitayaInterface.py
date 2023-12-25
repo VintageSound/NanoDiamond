@@ -1,3 +1,5 @@
+from PyQt5.QtNetwork import QAbstractSocket, QTcpSocket
+from PyQt5.QtCore import QObject
 import time
 import socket
 import json
@@ -10,7 +12,7 @@ import pandas as pd
 from Data.pulseConfiguration import pulseConfiguration
 from Data.measurementType import measurementType
 
-class redPitayaInterfaceV2():
+class QRedPitayaInterface():
     _instance = None
     maxPower = 2 ** 13  #◙ not sure why...
     timeStep = 0.008 # micro second. 
@@ -22,7 +24,7 @@ class redPitayaInterfaceV2():
     # the same connection \ socket \ series twice
     def __new__(cls, qObjectMain):
         if cls._instance is None:
-            cls._instance = super(redPitayaInterfaceV2, cls).__new__(cls)
+            cls._instance = super(QRedPitayaInterface, cls).__new__(cls)
             cls._instance.initialize(qObjectMain)
 
         return cls._instance
@@ -33,19 +35,19 @@ class redPitayaInterfaceV2():
         self.RabiXAxisLabel = "Time [micro seconds]"
         self.RabiYAxisLabel = "Photons Counted"
 
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.con.connected.connect(self.connectedMessageRecived)
+        self.socket = QTcpSocket()
+        self.socket.connected.connect(self.connectedMessageRecived)
         self.socket.readyRead.connect(self.dataRecived)
         self.socket.error.connect(self.connectionErrorRecived)
 
         # set IP address and Port number
-        self.ip = self.get_ip_address(redPitayaInterface.defaultRpHost)
-        self.port = redPitayaInterface.defaultPort
+        self.ip = self.get_ip_address(QRedPitayaInterface.defaultRpHost)
+        self.port = QRedPitayaInterface.defaultPort
 
         if self.ip:
-            print(f'The IP address of {redPitayaInterface.defaultRpHost} is {self.ip}')
+            print(f'The IP address of {QRedPitayaInterface.defaultRpHost} is {self.ip}')
         else:
-            print(f'Could not resolve the IP address of {redPitayaInterface.defaultRpHost}')
+            print(f'Could not resolve the IP address of {QRedPitayaInterface.defaultRpHost}')
 
         # state variable
         # self.isConnected = False
@@ -114,13 +116,13 @@ class redPitayaInterfaceV2():
         print('AOM is closed')
 
     def waitForData(self, timeout_ms = -1):
-        self.socket.readyRead.disconnect()
+        # self.socket.readyRead.disconnect()
         
         while not self.gotNewData:
             self.socket.waitForReadyRead(timeout_ms)
             self.dataRecived()
 
-        self.socket.readyRead.connect(self.dataRecived())
+        # self.socket.readyRead.connect(self.dataRecived())
         
         return self.data
     
@@ -160,22 +162,22 @@ class redPitayaInterfaceV2():
         newConfig = pulseConfiguration()
         
         if pulseConfig.measurement_type == measurementType.ODMR:
-            newConfig.count_duration = np.uint32(int(pulseConfig.count_duration / redPitayaInterface.timeStep))
+            newConfig.count_duration = np.uint32(int(pulseConfig.count_duration / QRedPitayaInterface.timeStep))
         else:
             newConfig.count_duration = np.uint32(1)
 
-        newConfig.count_number = np.uint32(int(np.log2(pulseConfig.count_number)))
-        newConfig.threshold = np.uint32(int(pulseConfig.threshold) * redPitayaInterface.maxPower / 20) # why 20 ????
+        newConfig.samples_number = np.uint32(int(np.log2(pulseConfig.samples_number)))
+        newConfig.threshold = np.uint32(int(pulseConfig.threshold) * QRedPitayaInterface.maxPower / 20) # why 20 ????
         newConfig.iterations = np.uint32(int(pulseConfig.iterations))
-        newConfig.pump_start = np.uint32(int(pulseConfig.pump_start / redPitayaInterface.timeStep))
-        newConfig.pump_duration = np.uint32(int(pulseConfig.pump_duration / redPitayaInterface.timeStep))
-        newConfig.microwave_start = np.uint32(int(pulseConfig.microwave_start / redPitayaInterface.timeStep))
-        newConfig.microwave_duration = np.uint32(int(pulseConfig.microwave_duration / redPitayaInterface.timeStep))
-        newConfig.image_start = np.uint32(int(pulseConfig.image_start / redPitayaInterface.timeStep))
-        newConfig.image_duration = np.uint32(int(pulseConfig.image_duration / redPitayaInterface.timeStep))
-        newConfig.readout_start = np.uint32(int(pulseConfig.readout_start / redPitayaInterface.timeStep))
-        newConfig.low_voltage_AOM = np.uint32(int(pulseConfig.low_voltage_AOM * redPitayaInterface.maxPower))
-        newConfig.high_voltage_AOM = np.uint32(int(pulseConfig.high_voltage_AOM * redPitayaInterface.maxPower))
+        newConfig.pump_start = np.uint32(int(pulseConfig.pump_start / QRedPitayaInterface.timeStep))
+        newConfig.pump_duration = np.uint32(int(pulseConfig.pump_duration / QRedPitayaInterface.timeStep))
+        newConfig.microwave_start = np.uint32(int(pulseConfig.microwave_start / QRedPitayaInterface.timeStep))
+        newConfig.microwave_duration = np.uint32(int(pulseConfig.microwave_duration / QRedPitayaInterface.timeStep))
+        newConfig.image_start = np.uint32(int(pulseConfig.image_start / QRedPitayaInterface.timeStep))
+        newConfig.image_duration = np.uint32(int(pulseConfig.image_duration / QRedPitayaInterface.timeStep))
+        newConfig.readout_start = np.uint32(int(pulseConfig.readout_start / QRedPitayaInterface.timeStep))
+        newConfig.low_voltage_AOM = np.uint32(int(pulseConfig.low_voltage_AOM * QRedPitayaInterface.maxPower))
+        newConfig.high_voltage_AOM = np.uint32(int(pulseConfig.high_voltage_AOM * QRedPitayaInterface.maxPower))
 
         return newConfig
 
@@ -185,7 +187,7 @@ class redPitayaInterfaceV2():
         print(pulseConfig.high_voltage_AOM)
 
         self.socket.write(struct.pack('<Q', 1 << 58 | config.count_duration))
-        self.socket.write(struct.pack('<Q', 2 << 58 | config.count_number))
+        self.socket.write(struct.pack('<Q', 2 << 58 | config.samples_number))
         self.socket.write(struct.pack('<Q', 3 << 58 | config.threshold))
         self.socket.write(struct.pack('<Q', 5 << 58 | config.iterations))
         self.socket.write(struct.pack('<Q', 7 << 58 | config.pump_start))
@@ -240,7 +242,7 @@ class redPitayaInterfaceV2():
         dataToPlot = np.array(data[0:int(self.size)], dtype=float)
 
         # TODO: This is a mistake!! the time step is longer than we think
-        x_data = np.arange(0, len(dataToPlot) * redPitayaInterface.rabiTimeStep, redPitayaInterface.rabiTimeStep)
+        x_data = np.arange(0, len(dataToPlot) * QRedPitayaInterface.rabiTimeStep, QRedPitayaInterface.rabiTimeStep)
 
         rabi_dataframe = pd.DataFrame({self.RabiXAxisLabel: x_data, self.RabiYAxisLabel: data})
 
@@ -253,7 +255,7 @@ class redPitayaInterfaceV2():
         print("new ODMR measurement started")
 
     def startRabiMeasurement(self):
-        self.socket.readyRead.connect(self.dataRecived)
+        # self.socket.readyRead.connect(self.dataRecived)
 
         self.gotNewData = False
         count_duration = np.uint32(1)
@@ -261,18 +263,18 @@ class redPitayaInterfaceV2():
         print("new rabi measurement started")
         
     def startRabiMeasurementSync(self, timeout = 3000):
-        self.socket.readyRead.disconnect()
+        # self.socket.readyRead.disconnect()
 
         self.gotNewData = False
         count_duration = np.uint32(1)
         self.socket.write(struct.pack('<Q', 6 << 58 | count_duration))
         print("new rabi measurement started")
         
-        self.socket.waitForReadyRead(timeout)
+        # self.socket.waitForReadyRead(timeout)
         print("self.socket.waitForReadyRead() finished")
 
         while not self.proccesNewDataSync():
-            self.socket.waitForReadyRead(timeout)
+            # self.socket.waitForReadyRead(timeout)
             print("self.socket.waitForReadyRead() finished")
 
         self.reconnect()

@@ -3,15 +3,22 @@ import traceback
 import pandas as pd
 import numpy as np
 from scipy.signal import argrelextrema
+from PyQt5.QtCore import QObject, Qt, QThread, pyqtSignal
 
 from Data.measurementType import measurementType
 from Data.repetition import repetition
 from Data.pulseConfiguration import pulseConfiguration
 from LogicManagers.measurementManager import measurementManager
-from LogicManagers import pulseAnalayzer 
+from LogicManagers import pulseAnalayzer
+from Data.microwaveConfiguration import microwaveConfiguration 
 
-class scanManager():
+class scanManager(QObject):
+    rabiPulseEndedEvent = pyqtSignal(float, float)
+    errorEvent = pyqtSignal(Exception)
+
     def __init__(self, measurementManager: measurementManager) -> None:
+        super().__init__()
+
         self.measurementManager = measurementManager
         self.timeRange = []
         self.extractedData = {}
@@ -25,44 +32,56 @@ class scanManager():
 
         self.pulseConfig = None
         self.microwaveConfig = None
-        self.rabiPulseEndedEvent = []
 
         self.isMeasurementActive = False
 
-    def registerToRabiPulseEndedEvent(self, callback):
-        self.rabiPulseEndedEvent.append(callback)
+    def startScanAsync(self, 
+                pulse_config : pulseConfiguration, 
+                microwave_config : microwaveConfiguration, 
+                startTime, 
+                endTime, 
+                timeStep):
+        self.scanWorker = ScanWorkerThread(self,
+                                           pulse_config,
+                                           microwave_config,
+                                           startTime,
+                                           endTime,
+                                           timeStep)
+        self.scanWorker.start()
+        return self.scanWorker
 
-    def raiseRabiPulseEndedEvent(self):
-        for callback in self.rabiPulseEndedEvent:
-            callback()
-
-    def startRabiScanSequence(self, pulse_config : pulseConfiguration, microwave_config : pulseConfiguration, startTime, endTime, timeStep):
+    # Need to run this function as a for loop condition
+    def startScan(self, 
+                pulse_config : pulseConfiguration, 
+                microwave_config : microwaveConfiguration, 
+                startTime, 
+                endTime, 
+                timeStep):
+        self.normalizationFactor = 0
         self.pulseConfig = pulse_config
         self.microwaveConfig = microwave_config
-        self.timeRange = list(range(startTime, endTime, timeStep))
+        self.timeRange = np.arange(startTime, endTime, timeStep)
         self.extractedData = {}
         self.measurementData = {}
-        self.currentIteration = 0
-        self.pulseConfig.microwave_duration = self.timeRange[self.currentIteration] 
         self.isMeasurementActive = True
 
-        self.measurementManager.registerToRabiPulseDataRecivedEvent(self.rabiPulseEndedEventHandler)
-        self.measurementManager.startNewRabiPulseMeasurement(pulseConfig = self.pulseConfig, microwaveConfig = self.microwaveConfig)
+        for time in self.timeRange:
+            self.pulseConfig.microwave_duration = time
+            data = self.measurementManager.startNewRabiPulseMeasurement(self.pulseConfig, self.microwaveConfig)
+            self.measurementData[time] = data
+
+            newPoint = self.extractPointFromPulseSequence(data)
+            self.extractedData[time] = newPoint
+            
+            yield newPoint, time
+
+            if not self.isMeasurementActive:
+                break
         
-    def rabiPulseEndedEventHandler(self, data):
-        self.measurementData[self.config.microwave_duration] = data
-        self.rabiPulseEndedEvent(data, self.config.microwave_duration)
-        newPoint = self.extractPointFromPulseSequence(data)
-
-        self.measurementData[self.timeRange[self.currentIteration]] = data
-        self.extractedData[self.timeRange[self.currentIteration]] = newPoint
-
-        self.continueCurrentScan()
-
     # Dima Normalization. normalize the values by the integraion of the entire pump pulse
     def extractPointFromPulseSequence(self, pulseSequence : pd.DataFrame):
-        if self.currentIteration == 0:
-            self.setNormalizationFactor()
+        if self.normalizationFactor == 0:
+            self.setNormalizationFactor(pulseSequence)
 
         # Because of the laser power drift it's necessary to make normalization.
         # For that just integrate first fluorescence pulse counts for each data file
@@ -76,18 +95,34 @@ class scanManager():
         # Eventually, it will show your desired Rabi oscillation.
         # For that just integrate second fluorescence pulse (at the beginning) for 0.5 msec.
         # Okay, it seems that now you got it! Just plot it.
-        integration_image = pulseAnalayzer.getIntegraionOfImageBegining(normalized_data)
+        integration_image = pulseAnalayzer.getIntegraionOfImageBegining(pulseSequence[self.timeColumn], normalized_data)
 
         return integration_image
 
     def setNormalizationFactor(self, pulseSequence : pd.DataFrame):
         self.normalizationFactor = pulseAnalayzer.getIntegraionOfPump(pulseSequence[self.timeColumn], pulseSequence[self.valueColumn])
 
-    def continueCurrentScan(self):
-        if not self.isMeasurementActive:
-            return
+class ScanWorkerThread(QThread):
+    def __init__(self, 
+                 manager : scanManager,
+                 pulse_config : pulseConfiguration, 
+                 microwave_config : microwaveConfiguration, 
+                 startTime, 
+                 endTime, 
+                 timeStep):
+        super().__init__()
 
-        self.currentIteration += 1
-        self.config.microwave_duration = self.timeRange[self.currentIteration] 
-        self.measurementManager.startNewRabiPulseMeasurement(config=self.config)
-    
+        self.scanManager = manager
+        self.pulseConfig = pulse_config
+        self.microwaveConfig = microwave_config
+        self.startTime = startTime
+        self.endTime = endTime
+        self.timeStep = timeStep
+
+    def run(self):
+        try:
+            for point, time in self.scanManager.startScan(self.pulseConfig, self.microwaveConfig, self.startTime, self.endTime, self.timeStep):
+                self.scanManager.rabiPulseEndedEvent.emit(point, time)
+        except Exception as ex:
+            print("Error in ScanWorkerThread:", ex)
+            self.scanManager.errorEvent.emit(ex)

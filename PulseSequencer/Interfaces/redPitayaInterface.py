@@ -1,5 +1,3 @@
-from PyQt5.QtNetwork import QAbstractSocket, QTcpSocket
-from PyQt5.QtCore import QObject
 import time
 import socket
 import json
@@ -11,6 +9,7 @@ import pandas as pd
 
 from Data.pulseConfiguration import pulseConfiguration
 from Data.measurementType import measurementType
+from Data.microwaveConfiguration import microwaveConfiguration
 
 class redPitayaInterface():
     _instance = None
@@ -22,24 +21,21 @@ class redPitayaInterface():
 
     # This is to make sure there is only one instance if the interface, so that no one will use 
     # the same connection \ socket \ series twice
-    def __new__(cls, qObjectMain):
+    def __new__(cls):
         if cls._instance is None:
             cls._instance = super(redPitayaInterface, cls).__new__(cls)
-            cls._instance.initialize(qObjectMain)
+            cls._instance.initialize()
 
         return cls._instance
         
-    def initialize(self, qObjectMain = None):
+    def initialize(self):
         self.ODMRXAxisLabel = "Frequency [MHz]"
         self.ODMRYAxisLabel = "Photons Counted"
         self.RabiXAxisLabel = "Time [micro seconds]"
         self.RabiYAxisLabel = "Photons Counted"
 
-        self.socket = QTcpSocket()
-        self.socket.connected.connect(self.connectedMessageRecived)
-        self.socket.readyRead.connect(self.dataRecived)
-        self.socket.error.connect(self.connectionErrorRecived)
-
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        
         # set IP address and Port number
         self.ip = self.get_ip_address(redPitayaInterface.defaultRpHost)
         self.port = redPitayaInterface.defaultPort
@@ -49,14 +45,10 @@ class redPitayaInterface():
         else:
             print(f'Could not resolve the IP address of {redPitayaInterface.defaultRpHost}')
 
-        # state variable
-        # self.isConnected = False
+        # state variables
         self.size = 2048
         
         self.isAOMOpen = False
-        self.connectedCallBack = None
-        self.reciveDataCallBack = None
-        self.connectionErrorCallBack = None
         self.pulseConfig = None
         self.gotNewData = None
         self.initializeBufferODMR()
@@ -76,20 +68,12 @@ class redPitayaInterface():
         self.data = np.frombuffer(self.buffer, np.int32)
 
     def getIsConnectionOpen(self):
-        return self.socket.isOpen()
-
-    def raiseNewDataRecived(self):
-        if self.reciveDataCallBack is not None:
-            self.reciveDataCallBack(self.data)
-
-    def registerRedPitayaConnected(self, callback):
-        self.connectedCallBack = callback
-
-    def registerReciveData(self, callback):
-        self.reciveDataCallBack = callback
-
-    def registerConnectionError(self, callback):
-        self.connectionErrorCallBack = callback
+        try:
+            # This will raise an OSError if the socket is closed
+            self.socket.getpeername()
+            return True
+        except OSError:
+            return False
 
     def get_ip_address(self, rp_host):
         try:
@@ -101,7 +85,7 @@ class redPitayaInterface():
         if self.isAOMOpen:
             return
 
-        self.socket.write(struct.pack('<Q', 16 << 58 | np.uint32(int(1))))
+        self.socket.sendall(struct.pack('<Q', 16 << 58 | np.uint32(int(1))))
 
         self.isAOMOpen = True
         print('AOM is opened')
@@ -110,22 +94,40 @@ class redPitayaInterface():
         if not self.isAOMOpen:
             return
 
-        self.socket.write(struct.pack('<Q', 16 << 58 | np.uint32(int(0))))
+        self.socket.sendall(struct.pack('<Q', 16 << 58 | np.uint32(int(0))))
 
         self.isAOMOpen = False
         print('AOM is closed')
 
-    def waitForData(self, timeout_ms = -1):
-        self.socket.readyRead.disconnect()
-        
-        while not self.gotNewData:
-            self.socket.waitForReadyRead(timeout_ms)
-            self.dataRecived()
+    def readData(self, token):
+        while token:
+            try:
+                data = self.socket.recv(self.bufferSize)
 
-        self.socket.readyRead.connect(self.dataRecived())
-        
-        return self.data
+                if not data:
+                    break
+
+                if self.processData(data):
+                    self.reconnect()
+                    return self.data
+
+            except socket.timeout:
+                pass
+
+    def readODMRData(self, token, microwave_config):
+        self.initializeBufferODMR()
+        data = self.readData(token)
+        df = self.convertODMRDataToDataFrame(data, microwave_config)
+
+        return df
     
+    def readRabiData(self, token):
+        self.initializeBufferRabi()
+        data = self.readData(token)
+        df = self.convertRabiDataToDataFrame(data)
+
+        return df
+
     def updateIpAndPort(self, ip, port):
         self.ip = ip
         self.port = port
@@ -138,11 +140,9 @@ class redPitayaInterface():
             self.ip = ip 
             self.port = port
 
-        print("trying to connect to red pitaya:", self.ip, self.port)
-        self.socket.connectToHost(self.ip, self.port)
-
-    def waitForConnected(self, timeout_ms = 1000):
-        self.socket.waitForConnected(timeout_ms)
+        print("Connecting to red pitaya:", self.ip, self.port)
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.connect((self.ip, self.port))
 
     def disconnect(self):
         if not self.getIsConnectionOpen():
@@ -152,11 +152,94 @@ class redPitayaInterface():
 
         self.socket.close()
         self.offset = 0
-        # self.isConnected = False
 
     def reconnect(self):
         self.disconnect()
         self.connect()
+
+    def openLaserAndMicrowave(self):
+        if self.isOpen:
+            return
+
+        self.socket.sendall(struct.pack('<Q', 16 << 58 | np.uint32(int(1))))
+
+        self.isOpen = True
+        print('Laser and MW are opened')
+
+    def closeLaserAndMicrowave(self):
+        if not self.isOpen:
+            return
+
+        self.socket.sendall(struct.pack('<Q', 16 << 58 | np.uint32(int(0))))
+
+        self.isOpen = False
+        print('Laser and MW are closed')
+
+    def convertODMRDataToDataFrame(self, data, microwaveConfig):
+        # TODO: Figure out WHAT THE HELL is this code...
+        # set data
+        channel1 = np.array(data[0:int(self.size / 2)], dtype=float)
+        channel2 = np.array(data[int(self.size / 2):self.size], dtype=float)
+        convertedData = np.zeros(len(channel2)) + channel1[0]
+        offset = 3.5 * channel2[0] # WHYYYYYYY
+
+        for i in range(1, len(convertedData)):
+            convertedData[i] = channel1[i] * ((channel2[0] + offset) / (channel2[i] + offset))
+
+        x_axis = np.linspace(microwaveConfig.startFreq, microwaveConfig.stopFreq, int(self.size / 2))
+        
+        converted_df = pd.DataFrame({self.ODMRXAxisLabel: x_axis, self.ODMRYAxisLabel: convertedData})
+
+        return converted_df
+
+    def convertRabiDataToDataFrame(self, data):
+        dataToPlot = np.array(data[0:int(self.size)], dtype=float)
+
+        # TODO: This is a mistake!! the time step is longer than we think
+        x_data = np.arange(0, len(dataToPlot) * redPitayaInterface.rabiTimeStep, redPitayaInterface.rabiTimeStep)
+
+        rabi_dataframe = pd.DataFrame({self.RabiXAxisLabel: x_data, self.RabiYAxisLabel: data})
+
+        return rabi_dataframe
+
+    def startODMR(self, pulse_config : pulseConfiguration, microwave_config : microwaveConfiguration, token):
+        self.gotNewData = False
+        config = self.convertConfigurationToRedPitayaType(pulse_config)
+        self.socket.sendall(struct.pack('<Q', 4 << 58 | config.count_duration))
+        print("new ODMR measurement started")
+
+        return self.readODMRData(token, microwave_config)
+
+    def startRabiMeasurement(self, token):
+        self.gotNewData = False
+        count_duration = np.uint32(1)
+        self.socket.sendall(struct.pack('<Q', 6 << 58 | count_duration))
+        print("new rabi measurement started")
+
+        return self.readRabiData(token)
+
+    def processData(self, data):
+        try:
+            size = len(data)
+            print("recived new data, bytes:", size)
+
+            # Receive partial data
+            if self.offset + size < self.bufferSize:
+                self.buffer[self.offset:self.offset + size] = data
+                self.offset += size
+
+                return False
+            
+            # Receive all data
+            print("All the data was recived")
+            self.buffer[self.offset:self.bufferSize] = data[:(self.bufferSize - self.offset)]
+            
+            self.offset = 0
+            self.gotNewData = True
+
+            return True      
+        except Exception:
+            traceback.print_exc()
 
     def convertConfigurationToRedPitayaType(self, pulseConfig : pulseConfiguration):
         newConfig = pulseConfiguration()
@@ -166,7 +249,7 @@ class redPitayaInterface():
         else:
             newConfig.count_duration = np.uint32(1)
 
-        newConfig.count_number = np.uint32(int(np.log2(pulseConfig.count_number)))
+        newConfig.samples_number = np.uint32(int(np.log2(pulseConfig.samples_number)))
         newConfig.threshold = np.uint32(int(pulseConfig.threshold) * redPitayaInterface.maxPower / 20) # why 20 ????
         newConfig.iterations = np.uint32(int(pulseConfig.iterations))
         newConfig.pump_start = np.uint32(int(pulseConfig.pump_start / redPitayaInterface.timeStep))
@@ -184,163 +267,21 @@ class redPitayaInterface():
     def congifurePulse(self, pulseConfig):
         config = self.convertConfigurationToRedPitayaType(pulseConfig)
 
-        print(pulseConfig.high_voltage_AOM)
+        print("AOM voltage:", pulseConfig.high_voltage_AOM)
 
-        self.socket.write(struct.pack('<Q', 1 << 58 | config.count_duration))
-        self.socket.write(struct.pack('<Q', 2 << 58 | config.count_number))
-        self.socket.write(struct.pack('<Q', 3 << 58 | config.threshold))
-        self.socket.write(struct.pack('<Q', 5 << 58 | config.iterations))
-        self.socket.write(struct.pack('<Q', 7 << 58 | config.pump_start))
-        self.socket.write(struct.pack('<Q', 8 << 58 | config.pump_duration))
-        self.socket.write(struct.pack('<Q', 9 << 58 | config.microwave_start))
-        self.socket.write(struct.pack('<Q', 10 << 58 | config.microwave_duration))
-        self.socket.write(struct.pack('<Q', 11 << 58 | config.image_start))
-        self.socket.write(struct.pack('<Q', 12 << 58 | config.image_duration))
-        self.socket.write(struct.pack('<Q', 13 << 58 | config.readout_start))
-        self.socket.write(struct.pack('<Q', 14 << 58 | config.low_voltage_AOM))
-        self.socket.write(struct.pack('<Q', 15 << 58 | config.high_voltage_AOM))
-        self.socket.write(struct.pack('<Q', 0 << 58 | config.threshold))
+        self.socket.sendall(struct.pack('<Q', 1 << 58 | config.count_duration))
+        self.socket.sendall(struct.pack('<Q', 2 << 58 | config.samples_number))
+        self.socket.sendall(struct.pack('<Q', 3 << 58 | config.threshold))
+        self.socket.sendall(struct.pack('<Q', 5 << 58 | config.iterations))
+        self.socket.sendall(struct.pack('<Q', 7 << 58 | config.pump_start))
+        self.socket.sendall(struct.pack('<Q', 8 << 58 | config.pump_duration))
+        self.socket.sendall(struct.pack('<Q', 9 << 58 | config.microwave_start))
+        self.socket.sendall(struct.pack('<Q', 10 << 58 | config.microwave_duration))
+        self.socket.sendall(struct.pack('<Q', 11 << 58 | config.image_start))
+        self.socket.sendall(struct.pack('<Q', 12 << 58 | config.image_duration))
+        self.socket.sendall(struct.pack('<Q', 13 << 58 | config.readout_start))
+        self.socket.sendall(struct.pack('<Q', 14 << 58 | config.low_voltage_AOM))
+        self.socket.sendall(struct.pack('<Q', 15 << 58 | config.high_voltage_AOM))
+        self.socket.sendall(struct.pack('<Q', 0 << 58 | config.threshold))
         
         print("Configuration sent to red pitaya")
-
-    def openLaserAndMicrowave(self):
-        if self.isOpen:
-            return
-
-        self.socket.write(struct.pack('<Q', 16 << 58 | np.uint32(int(1))))
-
-        self.isOpen = True
-        print('Laser and MW are opened')
-
-    def closeLaserAndMicrowave(self):
-        if not self.isOpen:
-            return
-
-        self.socket.write(struct.pack('<Q', 16 << 58 | np.uint32(int(0))))
-
-        self.isOpen = False
-        print('Laser and MW are closed')
-
-    def convertODMRData(self, data, microwaveConfig):
-        # TODO: Figure out WHAT THE HELL is this code...
-        # set data
-        channel1 = np.array(data[0:int(self.size / 2)], dtype=float)
-        channel2 = np.array(data[int(self.size / 2):self.size], dtype=float)
-        convertedData = np.zeros(len(channel2)) + channel1[0]
-        offset = 3.5 * channel2[0] # WHYYYYYYY
-
-        for i in range(1, len(convertedData)):
-            convertedData[i] = channel1[i] * ((channel2[0] + offset) / (channel2[i] + offset))
-
-        x_axis = np.linspace(microwaveConfig.startFreq, microwaveConfig.stopFreq, int(self.size / 2))
-        
-        converted_df = pd.DataFrame({self.ODMRXAxisLabel: x_axis, self.ODMRYAxisLabel: convertedData})
-
-        return converted_df
-
-    def convertRabiData(self, data):
-        dataToPlot = np.array(data[0:int(self.size)], dtype=float)
-
-        # TODO: This is a mistake!! the time step is longer than we think
-        x_data = np.arange(0, len(dataToPlot) * redPitayaInterface.rabiTimeStep, redPitayaInterface.rabiTimeStep)
-
-        rabi_dataframe = pd.DataFrame({self.RabiXAxisLabel: x_data, self.RabiYAxisLabel: data})
-
-        return rabi_dataframe
-
-    def startODMR(self, pulseConfig : pulseConfiguration):
-        self.gotNewData = False
-        config = self.convertConfigurationToRedPitayaType(pulseConfig)
-        self.socket.write(struct.pack('<Q', 4 << 58 | config.count_duration))
-        print("new ODMR measurement started")
-
-    def startRabiMeasurement(self):
-        self.socket.readyRead.connect(self.dataRecived)
-
-        self.gotNewData = False
-        count_duration = np.uint32(1)
-        self.socket.write(struct.pack('<Q', 6 << 58 | count_duration))
-        print("new rabi measurement started")
-        
-    def startRabiMeasurementSync(self, timeout = 3000):
-        self.socket.readyRead.disconnect()
-
-        self.gotNewData = False
-        count_duration = np.uint32(1)
-        self.socket.write(struct.pack('<Q', 6 << 58 | count_duration))
-        print("new rabi measurement started")
-        
-        self.socket.waitForReadyRead(timeout)
-        print("self.socket.waitForReadyRead() finished")
-
-        while not self.proccesNewDataSync():
-            self.socket.waitForReadyRead(timeout)
-            print("self.socket.waitForReadyRead() finished")
-
-        self.reconnect()
-        self.socket.waitForConnected()
-
-        return self.data
-
-    # ---------------- Events -----------------
-    def connectedMessageRecived(self):
-        try:
-            print("connected to Red Pitaya!")
-            # self.isConnected = True
-
-            if self.connectedCallBack is not None:
-                self.connectedCallBack()
-
-        except Exception:
-            traceback.print_exc()
-
-    def connectionErrorRecived(self, socketError):
-        if socketError == QAbstractSocket.RemoteHostClosedError:
-            return
-
-        if self.connectionErrorCallBack is not None:
-            self.connectionErrorCallBack(self.socket.errorString())
-
-    def proccesNewDataSync(self):
-        size = self.socket.bytesAvailable()
-        print("recived new data, bytes:", size)
-
-        # Receive partial data
-        if self.offset + size < self.bufferSize:
-            self.buffer[self.offset:self.offset + size] = self.socket.read(size)
-            self.offset += size
-
-            return False
-        
-        # Receive all data
-        print("All the data was recived")
-        self.buffer[self.offset:self.bufferSize] = self.socket.read(self.bufferSize - self.offset)
-        
-        self.offset = 0
-        return True
-
-    def dataRecived(self):
-        try:
-            print("enter data recived")
-
-            size = self.socket.bytesAvailable()
-            print("recived new data, bytes:", size)
-
-            # Receive partial data
-            if self.offset + size < self.bufferSize:
-                self.buffer[self.offset:self.offset + size] = self.socket.read(size)
-                self.offset += size
-
-                return
-            
-            # Receive all data
-            print("All the data was recived")
-            self.buffer[self.offset:self.bufferSize] = self.socket.read(self.bufferSize - self.offset)
-            
-            self.offset = 0
-            self.gotNewData = True
-
-            self.reconnect()
-            self.raiseNewDataRecived()        
-        except Exception:
-            traceback.print_exc()

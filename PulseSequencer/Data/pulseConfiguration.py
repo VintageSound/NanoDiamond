@@ -1,7 +1,7 @@
 class pulseConfiguration():
     def __init__(self):
         self.count_duration = 0
-        self.count_number = 0
+        self.samples_number = 0
         self.threshold = 0
         self.iterations = 0
         self.pump_start = 0

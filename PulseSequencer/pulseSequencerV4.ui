@@ -390,7 +390,7 @@
           <item>
            <widget class="QTabWidget" name="measurmentTabs">
             <property name="currentIndex">
-             <number>2</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="ODMRTab">
              <attribute name="title">
@@ -470,7 +470,7 @@
                        <item row="1" column="0">
                         <widget class="QLabel" name="lblCountNumber">
                          <property name="text">
-                          <string>Number of Pulses</string>
+                          <string>Number of Samples</string>
                          </property>
                         </widget>
                        </item>
