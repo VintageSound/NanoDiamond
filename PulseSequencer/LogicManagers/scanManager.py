@@ -21,7 +21,8 @@ class scanManager(QObject):
 
         self.measurementManager = measurementManager
         self.timeRange = []
-        self.extractedData = {}
+        self.extractedData_dima = {}
+        self.extractedData_hezi = {}
         self.measurementData = {}
 
         self.currentIteration = 0
@@ -51,6 +52,8 @@ class scanManager(QObject):
         return self.scanWorker
 
     # Need to run this function as a for loop condition
+    # for point, time in self.scanManager.startScan(...)
+    #   print(point, time) ## Do Something with the data...
     def startScan(self, 
                 pulse_config : pulseConfiguration, 
                 microwave_config : microwaveConfiguration, 
@@ -61,7 +64,7 @@ class scanManager(QObject):
         self.pulseConfig = pulse_config
         self.microwaveConfig = microwave_config
         self.timeRange = np.arange(startTime, endTime, timeStep)
-        self.extractedData = {}
+        self.extractedData_dima = {}
         self.measurementData = {}
         self.isMeasurementActive = True
 
@@ -70,16 +73,18 @@ class scanManager(QObject):
             data = self.measurementManager.startNewRabiPulseMeasurement(self.pulseConfig, self.microwaveConfig)
             self.measurementData[time] = data
 
-            newPoint = self.extractPointFromPulseSequence(data)
-            self.extractedData[time] = newPoint
+            newPoint_dima = self.extractPointFromPulseSequence_Dima(data)
+            newPoint_hezi = self.extractPointFromPulseSequence_Hezi(data)
+            self.extractedData_dima[time] = newPoint_dima
+            self.extractedData_hezi[time] = newPoint_hezi
             
-            yield newPoint, time
+            yield newPoint_dima, time
 
             if not self.isMeasurementActive:
                 break
         
     # Dima Normalization. normalize the values by the integraion of the entire pump pulse
-    def extractPointFromPulseSequence(self, pulseSequence : pd.DataFrame):
+    def extractPointFromPulseSequence_Dima(self, pulseSequence : pd.DataFrame):
         if self.normalizationFactor == 0:
             self.setNormalizationFactor(pulseSequence)
 
@@ -96,8 +101,28 @@ class scanManager(QObject):
         # For that just integrate second fluorescence pulse (at the beginning) for 0.5 msec.
         # Okay, it seems that now you got it! Just plot it.
         integration_image = pulseAnalayzer.getIntegraionOfImageBegining(pulseSequence[self.timeColumn], normalized_data)
+        result = integration_image / self.normalizationFactor
+        
+        return result
 
-        return integration_image
+    # Hezi Normalization. normalize the values by the last 300 ns of the image
+    def extractPointFromPulseSequence_Hezi(self, pulseSequence : pd.DataFrame):
+        time_image, data_image = pulseAnalayzer.getOnlyImage(pulseSequence[self.timeColumn], pulseSequence[self.valueColumn])
+        time_label = "Time"
+        data_label = "Data"
+        start_time_image = time_image[0]
+        end_time_image = time_image[-1]
+        
+        image_df = pd.DataFrame({time_label : time_image, data_label : data_image})
+        peak = image_df[(image_df[time_label] > start_time_image) & (image_df[time_label] < (start_time_image + 0.3))]
+        reference = image_df[(image_df[time_label] > (end_time_image - 0.3)) & (image_df[time_label] < end_time_image)]
+
+        peak_integration = np.sum(peak[data_label])
+        reference_integration = np.sum(reference[data_label])
+
+        result = (peak_integration - reference_integration)/(peak_integration + reference_integration)
+
+        return result
 
     def setNormalizationFactor(self, pulseSequence : pd.DataFrame):
         self.normalizationFactor = pulseAnalayzer.getIntegraionOfPump(pulseSequence[self.timeColumn], pulseSequence[self.valueColumn])

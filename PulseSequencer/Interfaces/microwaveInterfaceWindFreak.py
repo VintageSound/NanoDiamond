@@ -6,14 +6,14 @@ import numpy as np
 from Data.microwaveConfiguration import microwaveConfiguration
 from Data.measurementType import measurementType 
 
-class microwaveInterface():
+class microwaveInterfaceWindFreak():
     _instance = None
 
     # This is to make sure there is only one instance if the interface, so that no one will use 
     # the same connection \ socket \ series twice
     def __new__(cls):
         if cls._instance is None:
-            cls._instance = super(microwaveInterface, cls).__new__(cls)
+            cls._instance = super(microwaveInterfaceWindFreak, cls).__new__(cls)
             cls._instance.initialize()
 
         return cls._instance
@@ -110,7 +110,7 @@ class microwaveInterface():
         stepTime = ('t' + str(config.stepTime)).encode()
         trigMode = ('w' + str(config.trigMode)).encode()
         On = ('E1').encode()
-
+        
         command = power + powerSweepStop + powerSweepStart + startFreq + stopFreq + stepTime + stepSize + trigMode + On
 
         return command

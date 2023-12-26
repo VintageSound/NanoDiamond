@@ -10,4 +10,5 @@ class microwaveConfiguration:
         self.stopFreq = stopFreq
         self.stepSize = stepSize
         self.stepTime = stepTime
+        # TODO: Change to enum!!!!
         self.trigMode = trigMode

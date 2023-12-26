@@ -9,13 +9,10 @@ from Data.microwaveConfiguration import microwaveConfiguration
 
 from Interfaces.redPitayaInterface import redPitayaInterface
 from Interfaces.pulseBlasterInterface import pulseBlasterInterface
-from Interfaces.microwaveInterface import microwaveInterface
+from Interfaces.microwaveInterfaceSMR20 import microwaveInterfaceSMR20
+from Interfaces.microwaveInterfaceWindFreak import microwaveInterfaceWindFreak
 from Data.measurementType import measurementType
 from Data.repetition import repetition
-
-# TODO: add complete rabi scan prosses
-# TODO: add rabi scan normalization calaculation and plot the graph   
-# TODO: nootebook of series of measerements - Change MW, change Laser intensity, change initial pulse beginings
 
 class measurementManager(QObject):
      # Events 
@@ -34,7 +31,10 @@ class measurementManager(QObject):
         # interfaces
         self.redPitaya = redPitayaInterface()
         self.pulseBlaster = pulseBlasterInterface()
-        self.microwaveDevice = microwaveInterface()
+
+        # Choose the correct microwave device
+        # self.microwaveDevice = microwaveInterfaceWindFreak()
+        self.microwaveDevice = microwaveInterfaceSMR20()
 
         # Column Names
         self.ODMRXAxisLabel = self.redPitaya.ODMRXAxisLabel

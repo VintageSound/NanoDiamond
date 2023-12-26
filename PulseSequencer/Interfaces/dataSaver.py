@@ -6,9 +6,9 @@ import os
 from os import path
 
 from Data.measurementType import measurementType
-from Interfaces.QRedPitayaInterface import QRedPitayaInterface
 from LogicManagers.measurementManager import measurementManager
 from LogicManagers.scanManager import scanManager
+from Interfaces.redPitayaInterface import redPitayaInterface
 
 class dataSaver():
     def __init__(self, measurmentManager : measurementManager = None, scanManager : scanManager = None):
@@ -52,7 +52,7 @@ class dataSaver():
 
         metadata = {'Measurement type:': measurementType.ODMR.name,
                 'RF Power [dBm]:': pulseConfig.microwave_power,
-                'Measurment Duration [us]:': pulseConfig.count_duration * QRedPitayaInterface.timeStep,
+                'Measurment Duration [us]:': pulseConfig.count_duration * redPitayaInterface.timeStep,
                 'Comment:': comment,
                 'Scan Start Frequency [MHz]:': microwaveConfig.startFreq,
                 'Scan Stop Frequency [MHz]:': microwaveConfig.stopFreq,
@@ -71,18 +71,18 @@ class dataSaver():
         if file_name is None:
             file_name = str(self.rabiIndex)
 
-        metadata = {'Measurement type': measurementType.RabiPulse.name,
+        metadata = {'Measurement type': pulseConfig.measurement_type.name,
                 'RF Power [dBm]': pulseConfig.microwave_power,
-                'Measurement Duration [us]': pulseConfig.count_duration * QRedPitayaInterface.timeStep,
+                'Measurement Duration [us]': pulseConfig.count_duration,
                 'Comment': comment,
                 'MW frequency [MHz]': microwaveConfig.centerFreq,
                 'Pump pulse time [us]': pulseConfig.pump_start,
-                'Pump pulse duration [us]': pulseConfig.pump_duration * QRedPitayaInterface.timeStep,
-                'MW pulse time [us]': pulseConfig.microwave_start * QRedPitayaInterface.timeStep,
-                'MW pulse duration [us]': pulseConfig.microwave_duration * QRedPitayaInterface.timeStep,
-                'Imaging pulse time [us]': pulseConfig.image_start * QRedPitayaInterface.timeStep,
-                'Imaging Pulse duration [us]': pulseConfig.image_duration * QRedPitayaInterface.timeStep,
-                'Readout pulse time [us]': pulseConfig.readout_start * QRedPitayaInterface.timeStep,
+                'Pump pulse duration [us]': pulseConfig.pump_duration,
+                'MW pulse time [us]': pulseConfig.microwave_start,
+                'MW pulse duration [us]': pulseConfig.microwave_duration,
+                'Imaging pulse time [us]': pulseConfig.image_start,
+                'Imaging Pulse duration [us]': pulseConfig.image_duration,
+                'Readout pulse time [us]': pulseConfig.readout_start,
                 'Averages Number': pulseConfig.iterations}
    
         filePath = os.path.join(self.rabiFolder, file_name + ".pkl")
@@ -91,7 +91,39 @@ class dataSaver():
         self.rabiIndex += 1
 
     def saveCompleteScan(self, comment, file_name = None):
-        pass
+        full_data = self.scanManager.measurementData
+        pulse_config = self.scanManager.pulseConfig        
+        microwave_config = self.scanManager.microwaveConfig        
+
+        if file_name is None:
+            file_name = str(self.scanIndex)
+
+        metadata = {'Measurement type': pulse_config.measurement_type.name,
+                    'RF Power [dBm]': pulse_config.microwave_power,
+                    'Measurement Duration [us]': pulse_config.count_duration,
+                    'Comment': comment,
+                    'MW frequency [MHz]': microwave_config.centerFreq,
+                    'Pump pulse time [us]': pulse_config.pump_start,
+                    'Pump pulse duration [us]': pulse_config.pump_duration,
+                    'MW pulse time [us]': pulse_config.microwave_start,
+                    'MW pulse duration [us]': pulse_config.microwave_duration,
+                    'Imaging pulse time [us]': pulse_config.image_start,
+                    'Imaging Pulse duration [us]': pulse_config.image_duration,
+                    'Readout pulse time [us]': pulse_config.readout_start,
+                    'Number of Iterations:': pulse_config.iterations}
+   
+        filePath = os.path.join(self.scanFolder, file_name + ".pkl")
+
+        for time in full_data:
+            data = full_data[time]
+            metadata['MW pulse duration [us]'] = time
+            self.savePickle(filePath, metadata, data)
+
+        extractedPoints = pd.DataFrame({'Time' : self.scanManager.extractedData_dima.keys(),
+                                        'Population' : self.scanManager.extractedData_dima.values()})
+        self.savePickle(filePath, metadata, extractedPoints)
+
+        self.scanIndex += 1
 
     def savePickle(self, filePath, metadata, data : pd.DataFrame):
         print(filePath)

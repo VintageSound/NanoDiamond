@@ -378,7 +378,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
             stopFreq=float(self.txtStopFreq.text()),
             trigMode=current_trigger_mode)
 
-        config.stepSize = (config.stopFreq - config.startFreq) / (int(self.txtCountNumber.text()) - 1)
+        config.stepSize = (config.stopFreq - config.startFreq) / int(self.txtCountNumber.text())
         config.stepTime = float(self.txtCountDuration.text()) / constConvertMicroSecondToMilisecond
 
         return config
@@ -526,7 +526,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         self.plotRabiData(data)
 
     def scanUpdatedEventHandler(self, point, time):
-        self.plotScan(self.scanManager.extractedData.keys(), self.scanManager.extractedData.values())
+        self.plotScan(self.scanManager.extractedData_dima.keys(), self.scanManager.extractedData_dima.values())
         
     def microwaveStatusChanged(self):
         try:

@@ -52,15 +52,30 @@ class pulseBlasterInterface():
         print("disconnected from pulse blaster")
 
     def configurePulseBlaster(self, pulseConfig : pulseConfiguration):
-        isRabi = (pulseConfig.measurement_type == measurementType.RabiPulse)
+        config_dic = {}
 
-        if pulseConfig.measurement_type == measurementType.RamziPulse:
-            raise NotImplementedError("ramzi not implemented!")
-
-        data_to_send = json.dumps(
-            [float(pulseConfig.pump_start), float(pulseConfig.pump_duration), float(pulseConfig.microwave_start),
-             float(pulseConfig.microwave_duration), float(pulseConfig.image_start), float(pulseConfig.image_duration),
-             isRabi])
-        self.client_socket.send(data_to_send.encode('utf-8'))
+        if (pulseConfig.measurement_type == measurementType.RabiPulse):
+            config_dic = self._createRabiDictionary(pulseConfig)
+        elif (pulseConfig.measurement_type == measurementType.ODMR):
+            config_dic = {"measurement_type" : measurementType.ODMR.name}
+        else:
+            raise NotImplementedError(pulseConfig.measurement_type.name + "not implemented")
+        
+        json_config = json.dumps(config_dic)
+        self.client_socket.send(json_config.encode('utf-8'))
         print("configured pulse blaster")
+
+    def _createRabiDictionary(self, pulseConfig : pulseConfiguration):        
+        config_dic = {"measurement_type" : measurementType.RabiPulse.name,
+                    "start_pump" : pulseConfig.pump_start,
+                    "duration_pump" : pulseConfig.pump_duration,
+                    "start_mw" : pulseConfig.microwave_start,
+                    "start_image" : pulseConfig.image_start,
+                    "duration_mw" : pulseConfig.microwave_duration}
+        
+        return config_dic
+        
+
+
+        
 

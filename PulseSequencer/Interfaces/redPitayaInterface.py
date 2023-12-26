@@ -15,7 +15,7 @@ class redPitayaInterface():
     _instance = None
     maxPower = 2 ** 13  #◙ not sure why...
     timeStep = 0.008 # micro second. 
-    rabiTimeStep = 0.02 # micro second. 
+    rabiTimeStep = 0.024 # micro second. 
     defaultRpHost = 'rp-f09ded.local'
     defaultPort = 1001
 
@@ -246,10 +246,11 @@ class redPitayaInterface():
         
         if pulseConfig.measurement_type == measurementType.ODMR:
             newConfig.count_duration = np.uint32(int(pulseConfig.count_duration / redPitayaInterface.timeStep))
+            newConfig.samples_number = np.uint32(int(np.log2(pulseConfig.samples_number)))
         else:
             newConfig.count_duration = np.uint32(1)
+            newConfig.samples_number = np.uint32(int(np.log2(1024)))
 
-        newConfig.samples_number = np.uint32(int(np.log2(pulseConfig.samples_number)))
         newConfig.threshold = np.uint32(int(pulseConfig.threshold) * redPitayaInterface.maxPower / 20) # why 20 ????
         newConfig.iterations = np.uint32(int(pulseConfig.iterations))
         newConfig.pump_start = np.uint32(int(pulseConfig.pump_start / redPitayaInterface.timeStep))
