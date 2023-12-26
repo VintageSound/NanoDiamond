@@ -264,8 +264,12 @@ def program_pb_sequence():
         # Now you can use the received_data in this thread
         if received_data is None:
             continue
-
-        measurement_type = measurementType(int(receive_data["measurement_type"]))
+        try:
+            print(received_data["measurement_type"])
+            measurement_type = measurementType[received_data["measurement_type"]]
+        except Exception as ex:
+            print("recived wring measurement_type:", received_data["measurement_type"], ex)
+            continue
 
         if measurement_type == measurementType.RabiPulse:
            programRabiPulse()
@@ -284,12 +288,12 @@ def program_pb_sequence():
     pause()
 
 # create threads
-# get_data = threading.Thread(target=receive_data, name="get_data")
-# program_pb = threading.Thread(target=program_pb_sequence, name="program_pb_sequence")
-# connect_client = threading.Thread(target=connect_client, name='connect_client')
-#
-# connect_client.start()
-# get_data.start()
-# program_pb.start()
+get_data = threading.Thread(target=receive_data, name="get_data")
+program_pb = threading.Thread(target=program_pb_sequence, name="program_pb_sequence")
+connect_client = threading.Thread(target=connect_client, name='connect_client')
 
-test_function()
+connect_client.start()
+get_data.start()
+program_pb.start()
+
+#test_function()
