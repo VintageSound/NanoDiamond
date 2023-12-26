@@ -40,6 +40,8 @@ class pulseBlasterInterface():
         self.client_socket.connect((self.server_ip, self.server_port))
         self.isConnected = True
 
+        print("connected to pulse blaster")
+
     def disconnect(self):
         if not self.isConnected:
             return
@@ -47,15 +49,17 @@ class pulseBlasterInterface():
         self.client_socket.close()
         self.initialize()
 
-    def configurePulseBlaster(self, pulseConfig : pulseConfiguration, measurementType : measurementType):
-        isRabi = (measurementType == measurementType.RabiPulse)
+        print("disconnected from pulse blaster")
 
-        if measurementType == measurementType.RamziPulse:
+    def configurePulseBlaster(self, pulseConfig : pulseConfiguration):
+        isRabi = (pulseConfig.measurement_type == measurementType.RabiPulse)
+
+        if pulseConfig.measurement_type == measurementType.RamziPulse:
             raise NotImplementedError("ramzi not implemented!")
 
         data_to_send = json.dumps(
-            [float(pulseConfig.StartPump), float(pulseConfig.WidthPump), float(pulseConfig.StartMW),
-             float(pulseConfig.WidthMW), float(pulseConfig.StartImage), float(pulseConfig.WidthImage),
+            [float(pulseConfig.pump_start), float(pulseConfig.pump_duration), float(pulseConfig.microwave_start),
+             float(pulseConfig.microwave_duration), float(pulseConfig.image_start), float(pulseConfig.image_duration),
              isRabi])
         self.client_socket.send(data_to_send.encode('utf-8'))
         print("configured pulse blaster")

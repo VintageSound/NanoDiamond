@@ -1,0 +1,28 @@
+ODMR:
+no need for keys
+
+Rabi:
+start_pump
+duration_pump
+start_mw
+duration_mw
+start_image
+
+Ramsey:
+start_pump
+duration_pump
+start_mw
+start_image
+half_pi_duration
+tau
+
+Hanh Echo: (same as Ramsey)
+start_pump
+duration_pump
+start_mw
+start_image
+half_pi_duration
+tau
+ 
+
+ 

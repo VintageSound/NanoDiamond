@@ -20,6 +20,7 @@ class microwaveInterface():
 
     def initialize(self) -> None:
         self.ser = serial.Serial()
+        # self.isMicrowaveOn = False
 
     def getIsConnected(self):
         return self.ser.is_open
@@ -50,12 +51,21 @@ class microwaveInterface():
 
     def checkIfMicrowaveIsOn(self):
         if not self.ser.is_open:
-            raise Exception('Windfreak is disconnected')
+            raise ConnectionError('Windfreak is disconnected')
         
         self.ser.write(b'E?')
-        data = self.ser.readlines()
 
-        if data[0].decode('utf-8') == '1\n':
+        # sometimes data returns nothing, if so - try few times
+        for i in range(3):
+            data = self.ser.readlines()
+
+            if len(data) > 0:
+                break
+
+        if len(data) == 0:
+            raise ConnectionError('cannot recive data from windfreak')
+
+        if data[-1].decode('utf-8') == '1\n':
             return True
         
         return False
@@ -63,10 +73,11 @@ class microwaveInterface():
     def turnOnMicrowave(self):
         if not self.ser.is_open:
             raise Exception('Windfreak is disconnected')
-        
+
         if not self.checkIfMicrowaveIsOn():
+            self.ser.write(b'C0')
             self.ser.write(b'E1')
-            
+
     def turnOffMicrowave(self):
         if not self.ser.is_open:
             raise Exception('Windfreak is disconnected')
@@ -74,20 +85,22 @@ class microwaveInterface():
         if self.checkIfMicrowaveIsOn():
             self.ser.write(b'E0')   
 
-    def sendSweepCommand(self, config : microwaveConfiguration):
+    def sendODMRSweepCommand(self, config : microwaveConfiguration):
         command = self.createSweepCommandFromConfig(config)
         self.ser.write(command)
         
-        print("Windfreak sweep configuration sent")
+        print("Windfreak ODMR configuration sent")
 
-    def sendCenterFrequencyAndTriggerTypeCommand(self, config : microwaveConfiguration):
-        trigMode = ('w' + str(config.TrigMode)).encode()
-        self.ser.write(config.centerFreq + trigMode)
+    def sendRabiCommand(self, config : microwaveConfiguration):
+        centerFreq = ('f' + str(config.centerFreq)).encode()
+        trigMode = ('w' + str(config.trigMode)).encode()
+        power = ('W' + str(config.power)).encode()
 
-        print("Windfreak configuration sent:", config.centerFreq, trigMode)
+        self.ser.write(power + centerFreq + trigMode)
+
+        print("Windfreak Rabi configuration sent:", config.centerFreq, config.trigMode, config.power)
 
     def createSweepCommandFromConfig(self, config : microwaveConfiguration):
-        # centerFreq = ('f' + str(config.centerFreq)).encode()
         power = ('W' + str(config.power)).encode()
         powerSweepStart = ('[' + str(config.powerSweepStart)).encode()
         powerSweepStop = (']' + str(config.powerSweepStop)).encode()

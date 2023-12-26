@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.special import dawsn
-import quamash
+#import quamash
 import pyrpl
 
 r = pyrpl.RedPitaya()
