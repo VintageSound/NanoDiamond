@@ -131,7 +131,7 @@ def select_boards():
             else:
                 pb_select_board(choice)
                 print("Board %d selected." % choice)
-                break;
+                break
         except ValueError:
             print("Incorrect input. Please enter a valid board number.")
 

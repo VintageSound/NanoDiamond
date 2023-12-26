@@ -3,6 +3,8 @@ import socket
 import json
 import threading
 
+from PulseSequencer.Data.measurementType import measurementType
+
 server_ip = "132.72.13.187"
 server_port = 50001
 
