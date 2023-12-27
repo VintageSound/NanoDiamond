@@ -71,6 +71,7 @@ class microwaveInterfaceSMR20():
         self._set_freq_mode_sweep()
         self._set_power(config.power)
         self._set_trigger_mode(config.trigMode)
+        #self._set_sweep_mode(2)
         self._set_sweep_parameters(config.startFreq, config.stopFreq, config.stepSize, config.stepTime)
         self._set_sweep_spacing("LINear")
         self._start_sweep()
@@ -105,8 +106,8 @@ class microwaveInterfaceSMR20():
         # Set the sweep parameters. Frequencies in MHz
         self._write("FREQ:STAR %d E6" % start_frequency)
         self._write("FREQ:STOP %d E6" % stop_frequency)
-        self._write("SWE:STEP %d E6" % step_size)
-        self._write("SWE:DWEL %d ms" % dwell_time)
+        self._write("SWE:STEP %f E6" % step_size)
+        self._write("SWE:DWEL %f ms" % dwell_time)
 
     def _start_sweep(self):
         # Start the sweep.
@@ -120,6 +121,7 @@ class microwaveInterfaceSMR20():
             self._write("TRIG:SWE:SOUR SING")
         elif mode == 2:
             self._write("TRIG:SWE:SOUR EXT")
+
         else:
             raise ValueError("Invalid trigger mode: %s" % mode)
 

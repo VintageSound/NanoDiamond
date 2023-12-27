@@ -6,7 +6,7 @@ from datetime import datetime
 import os
 import traceback
 import time
-from MW_control import SMR20_control
+from PulseSequencer.Interfaces import microwaveInterfaceSMR20
 import socket
 import json
 

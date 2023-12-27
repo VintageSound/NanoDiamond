@@ -82,7 +82,7 @@ class scanManager(QObject):
 
             if not self.isMeasurementActive:
                 break
-        
+            
     # Dima Normalization. normalize the values by the integraion of the entire pump pulse
     def extractPointFromPulseSequence_Dima(self, pulseSequence : pd.DataFrame):
         if self.normalizationFactor == 0:
@@ -108,6 +108,10 @@ class scanManager(QObject):
     # Hezi Normalization. normalize the values by the last 300 ns of the image
     def extractPointFromPulseSequence_Hezi(self, pulseSequence : pd.DataFrame):
         time_image, data_image = pulseAnalayzer.getOnlyImage(pulseSequence[self.timeColumn], pulseSequence[self.valueColumn])
+
+        if len(time_image) < 2:
+            return 0
+        
         time_label = "Time"
         data_label = "Data"
         start_time_image = time_image[0]

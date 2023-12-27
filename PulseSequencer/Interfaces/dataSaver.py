@@ -125,6 +125,22 @@ class dataSaver():
 
         self.scanIndex += 1
 
+    def loadCompleteScan(self, filePath):
+        metadadata_list = []
+        data_list = []
+
+        with open(filePath, 'rb') as fin:
+            while True:
+                try:
+                    pdMetadata = pd.read_pickle(fin)
+                    data = pd.read_pickle(fin)
+                    metadadata_list.append(pdMetadata)
+                    data_list.append(data)
+                except EOFError:
+                    break
+
+        return metadadata_list, data_list
+
     def savePickle(self, filePath, metadata, data : pd.DataFrame):
         print(filePath)
 

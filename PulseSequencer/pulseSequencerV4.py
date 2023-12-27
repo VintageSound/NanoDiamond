@@ -366,7 +366,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         self.measurementManager.updateMicrowaveODMRConfig(config)
 
     def createODMRMicrowaveConfig(self):
-        current_trigger_mode = 1
+        current_trigger_mode = 2
         rf_power = float(self.txtRFPower.text())
 
         config = microwaveConfiguration(

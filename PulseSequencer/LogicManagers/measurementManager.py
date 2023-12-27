@@ -33,8 +33,8 @@ class measurementManager(QObject):
         self.pulseBlaster = pulseBlasterInterface()
 
         # Choose the correct microwave device
-        # self.microwaveDevice = microwaveInterfaceWindFreak()
-        self.microwaveDevice = microwaveInterfaceSMR20()
+        self.microwaveDevice = microwaveInterfaceWindFreak()
+        # self.microwaveDevice = microwaveInterfaceSMR20()
 
         # Column Names
         self.ODMRXAxisLabel = self.redPitaya.ODMRXAxisLabel

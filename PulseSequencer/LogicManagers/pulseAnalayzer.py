@@ -4,12 +4,20 @@ from scipy import signal
 
 def getIntegraionOfPump(time, data):
     pump_timestep, image_timestep = getPulsesTimesteps(time, data)
+
+    if len(pump_timestep) < 2:
+        return 0
+    
     integration = np.trapz(y=data[pump_timestep[0]:pump_timestep[1]], x=time[pump_timestep[0]:pump_timestep[1]])
 
     return integration
 
 def getIntegraionOfImage(time, data):
     pump_timestep, image_timestep = getPulsesTimesteps(time, data)
+
+    if len(image_timestep) < 2:
+        return 0 
+
     integration = np.trapz(y=data[image_timestep[0]:image_timestep[1]], x=time[image_timestep[0]:image_timestep[1]])
 
     return integration
@@ -38,6 +46,10 @@ def getOnlyPump(time, data):
 
 def getIntegraionOfImageBegining(time, data, untilIndex = 50):
     pump_timestep, image_timestep = getPulsesTimesteps(time, data)
+
+    if len(image_timestep) < 2:
+        return 0 
+
     integration = np.trapz(y=data[image_timestep[0]:(image_timestep[0] + untilIndex)], x=time[image_timestep[0]:(image_timestep[0] + untilIndex)])
 
     return integration
@@ -55,6 +67,10 @@ def getPulsesTimesteps(time, data):
 def findTwoBiggestPeaks(arr):
     peak_indices, peak_dict = signal.find_peaks(arr, height=-1000)
     peak_heights = peak_dict ['peak_heights']
+
+    if len(peak_heights) < 2:
+        return (0,0)
+
     highest_peak_index = peak_indices [np.argmax (peak_heights)]
     second_highest_peak_index = peak_indices [np.argpartition (peak_heights,-2) [-2]]
 
