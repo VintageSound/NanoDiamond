@@ -251,6 +251,8 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
                 max_repetitions = int(max_repetitions)
 
             self.measurementManager.startNewODMRMeasurementAsync(pulse_config, microwave_config, repeat, max_repetitions)
+            # self.measurementManager.startNewODMRMeasurement(pulse_config, microwave_config, repeat, max_repetitions)
+
         except Exception as ex:
             print(ex)
             traceback.print_exc()
@@ -427,6 +429,11 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
             self.axesODMR.set_position([0.15, 0.15, 0.8, 0.8])
             self.axesODMR.legend(loc="upper right")
             
+            # TEST: Set label
+            photonsAVG = np.average(data[y_label])
+            self.photonsCountLabel.setText(str(photonsAVG))
+            self.photonsCountLabel_big.setText(str(photonsAVG))
+
             self.odmrCanvas.draw()
         except Exception:
             traceback.print_exc()
@@ -436,6 +443,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
             # reset toolbar
             self.rabiToolbar.home()
             self.rabiToolbar.update()
+
 
             # plot
             self.plotRabiCompletePulse(data)
