@@ -24,6 +24,7 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 import matplotlib.pyplot as plt
 
 from LogicManagers.measurementManager import measurementManager
+from LogicManagers.MeasurementProcessor import MeasurementProcessor
 from LogicManagers.scanManager import scanManager
 from LogicManagers import pulseAnalayzer
 
@@ -42,6 +43,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         super(PhaseLockedLoop, self).__init__()
         self.setupUi(self)
         self.measurementManager = measurementManager()
+        self.measurementProcessor = MeasurementProcessor()
         self.dataSaver = dataSaver(self.measurementManager)
         self.scanManager = scanManager(self.measurementManager)
 
@@ -56,8 +58,11 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         self.measurementManager.AOMStatusChangedEvent.connect(self.laserStatusChangedEventHandler)
         self.measurementManager.rabiPulseDataRecivedEvent.connect(self.reciveRabiDataHandler)
         self.measurementManager.ODMRDataRecivedEvent.connect(self.reciveODMRDataHandler)
+        self.measurementManager.ODMRDataRecivedEvent.connect(self.measurementProcessor.reciveODMRDataHandler)
         self.measurementManager.connectionErrorEvent.connect(self.connectionErrorEventHandler)
         self.measurementManager.microwaveStatusChangeEvent.connect(self.microwaveStatusChanged)
+
+        self.measurementProcessor.photonsAVGRecivedEvent.connect(self.recivePhotonsAVGHandler)
 
         self.scanManager.rabiPulseEndedEvent.connect(self.scanUpdatedEventHandler)
         self.scanManager.errorEvent.connect(self.connectionErrorEventHandler)
@@ -317,6 +322,8 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
 
             self.dataSaver.saveODMR(comment, self.ODMRFileNumber.text())      
             self.ODMRFileNumber.setText(str(self.dataSaver.ODMRIndex))
+
+            self.dataSaver.savePhotonsAVG()
         except Exception as ex:
             print(ex)
             traceback.print_exc()
@@ -429,14 +436,13 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
             self.axesODMR.set_position([0.15, 0.15, 0.8, 0.8])
             self.axesODMR.legend(loc="upper right")
             
-            # TEST: Set label
-            photonsAVG = np.average(data[y_label])
-            self.photonsCountLabel.setText(str(photonsAVG))
-            self.photonsCountLabel_big.setText(str(photonsAVG))
-
             self.odmrCanvas.draw()
         except Exception:
             traceback.print_exc()
+
+    def plotPhotonsAVG(self, photonsAVG):
+        self.photonsCountLabel.setText(str(photonsAVG))
+        self.photonsCountLabel_big.setText(str(photonsAVG))
 
     def plotRabiData(self, data):
         try:
@@ -528,6 +534,9 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
     def reciveODMRDataHandler(self, data, count):
         self.lblCurrentRepetetion.setText(str(count))
         self.plotODMRData(data)
+
+    def recivePhotonsAVGHandler(self, photonsAVG):
+        self.plotPhotonsAVG(photonsAVG)
 
     def reciveRabiDataHandler(self, data):
         # self.lblCurrentRepetetion.setText(str(count))

@@ -7,14 +7,16 @@ from os import path
 
 from Data.measurementType import measurementType
 from LogicManagers.measurementManager import measurementManager
+from LogicManagers.MeasurementProcessor import MeasurementProcessor
 from LogicManagers.scanManager import scanManager
 from Interfaces.redPitayaInterface import redPitayaInterface
 
 class dataSaver():
-    def __init__(self, measurmentManager : measurementManager = None, scanManager : scanManager = None):
+    def __init__(self, measurmentManager : measurementManager = None, scanManager : scanManager = None, measurementProcessor: MeasurementProcessor = None):
         self.currentDate = datetime.date(datetime.now())
         self.measurmentManager = measurmentManager
         self.scanManager = scanManager
+        self.measurementProcessor = measurementProcessor
         self.ODMRIndex = 0
         self.rabiIndex = 0
         self.scanIndex = 0
@@ -124,6 +126,17 @@ class dataSaver():
         self.savePickle(filePath, metadata, extractedPoints)
 
         self.scanIndex += 1
+
+    def savePhotonsAVG(self):
+        if file_name is None:
+            file_name = str(self.rabiIndex)
+
+        data = self.measurementProcessor.photonsAVGHistory
+        metadata = {}
+
+        filePath = os.path.join(self.ODMRFolder, file_name + "photonsAVG_.pkl")
+
+        self.savePickle(filePath, metadata, data)
 
     def loadCompleteScan(self, filePath):
         metadadata_list = []
