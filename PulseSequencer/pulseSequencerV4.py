@@ -44,7 +44,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         self.setupUi(self)
         self.measurementManager = measurementManager()
         self.measurementProcessor = MeasurementProcessor()
-        self.dataSaver = dataSaver(self.measurementManager)
+        self.dataSaver = dataSaver(self.measurementManager, measurementProcessor = self.measurementProcessor)
         self.scanManager = scanManager(self.measurementManager)
 
         self.txtIPRedPitaya.setText(str(self.measurementManager.redPitaya.ip))
@@ -57,8 +57,8 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         # Register Events
         self.measurementManager.AOMStatusChangedEvent.connect(self.laserStatusChangedEventHandler)
         self.measurementManager.rabiPulseDataRecivedEvent.connect(self.reciveRabiDataHandler)
-        self.measurementManager.ODMRDataRecivedEvent.connect(self.reciveODMRDataHandler)
         self.measurementManager.ODMRDataRecivedEvent.connect(self.measurementProcessor.reciveODMRDataHandler)
+        self.measurementManager.ODMRDataRecivedEvent.connect(self.reciveODMRDataHandler)
         self.measurementManager.connectionErrorEvent.connect(self.connectionErrorEventHandler)
         self.measurementManager.microwaveStatusChangeEvent.connect(self.microwaveStatusChanged)
 

@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import os
 from os import path
+import csv
 
 from Data.measurementType import measurementType
 from LogicManagers.measurementManager import measurementManager
@@ -127,16 +128,18 @@ class dataSaver():
 
         self.scanIndex += 1
 
-    def savePhotonsAVG(self):
+    def savePhotonsAVG(self, file_name = None):
         if file_name is None:
             file_name = str(self.rabiIndex)
 
         data = self.measurementProcessor.photonsAVGHistory
         metadata = {}
 
-        filePath = os.path.join(self.ODMRFolder, file_name + "photonsAVG_.pkl")
-
+        filePath = os.path.join(self.ODMRFolder, file_name + "_photonsAVG.pkl")
         self.savePickle(filePath, metadata, data)
+
+        filePath = os.path.join(self.ODMRFolder, file_name + "_photonsAVG.csv")
+        self.saveCsv(filePath, data)
 
     def loadCompleteScan(self, filePath):
         metadadata_list = []
@@ -153,6 +156,10 @@ class dataSaver():
                     break
 
         return metadadata_list, data_list
+
+    def saveCsv(self, filePath, data):
+        data.to_csv(filePath)
+        print(filePath)
 
     def savePickle(self, filePath, metadata, data : pd.DataFrame):
         print(filePath)

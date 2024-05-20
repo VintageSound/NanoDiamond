@@ -12,6 +12,6 @@ class MeasurementProcessor(QObject):
     def reciveODMRDataHandler(self, data, count):
         y_label = data.columns[1]
         photonsAVG = np.average(data[y_label])
-        self.photonsAVGHistory.append({ "photonsAVG": photonsAVG }, ignore_index=True)
+        self.photonsAVGHistory = self.photonsAVGHistory.append({ "photonsAVG": photonsAVG }, ignore_index=True)
         self.photonsAVGRecivedEvent.emit(photonsAVG)
         return photonsAVG
