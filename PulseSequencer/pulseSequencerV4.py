@@ -326,6 +326,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
 
             self.dataSaver.saveODMR(comment, self.ODMRFileNumber.text())      
             self.dataSaver.savePhotonsAVG(self.ODMRFileNumber.text())
+            self.ODMRFileNumber.setText(str(self.dataSaver.ODMRIndex))
         except Exception as ex:
             print(ex)
             traceback.print_exc()
