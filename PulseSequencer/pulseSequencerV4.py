@@ -17,6 +17,7 @@ from PyQt5 import QtTest
 import matplotlib
 
 from Interfaces.dataSaver import dataSaver
+from Interfaces.AutoSaver import AutoSaver
 
 matplotlib.use('Qt5Agg')
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -46,6 +47,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         self.measurementProcessor = MeasurementProcessor()
         self.dataSaver = dataSaver(self.measurementManager, measurementProcessor = self.measurementProcessor)
         self.scanManager = scanManager(self.measurementManager)
+        self.autoSaver = AutoSaver(10)
 
         self.txtIPRedPitaya.setText(str(self.measurementManager.redPitaya.ip))
         self.txtPortRedPitaya.setText(str(self.measurementManager.redPitaya.port))
@@ -62,6 +64,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         self.measurementManager.connectionErrorEvent.connect(self.connectionErrorEventHandler)
         self.measurementManager.microwaveStatusChangeEvent.connect(self.microwaveStatusChanged)
 
+        # self.autoSaver.autoSaveEvent.connect(self.saveODMR)
         self.measurementProcessor.photonsAVGRecivedEvent.connect(self.recivePhotonsAVGHandler)
 
         self.scanManager.rabiPulseEndedEvent.connect(self.scanUpdatedEventHandler)
@@ -257,6 +260,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
 
             self.measurementManager.startNewODMRMeasurementAsync(pulse_config, microwave_config, repeat, max_repetitions)
             # self.measurementManager.startNewODMRMeasurement(pulse_config, microwave_config, repeat, max_repetitions)
+            self.measurementProcessor.startPhotonsMeasurement()
 
         except Exception as ex:
             print(ex)
@@ -315,15 +319,17 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         self.onOffRabiConnectButton.setStyleSheet("background-color:none")
 
     # TODO: Test
-    def saveODMR(self):
+    def saveODMR(self, suffix: str = ""):
         try:
             self.dataSaver.setODMRFolderToSave(self.ODMRPathTextBox.text())
             comment = self.ODMRComment.text()
 
-            self.dataSaver.saveODMR(comment, self.ODMRFileNumber.text())      
-            self.ODMRFileNumber.setText(str(self.dataSaver.ODMRIndex))
-
-            self.dataSaver.savePhotonsAVG()
+            self.dataSaver.saveODMR(comment, self.ODMRFileNumber.text() + suffix)      
+            self.dataSaver.savePhotonsAVG(self.ODMRFileNumber.text() + suffix)
+            if len(suffix) == 0:
+                self.ODMRFileNumber.setText(str(self.dataSaver.ODMRIndex))
+            else:
+                self.dataSaver.ODMRIndex -= 1
         except Exception as ex:
             print(ex)
             traceback.print_exc()
@@ -534,6 +540,7 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
     def reciveODMRDataHandler(self, data, count):
         self.lblCurrentRepetetion.setText(str(count))
         self.plotODMRData(data)
+        # self.autoSaver.onData()
 
     def recivePhotonsAVGHandler(self, photonsAVG):
         self.plotPhotonsAVG(photonsAVG)

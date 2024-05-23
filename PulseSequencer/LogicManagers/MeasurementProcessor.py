@@ -9,6 +9,9 @@ class MeasurementProcessor(QObject):
         super().__init__()
         self.photonsAVGHistory = pd.DataFrame([], columns=["photonsAVG"])
 
+    def startPhotonsMeasurement(self):
+        self.photonsAVGHistory = pd.DataFrame([], columns=["photonsAVG"])
+
     def reciveODMRDataHandler(self, data, count):
         y_label = data.columns[1]
         photonsAVG = np.average(data[y_label])
