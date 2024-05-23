@@ -319,17 +319,13 @@ class PhaseLockedLoop(QMainWindow, Ui_PhaseLockedLoop):
         self.onOffRabiConnectButton.setStyleSheet("background-color:none")
 
     # TODO: Test
-    def saveODMR(self, suffix: str = ""):
+    def saveODMR(self):
         try:
             self.dataSaver.setODMRFolderToSave(self.ODMRPathTextBox.text())
             comment = self.ODMRComment.text()
 
-            self.dataSaver.saveODMR(comment, self.ODMRFileNumber.text() + suffix)      
-            self.dataSaver.savePhotonsAVG(self.ODMRFileNumber.text() + suffix)
-            if len(suffix) == 0:
-                self.ODMRFileNumber.setText(str(self.dataSaver.ODMRIndex))
-            else:
-                self.dataSaver.ODMRIndex -= 1
+            self.dataSaver.saveODMR(comment, self.ODMRFileNumber.text())      
+            self.dataSaver.savePhotonsAVG(self.ODMRFileNumber.text())
         except Exception as ex:
             print(ex)
             traceback.print_exc()
